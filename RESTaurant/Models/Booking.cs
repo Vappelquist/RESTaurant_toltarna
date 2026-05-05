@@ -1,19 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using RESTaurant.Models.Models.Enums;
 
 namespace RESTaurant.Models
 {
     internal class Booking
     {
         public int Id { get; set; }
-        public int GuestId { get; set; }
-        public DateTime DateBooked { get; set; }
+        public int CustomerId { get; set; }
+        public Customer? customers { get; set; }
+        
+        public DateTime DateBooked { get; set; } //When you booked
         public int AmountOfGuests { get; set; }
         public string? BookingNotes { get; set; }
-        public DateTime StartTime { get; set; }
-        public DateTime EndTime { get; set; }
+        public DateTime StartTime { get; set; } //When you arrive
+        public DateTime EndTime { get; set; } //When you leave
+        public BookingStatus status { get; set; }
+
+        //NAV
+        public List<Table>? Tables { get; set; }
     }
 }
