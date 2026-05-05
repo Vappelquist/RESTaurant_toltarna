@@ -1,6 +1,6 @@
-﻿namespace RESTaurant.Models
+﻿namespace Restaurant.Models
 {
-    internal class Customer : User
+    public class Customer : User
     {
         public string? FirstName { get; set; }
         public string? LastName { get; set; }

@@ -1,4 +1,7 @@
 
+using Microsoft.EntityFrameworkCore;
+using Restaurant.Models.Data;
+
 namespace REST_aurant.API
 {
     public class Program
@@ -13,7 +16,8 @@ namespace REST_aurant.API
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-
+            builder.Services.AddDbContext<RestaurantDbContext>(options =>
+            options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

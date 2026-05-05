@@ -1,8 +1,8 @@
-﻿using RESTaurant.Models.Models.Enums;
+﻿using Restaurant.Models.Models.Enums;
 
-namespace RESTaurant.Models
+namespace Restaurant.Models
 {
-    internal class Booking
+    public class Booking
     {
         public int Id { get; set; }
         public int CustomerId { get; set; }

@@ -1,6 +1,6 @@
-﻿namespace RESTaurant.Models
+﻿namespace Restaurant.Models
 {
-    internal class Admin : User
+    public class Admin : User
     {
 
     }

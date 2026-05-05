@@ -1,6 +1,5 @@
-﻿namespace RESTaurant.Models.Models.Enums
+﻿namespace Restaurant.Models.Models.Enums
 {
-
     public enum BookingStatus
     {
         Confirmed,
