@@ -1,8 +1,14 @@
-﻿namespace Restaurant.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Restaurant.Models
 {
     public class Customer : User
     {
+        [Required]
+        [MaxLength(50)]
         public string? FirstName { get; set; }
+        [Required]
+        [MaxLength(50)]
         public string? LastName { get; set; }
         public string? PhoneNumber { get; set; }
         public bool IsEighteen { get; set; }

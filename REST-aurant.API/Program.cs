@@ -1,6 +1,7 @@
 
 using Microsoft.EntityFrameworkCore;
-using Restaurant.Models.Data;
+using REST_aurant.API.Data;
+using Restaurant.Models;
 
 namespace REST_aurant.API
 {
@@ -19,6 +20,12 @@ namespace REST_aurant.API
             builder.Services.AddDbContext<RestaurantDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
             var app = builder.Build();
+            
+            //builder.Services.AddDbContext<RestaurantDbContext>(options =>
+            //options.UseSqlServer(
+            //builder.Configuration.GetConnectionString("Default"),
+            //b => b.MigrationsAssembly("REST-aurant") 
+            //));
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
