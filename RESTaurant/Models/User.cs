@@ -1,9 +1,13 @@
-﻿namespace Restaurant.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Restaurant.Models
 {
     public class User
     {
         public int Id { get; set; }
+        [Required]
         public string? Email { get; set; }
+        [Required]
         public string? Password { get; set; }
     }
 }

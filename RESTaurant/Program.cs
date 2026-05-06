@@ -1,4 +1,6 @@
-﻿namespace RESTaurant
+﻿using Restaurant.Models;
+
+namespace RESTaurant
 {
     internal class Program
     {

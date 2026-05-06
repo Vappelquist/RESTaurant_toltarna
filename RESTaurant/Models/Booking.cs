@@ -1,4 +1,5 @@
 ﻿using Restaurant.Models.Models.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace Restaurant.Models
 {
@@ -6,14 +7,18 @@ namespace Restaurant.Models
     {
         public int Id { get; set; }
         public int CustomerId { get; set; }
-        public Customer? customers { get; set; }
-        
+        public Customer? Customer { get; set; }
+
+        [Required]
         public DateTime DateBooked { get; set; } //When you booked
+        [Required]
         public int AmountOfGuests { get; set; }
         public string? BookingNotes { get; set; }
+        [Required]
         public DateTime StartTime { get; set; } //When you arrive
+        [Required]
         public DateTime EndTime { get; set; } //When you leave
-        public BookingStatus status { get; set; }
+        public BookingStatus Status { get; set; }
 
         //NAV
         public List<Table>? Tables { get; set; }
