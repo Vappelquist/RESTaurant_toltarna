@@ -1,9 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Restaurant.Models;
 
-namespace REST_aurant.API.Data
+namespace Restaurant.Data 
 {
-
     public class RestaurantDbContext : DbContext
     {
         public RestaurantDbContext(DbContextOptions<RestaurantDbContext> options) : base(options)
@@ -28,4 +32,3 @@ namespace REST_aurant.API.Data
         }
     }
 }
-

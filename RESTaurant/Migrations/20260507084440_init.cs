@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace REST_aurant.API.Migrations
+namespace Restaurant.Migrations
 {
     /// <inheritdoc />
     public partial class init : Migration
