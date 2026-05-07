@@ -1,4 +1,4 @@
-﻿using Restaurant.Models.Models.Enums;
+﻿using Restaurant.Models.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace Restaurant.Models

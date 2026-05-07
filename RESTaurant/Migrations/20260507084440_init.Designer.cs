@@ -5,14 +5,14 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using REST_aurant.API.Data;
+using Restaurant.Data;
 
 #nullable disable
 
-namespace REST_aurant.API.Migrations
+namespace Restaurant.Migrations
 {
     [DbContext(typeof(RestaurantDbContext))]
-    [Migration("20260506120257_init")]
+    [Migration("20260507084440_init")]
     partial class init
     {
         /// <inheritdoc />
