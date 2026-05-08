@@ -2,7 +2,7 @@
 
 namespace Restaurant.Models
 {
-    public class Customer : User
+    public class Guest : User
     {
         [Required]
         [MaxLength(50)]

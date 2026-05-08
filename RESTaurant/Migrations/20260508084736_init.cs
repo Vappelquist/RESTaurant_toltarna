@@ -26,7 +26,7 @@ namespace Restaurant.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Customers",
+                name: "Guests",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -42,7 +42,7 @@ namespace Restaurant.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Customers", x => x.Id);
+                    table.PrimaryKey("PK_Guests", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -65,7 +65,7 @@ namespace Restaurant.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CustomerId = table.Column<int>(type: "int", nullable: false),
+                    GuestId = table.Column<int>(type: "int", nullable: false),
                     DateBooked = table.Column<DateTime>(type: "datetime2", nullable: false),
                     AmountOfGuests = table.Column<int>(type: "int", nullable: false),
                     BookingNotes = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -77,9 +77,9 @@ namespace Restaurant.Migrations
                 {
                     table.PrimaryKey("PK_Bookings", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Bookings_Customers_CustomerId",
-                        column: x => x.CustomerId,
-                        principalTable: "Customers",
+                        name: "FK_Bookings_Guests_GuestId",
+                        column: x => x.GuestId,
+                        principalTable: "Guests",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -109,9 +109,9 @@ namespace Restaurant.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Bookings_CustomerId",
+                name: "IX_Bookings_GuestId",
                 table: "Bookings",
-                column: "CustomerId");
+                column: "GuestId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BookingTables_TablesId",
@@ -141,7 +141,7 @@ namespace Restaurant.Migrations
                 name: "Tables");
 
             migrationBuilder.DropTable(
-                name: "Customers");
+                name: "Guests");
         }
     }
 }

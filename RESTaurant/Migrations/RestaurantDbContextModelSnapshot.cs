@@ -72,14 +72,14 @@ namespace Restaurant.Migrations
                     b.Property<string>("BookingNotes")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("DateBooked")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("GuestId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
@@ -89,12 +89,12 @@ namespace Restaurant.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CustomerId");
+                    b.HasIndex("GuestId");
 
                     b.ToTable("Bookings");
                 });
 
-            modelBuilder.Entity("Restaurant.Models.Customer", b =>
+            modelBuilder.Entity("Restaurant.Models.Guest", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -134,7 +134,7 @@ namespace Restaurant.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Customers");
+                    b.ToTable("Guests");
                 });
 
             modelBuilder.Entity("Restaurant.Models.Table", b =>
@@ -176,16 +176,16 @@ namespace Restaurant.Migrations
 
             modelBuilder.Entity("Restaurant.Models.Booking", b =>
                 {
-                    b.HasOne("Restaurant.Models.Customer", "Customer")
+                    b.HasOne("Restaurant.Models.Guest", "Guest")
                         .WithMany("Bookings")
-                        .HasForeignKey("CustomerId")
+                        .HasForeignKey("GuestId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Customer");
+                    b.Navigation("Guest");
                 });
 
-            modelBuilder.Entity("Restaurant.Models.Customer", b =>
+            modelBuilder.Entity("Restaurant.Models.Guest", b =>
                 {
                     b.Navigation("Bookings");
                 });

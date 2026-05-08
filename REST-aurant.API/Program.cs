@@ -20,7 +20,7 @@ namespace REST_aurant.API
             builder.Services.AddDbContext<RestaurantDbContext>(options =>
             options.UseSqlServer(
             builder.Configuration.GetConnectionString("Default"),
-            b => b.MigrationsAssembly("Restaurant") // ← lägg till denna rad
+            b => b.MigrationsAssembly("Restaurant")
             ));
 
             var app = builder.Build();
