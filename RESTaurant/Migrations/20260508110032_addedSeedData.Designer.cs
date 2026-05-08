@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Restaurant.Data;
 
@@ -11,9 +12,11 @@ using Restaurant.Data;
 namespace Restaurant.Migrations
 {
     [DbContext(typeof(RestaurantDbContext))]
-    partial class RestaurantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260508110032_addedSeedData")]
+    partial class addedSeedData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -40,17 +43,22 @@ namespace Restaurant.Migrations
                         new
                         {
                             BookingsId = 1,
+                            TablesId = 8
+                        },
+                        new
+                        {
+                            BookingsId = 2,
                             TablesId = 1
                         },
                         new
                         {
                             BookingsId = 3,
-                            TablesId = 5
+                            TablesId = 2
                         },
                         new
                         {
                             BookingsId = 3,
-                            TablesId = 6
+                            TablesId = 9
                         });
                 });
 
@@ -115,33 +123,32 @@ namespace Restaurant.Migrations
                         {
                             Id = 1,
                             AmountOfGuests = 2,
-                            BookingNotes = "Dejt-kväll",
-                            DateBooked = new DateTime(2026, 5, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EndTime = new DateTime(2026, 5, 8, 20, 0, 0, 0, DateTimeKind.Unspecified),
+                            BookingNotes = "Jubileum — gärna levande ljus",
+                            DateBooked = new DateTime(2025, 5, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EndTime = new DateTime(2025, 5, 10, 20, 0, 0, 0, DateTimeKind.Unspecified),
                             GuestId = 1,
-                            StartTime = new DateTime(2026, 5, 8, 18, 0, 0, 0, DateTimeKind.Unspecified),
+                            StartTime = new DateTime(2025, 5, 10, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             Status = 0
                         },
                         new
                         {
                             Id = 2,
                             AmountOfGuests = 4,
-                            BookingNotes = "Inställt pga sjukdom",
-                            DateBooked = new DateTime(2026, 5, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EndTime = new DateTime(2026, 5, 10, 21, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateBooked = new DateTime(2025, 5, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EndTime = new DateTime(2025, 5, 11, 21, 0, 0, 0, DateTimeKind.Unspecified),
                             GuestId = 2,
-                            StartTime = new DateTime(2026, 5, 10, 19, 0, 0, 0, DateTimeKind.Unspecified),
+                            StartTime = new DateTime(2025, 5, 11, 19, 0, 0, 0, DateTimeKind.Unspecified),
                             Status = 1
                         },
                         new
                         {
                             Id = 3,
-                            AmountOfGuests = 12,
-                            BookingNotes = "Släktträff",
-                            DateBooked = new DateTime(2026, 5, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EndTime = new DateTime(2026, 5, 15, 20, 0, 0, 0, DateTimeKind.Unspecified),
+                            AmountOfGuests = 6,
+                            BookingNotes = "Allergiker i sällskapet",
+                            DateBooked = new DateTime(2025, 4, 28, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EndTime = new DateTime(2025, 5, 12, 20, 0, 0, 0, DateTimeKind.Unspecified),
                             GuestId = 3,
-                            StartTime = new DateTime(2026, 5, 15, 17, 0, 0, 0, DateTimeKind.Unspecified),
+                            StartTime = new DateTime(2025, 5, 12, 17, 30, 0, 0, DateTimeKind.Unspecified),
                             Status = 0
                         });
                 });
@@ -192,37 +199,36 @@ namespace Restaurant.Migrations
                         new
                         {
                             Id = 1,
-                            Allergies = "Nötter",
-                            Email = "anna@mail.com",
+                            Allergies = "Gluten",
+                            Email = "anna.lindqvist@email.se",
                             FirstName = "Anna",
                             IsEighteen = true,
-                            LastName = "Andersson",
-                            Note = "Vill sitta vid fönstret",
-                            Password = "Lösen123",
-                            PhoneNumber = "070-1112233"
+                            LastName = "Lindqvist",
+                            Note = "Föredrar fönsterbord",
+                            Password = "password123",
+                            PhoneNumber = "0701234567"
                         },
                         new
                         {
                             Id = 2,
-                            Email = "erik@mail.com",
+                            Email = "erik.svensson@email.se",
                             FirstName = "Erik",
                             IsEighteen = true,
-                            LastName = "Eriksson",
-                            Note = "Fyller år!",
-                            Password = "Lösen123",
-                            PhoneNumber = "070-4445566"
+                            LastName = "Svensson",
+                            Password = "password123",
+                            PhoneNumber = "0709876543"
                         },
                         new
                         {
                             Id = 3,
-                            Allergies = "Laktos",
-                            Email = "stig@mail.com",
-                            FirstName = "Stig",
-                            IsEighteen = true,
-                            LastName = "Stigsson",
-                            Note = "Barnstol behövs",
-                            Password = "Lösen123",
-                            PhoneNumber = "070-7778899"
+                            Allergies = "Nötter, Laktos",
+                            Email = "maria.johansson@email.se",
+                            FirstName = "Maria",
+                            IsEighteen = false,
+                            LastName = "Johansson",
+                            Note = "Allergiker — dubbelkolla alltid",
+                            Password = "password123",
+                            PhoneNumber = "0731122334"
                         });
                 });
 
@@ -251,38 +257,86 @@ namespace Restaurant.Migrations
                         new
                         {
                             Id = 1,
-                            Seats = 2,
-                            TableNumber = 1
+                            Seats = 4,
+                            TableNumber = 10
                         },
                         new
                         {
                             Id = 2,
-                            Seats = 2,
-                            TableNumber = 2
+                            Seats = 4,
+                            TableNumber = 20
                         },
                         new
                         {
                             Id = 3,
                             Seats = 4,
-                            TableNumber = 3
+                            TableNumber = 30
                         },
                         new
                         {
                             Id = 4,
                             Seats = 4,
-                            TableNumber = 4
+                            TableNumber = 40
                         },
                         new
                         {
                             Id = 5,
-                            Seats = 6,
-                            TableNumber = 5
+                            Seats = 4,
+                            TableNumber = 50
                         },
                         new
                         {
                             Id = 6,
-                            Seats = 10,
-                            TableNumber = 6
+                            Seats = 4,
+                            TableNumber = 60
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Seats = 4,
+                            TableNumber = 70
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Seats = 2,
+                            TableNumber = 15
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Seats = 2,
+                            TableNumber = 25
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Seats = 2,
+                            TableNumber = 35
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Seats = 2,
+                            TableNumber = 45
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Seats = 2,
+                            TableNumber = 55
+                        },
+                        new
+                        {
+                            Id = 13,
+                            Seats = 2,
+                            TableNumber = 65
+                        },
+                        new
+                        {
+                            Id = 14,
+                            Seats = 2,
+                            TableNumber = 75
                         });
                 });
 
