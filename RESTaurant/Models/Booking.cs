@@ -6,8 +6,8 @@ namespace Restaurant.Models
     public class Booking
     {
         public int Id { get; set; }
-        public int CustomerId { get; set; }
-        public Customer? Customer { get; set; }
+        public int GuestId { get; set; }
+        public Guest? Guest { get; set; }
 
         [Required]
         public DateTime DateBooked { get; set; } //When you booked
