@@ -51,6 +51,42 @@ namespace Restaurant.Data
                 new Table { Id = 13, TableNumber = 65, Seats = 2 },
                 new Table { Id = 14, TableNumber = 75, Seats = 2 }
                 );
+
+            modelBuilder.Entity<Guest>().HasData(
+            new Guest
+            {
+                FirstName = "Anna",
+                LastName = "Lindqvist",
+                Email = "anna.lindqvist@email.se",
+                Password = "password123",
+                PhoneNumber = "0701234567",
+                IsEighteen = true,
+                Allergies = "Gluten",
+                Note = "Föredrar fönsterbord"
+            },
+                new Guest
+                {
+                    FirstName = "Erik",
+                    LastName = "Svensson",
+                    Email = "erik.svensson@email.se",
+                    Password = "password123",
+                    PhoneNumber = "0709876543",
+                    IsEighteen = true,
+                    Allergies = null,
+                    Note = null
+                },
+                new Guest
+                {
+                    FirstName = "Maria",
+                    LastName = "Johansson",
+                    Email = "maria.johansson@email.se",
+                    Password = "password123",
+                    PhoneNumber = "0731122334",
+                    IsEighteen = false,
+                    Allergies = "Nötter, Laktos",
+                    Note = "Allergiker — dubbelkolla alltid"
+                }
+                );
         }
     }
 }
