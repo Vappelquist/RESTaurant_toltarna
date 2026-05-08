@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Restaurant.Data;
 
@@ -11,9 +12,11 @@ using Restaurant.Data;
 namespace Restaurant.Migrations
 {
     [DbContext(typeof(RestaurantDbContext))]
-    partial class RestaurantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260508111940_seedData")]
+    partial class seedData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -41,16 +44,6 @@ namespace Restaurant.Migrations
                         {
                             BookingsId = 1,
                             TablesId = 1
-                        },
-                        new
-                        {
-                            BookingsId = 3,
-                            TablesId = 5
-                        },
-                        new
-                        {
-                            BookingsId = 3,
-                            TablesId = 6
                         });
                 });
 
@@ -121,28 +114,6 @@ namespace Restaurant.Migrations
                             GuestId = 1,
                             StartTime = new DateTime(2026, 5, 8, 18, 0, 0, 0, DateTimeKind.Unspecified),
                             Status = 0
-                        },
-                        new
-                        {
-                            Id = 2,
-                            AmountOfGuests = 4,
-                            BookingNotes = "Inställt pga sjukdom",
-                            DateBooked = new DateTime(2026, 5, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EndTime = new DateTime(2026, 5, 10, 21, 0, 0, 0, DateTimeKind.Unspecified),
-                            GuestId = 2,
-                            StartTime = new DateTime(2026, 5, 10, 19, 0, 0, 0, DateTimeKind.Unspecified),
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 3,
-                            AmountOfGuests = 12,
-                            BookingNotes = "Släktträff",
-                            DateBooked = new DateTime(2026, 5, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EndTime = new DateTime(2026, 5, 15, 20, 0, 0, 0, DateTimeKind.Unspecified),
-                            GuestId = 3,
-                            StartTime = new DateTime(2026, 5, 15, 17, 0, 0, 0, DateTimeKind.Unspecified),
-                            Status = 0
                         });
                 });
 
@@ -211,18 +182,6 @@ namespace Restaurant.Migrations
                             Note = "Fyller år!",
                             Password = "Lösen123",
                             PhoneNumber = "070-4445566"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Allergies = "Laktos",
-                            Email = "stig@mail.com",
-                            FirstName = "Stig",
-                            IsEighteen = true,
-                            LastName = "Stigsson",
-                            Note = "Barnstol behövs",
-                            Password = "Lösen123",
-                            PhoneNumber = "070-7778899"
                         });
                 });
 
