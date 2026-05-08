@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using Restaurant.Models;
+using Restaurant.Models.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Restaurant.Models;
 
 namespace Restaurant.Data 
 {
@@ -87,6 +88,57 @@ namespace Restaurant.Data
                     Note = "Allergiker — dubbelkolla alltid"
                 }
                 );
+
+            // Kopplingstabellen måste seedas explicit med HasData
+            modelBuilder.Entity<Booking>()
+                .HasMany(b => b.Tables)
+                .WithMany(t => t.Bookings)
+                .UsingEntity(j => j.HasData(
+                    new { BookingsId = 1, TablesId = 8 },  // Anna (2 gäster) → bord 15 (Id 8)
+                    new { BookingsId = 2, TablesId = 1 },  // Erik (4 gäster) → bord 10 (Id 1)
+                    new { BookingsId = 3, TablesId = 2 },  // Maria (6 gäster) → bord 20 (Id 2)
+                    new { BookingsId = 3, TablesId = 9 }   // Maria fortsätter  → bord 25 (Id 9)
+                ));
+
+            //modelBuilder.Entity<Booking>().HasData(
+            //new Booking
+            //{
+            //    GuestId = 1,
+            //    DateBooked = DateTime.Now.AddDays(-3),
+            //    AmountOfGuests = 2,
+            //    StartTime = DateTime.Today.AddDays(1).AddHours(18),
+            //    EndTime = DateTime.Today.AddDays(1).AddHours(20),
+            //    BookingNotes = "Jubileum — gärna levande ljus",
+            //    Status = BookingStatus.Confirmed,
+            //    Tables = new List<Table> { Tables.First(t => t.TableNumber == 15) }
+            //},
+            //    new Booking
+            //    {
+            //        GuestId = 2,
+            //        DateBooked = DateTime.Now.AddDays(-1),
+            //        AmountOfGuests = 4,
+            //        StartTime = DateTime.Today.AddDays(2).AddHours(19),
+            //        EndTime = DateTime.Today.AddDays(2).AddHours(21),
+            //        BookingNotes = null,
+            //        Status = BookingStatus.Canceled,
+            //        Tables = new List<Table> { Tables.First(t => t.TableNumber == 10) }
+            //    },
+            //    new Booking
+            //    {
+            //        GuestId = 3,
+            //        DateBooked = DateTime.Now.AddDays(-5),
+            //        AmountOfGuests = 6,
+            //        StartTime = DateTime.Today.AddDays(3).AddHours(17).AddMinutes(30),
+            //        EndTime = DateTime.Today.AddDays(3).AddHours(20),
+            //        BookingNotes = "Allergiker i sällskapet",
+            //        Status = BookingStatus.Confirmed,
+            //        Tables = new List<Table>
+            //        {
+            //            Tables.First(t => t.TableNumber == 20),
+            //            Tables.First(t => t.TableNumber == 25)
+            //        }
+            //    }
+            //    );
         }
     }
 }
