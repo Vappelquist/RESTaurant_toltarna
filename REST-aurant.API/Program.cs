@@ -1,8 +1,8 @@
 
 using Microsoft.EntityFrameworkCore;
-using Restaurant.Data;
+using REST_aurant.API.Data;
 
-namespace REST_aurant.API
+namespace Restaurant.API
 {
     public class Program
     {
@@ -20,7 +20,7 @@ namespace REST_aurant.API
             builder.Services.AddDbContext<RestaurantDbContext>(options =>
             options.UseSqlServer(
             builder.Configuration.GetConnectionString("Default"),
-            b => b.MigrationsAssembly("Restaurant")
+            b => b.MigrationsAssembly("Restaurant.API")
             ));
 
             var app = builder.Build();

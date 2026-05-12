@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Restaurant.Data;
+using REST_aurant.API.Data;
 
 #nullable disable
 
-namespace Restaurant.Migrations
+namespace REST_aurant.API.Migrations
 {
     [DbContext(typeof(RestaurantDbContext))]
     partial class RestaurantDbContextModelSnapshot : ModelSnapshot
@@ -27,12 +27,12 @@ namespace Restaurant.Migrations
                     b.Property<int>("BookingsId")
                         .HasColumnType("int");
 
-                    b.Property<int>("TablesId")
+                    b.Property<int>("TablesTableNumber")
                         .HasColumnType("int");
 
-                    b.HasKey("BookingsId", "TablesId");
+                    b.HasKey("BookingsId", "TablesTableNumber");
 
-                    b.HasIndex("TablesId");
+                    b.HasIndex("TablesTableNumber");
 
                     b.ToTable("BookingTables", (string)null);
 
@@ -40,42 +40,21 @@ namespace Restaurant.Migrations
                         new
                         {
                             BookingsId = 1,
-                            TablesId = 1
+                            TablesTableNumber = 1
                         },
                         new
                         {
                             BookingsId = 3,
-                            TablesId = 5
+                            TablesTableNumber = 5
                         },
                         new
                         {
                             BookingsId = 3,
-                            TablesId = 6
+                            TablesTableNumber = 6
                         });
                 });
 
-            modelBuilder.Entity("Restaurant.Models.Admin", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Admins");
-                });
-
-            modelBuilder.Entity("Restaurant.Models.Booking", b =>
+            modelBuilder.Entity("Restaurant.Models.Models.Booking", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -146,101 +125,18 @@ namespace Restaurant.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Restaurant.Models.Guest", b =>
+            modelBuilder.Entity("Restaurant.Models.Models.Table", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("TableNumber")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Allergies")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<bool>("IsEighteen")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("Note")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Guests");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Allergies = "Nötter",
-                            Email = "anna@mail.com",
-                            FirstName = "Anna",
-                            IsEighteen = true,
-                            LastName = "Andersson",
-                            Note = "Vill sitta vid fönstret",
-                            Password = "Lösen123",
-                            PhoneNumber = "070-1112233"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Email = "erik@mail.com",
-                            FirstName = "Erik",
-                            IsEighteen = true,
-                            LastName = "Eriksson",
-                            Note = "Fyller år!",
-                            Password = "Lösen123",
-                            PhoneNumber = "070-4445566"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Allergies = "Laktos",
-                            Email = "stig@mail.com",
-                            FirstName = "Stig",
-                            IsEighteen = true,
-                            LastName = "Stigsson",
-                            Note = "Barnstol behövs",
-                            Password = "Lösen123",
-                            PhoneNumber = "070-7778899"
-                        });
-                });
-
-            modelBuilder.Entity("Restaurant.Models.Table", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TableNumber"));
 
                     b.Property<int>("Seats")
                         .HasColumnType("int");
 
-                    b.Property<int>("TableNumber")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
+                    b.HasKey("TableNumber");
 
                     b.HasIndex("TableNumber")
                         .IsUnique();
@@ -250,60 +146,159 @@ namespace Restaurant.Migrations
                     b.HasData(
                         new
                         {
-                            Id = 1,
-                            Seats = 2,
-                            TableNumber = 1
+                            TableNumber = 1,
+                            Seats = 2
                         },
                         new
                         {
+                            TableNumber = 2,
+                            Seats = 2
+                        },
+                        new
+                        {
+                            TableNumber = 3,
+                            Seats = 4
+                        },
+                        new
+                        {
+                            TableNumber = 4,
+                            Seats = 4
+                        },
+                        new
+                        {
+                            TableNumber = 5,
+                            Seats = 6
+                        },
+                        new
+                        {
+                            TableNumber = 6,
+                            Seats = 10
+                        });
+                });
+
+            modelBuilder.Entity("Restaurant.Models.Models.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
+
+                    b.HasDiscriminator().HasValue("User");
+
+                    b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("Restaurant.Models.Models.Admin", b =>
+                {
+                    b.HasBaseType("Restaurant.Models.Models.User");
+
+                    b.HasDiscriminator().HasValue("Admin");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 4,
+                            Email = "admin@mail.com",
+                            Password = "Admin123"
+                        });
+                });
+
+            modelBuilder.Entity("Restaurant.Models.Models.Guest", b =>
+                {
+                    b.HasBaseType("Restaurant.Models.Models.User");
+
+                    b.Property<string>("Allergies")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasDiscriminator().HasValue("Guest");
+
+                    b.HasData(
+                        new
+                        {
                             Id = 2,
-                            Seats = 2,
-                            TableNumber = 2
+                            Email = "erik@mail.com",
+                            Password = "Lösen123",
+                            FirstName = "Erik",
+                            LastName = "Eriksson",
+                            Note = "Fyller år!",
+                            PhoneNumber = "070-4445566"
                         },
                         new
                         {
                             Id = 3,
-                            Seats = 4,
-                            TableNumber = 3
+                            Email = "stig@mail.com",
+                            Password = "Lösen123",
+                            Allergies = "Laktos",
+                            FirstName = "Stig",
+                            LastName = "Stigsson",
+                            Note = "Barnstol behövs",
+                            PhoneNumber = "070-7778899"
                         },
                         new
                         {
-                            Id = 4,
-                            Seats = 4,
-                            TableNumber = 4
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Seats = 6,
-                            TableNumber = 5
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Seats = 10,
-                            TableNumber = 6
+                            Id = 1,
+                            Email = "anna@mail.com",
+                            Password = "Lösen123",
+                            Allergies = "Nötter",
+                            FirstName = "Anna",
+                            LastName = "Andersson",
+                            Note = "Vill sitta vid fönstret",
+                            PhoneNumber = "070-1112233"
                         });
                 });
 
             modelBuilder.Entity("BookingTable", b =>
                 {
-                    b.HasOne("Restaurant.Models.Booking", null)
+                    b.HasOne("Restaurant.Models.Models.Booking", null)
                         .WithMany()
                         .HasForeignKey("BookingsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Restaurant.Models.Table", null)
+                    b.HasOne("Restaurant.Models.Models.Table", null)
                         .WithMany()
-                        .HasForeignKey("TablesId")
+                        .HasForeignKey("TablesTableNumber")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Restaurant.Models.Booking", b =>
+            modelBuilder.Entity("Restaurant.Models.Models.Booking", b =>
                 {
-                    b.HasOne("Restaurant.Models.Guest", "Guest")
+                    b.HasOne("Restaurant.Models.Models.Guest", "Guest")
                         .WithMany("Bookings")
                         .HasForeignKey("GuestId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -312,7 +307,7 @@ namespace Restaurant.Migrations
                     b.Navigation("Guest");
                 });
 
-            modelBuilder.Entity("Restaurant.Models.Guest", b =>
+            modelBuilder.Entity("Restaurant.Models.Models.Guest", b =>
                 {
                     b.Navigation("Bookings");
                 });
