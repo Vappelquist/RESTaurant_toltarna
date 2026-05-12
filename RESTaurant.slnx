@@ -1,5 +1,5 @@
 <Solution>
   <Project Path="REST-aurant.API/Restaurant.API.csproj" />
   <Project Path="REST-aurant.Test/Restaurant.Test.csproj" />
-  <Project Path="RESTaurant/Restaurant.csproj" />
+  <Project Path="Restaurant.Models/Restaurant.Models.csproj" Id="1f1ab395-61bc-4d77-9a7b-5c77993104d6" />
 </Solution>
