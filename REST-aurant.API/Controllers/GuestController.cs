@@ -36,6 +36,8 @@ namespace REST_aurant.API.Controllers
             {
                 FirstName = addGuestRequest.FirstName,
                 LastName = addGuestRequest.LastName,
+                Email = addGuestRequest.Email,
+                Password = addGuestRequest.Password,
                 PhoneNumber = addGuestRequest.PhoneNumber,
                 Allergies = addGuestRequest.Allergies,
                 Note = addGuestRequest.Note
