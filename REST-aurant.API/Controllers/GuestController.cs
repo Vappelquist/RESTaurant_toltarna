@@ -23,5 +23,25 @@ namespace REST_aurant.API.Controllers
             var guests = await _context.Guests.ToListAsync();
             return Ok(guests);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> AddGuest(Guest guest)
+        {
+            if (guest == null)
+            {
+                return BadRequest("User was not registered.");
+            }
+            var guestToAdd = new Guest
+            {
+                FirstName = guest.FirstName,
+                LastName = guest.LastName,
+                PhoneNumber = guest.PhoneNumber,
+                Allergies = guest.Allergies,
+                Note = guest.Note
+            };
+            await _context.Guests.AddAsync(guestToAdd);
+            await _context.SaveChangesAsync();
+            return Ok(guestToAdd);
+        }
     }
 }
