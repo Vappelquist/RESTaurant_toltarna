@@ -25,7 +25,8 @@ namespace REST_aurant.API.Controllers
             return Ok(guests);
         }
 
-        [HttpPost]
+        [HttpPost(Name = "RegisterNewGuest")]
+        [EndpointSummary("Register new guest")]
         public async Task<IActionResult> AddGuest(CreateAddGuestRequest addGuestRequest)
         {
             if (addGuestRequest == null)
