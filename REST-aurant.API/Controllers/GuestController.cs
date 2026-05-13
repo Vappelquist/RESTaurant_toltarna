@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using REST_aurant.API.Data;
 using Restaurant.Models.Models;
+using static REST_aurant.API.DTOs.GuestDTOs;
 
 namespace REST_aurant.API.Controllers
 {
@@ -25,19 +26,19 @@ namespace REST_aurant.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddGuest(Guest guest)
+        public async Task<IActionResult> AddGuest(CreateAddGuestRequest addGuestRequest)
         {
-            if (guest == null)
+            if (addGuestRequest == null)
             {
                 return BadRequest("User was not registered.");
             }
             var guestToAdd = new Guest
             {
-                FirstName = guest.FirstName,
-                LastName = guest.LastName,
-                PhoneNumber = guest.PhoneNumber,
-                Allergies = guest.Allergies,
-                Note = guest.Note
+                FirstName = addGuestRequest.FirstName,
+                LastName = addGuestRequest.LastName,
+                PhoneNumber = addGuestRequest.PhoneNumber,
+                Allergies = addGuestRequest.Allergies,
+                Note = addGuestRequest.Note
             };
             await _context.Guests.AddAsync(guestToAdd);
             await _context.SaveChangesAsync();
