@@ -1,6 +1,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using REST_aurant.API.Data;
+using System.Text.Json.Serialization;
 
 namespace Restaurant.API
 {
@@ -22,6 +23,12 @@ namespace Restaurant.API
             builder.Configuration.GetConnectionString("Default"),
             b => b.MigrationsAssembly("Restaurant.API")
             ));
+
+            builder.Services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
 
             var app = builder.Build();
 
