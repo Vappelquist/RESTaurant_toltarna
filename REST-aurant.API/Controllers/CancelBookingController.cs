@@ -10,14 +10,16 @@ namespace REST_aurant.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CancelBookingController : ControllerBase
+    public class EditBookingController : ControllerBase
     {
         private readonly RestaurantDbContext _ctx;
-        public CancelBookingController(RestaurantDbContext ctx)
+        public EditBookingController(RestaurantDbContext ctx)
         {
             _ctx = ctx;
         }
-        [HttpPut("{id}", Name = "CancelBooking")]
+
+        //Use this endpoint to cancel a booking if the guest calls to cancel.
+        [HttpPut("{id}/cancel", Name = "CancelBooking")]
         public async Task<ActionResult> CancelBooking(int id)
         {
             var booking = await _ctx.Bookings.FindAsync(id);
@@ -30,6 +32,42 @@ namespace REST_aurant.API.Controllers
                 return BadRequest("Bokningen är redan avbokad");
             }
             booking.Status = BookingStatus.Canceled;
+            await _ctx.SaveChangesAsync();
+            return NoContent();
+        }
+
+        //Use this endpoint to revert accidentally canceled bookings back to confirmed status.
+        [HttpPut("{id}/confirm", Name = "ConfirmBooking")]
+        public async Task<ActionResult> ConfirmBooking(int id)
+        {
+            var booking = await _ctx.Bookings.FindAsync(id);
+            if (booking == null)
+            {
+                return NotFound("Bokningen finns inte");
+            }
+            if (booking.Status == BookingStatus.Confirmed)
+            {
+                return BadRequest("Bokningen är redan bekräftad");
+            }
+            booking.Status = BookingStatus.Confirmed;
+            await _ctx.SaveChangesAsync();
+            return NoContent();
+        }
+
+        //Use this endpoint to mark a booking as complete after the guests have finished dining.
+        [HttpPut("{id}/complete", Name = "CompleteBooking")]
+        public async Task<ActionResult> CompleteBooking(int id)
+        {
+            var booking = await _ctx.Bookings.FindAsync(id);
+            if (booking == null)
+            {
+                return NotFound("Bokningen finns inte");
+            }
+            if (booking.Status == BookingStatus.Complete)
+            {
+                return BadRequest("Bokningen är redan slutförd");
+            }
+            booking.Status = BookingStatus.Complete;
             await _ctx.SaveChangesAsync();
             return NoContent();
         }
