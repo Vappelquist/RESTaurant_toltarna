@@ -46,11 +46,23 @@ namespace REST_aurant.API.Controllers
 
         //Get: weekly bookings by week
         [HttpGet("GetWeeklyBookings")]
-        public async Task<ActionResult<IEnumerable<GetAllBookingResponse>>> GetWeeklyBookings(int week)
+        public async Task<ActionResult<IEnumerable<GetAllBookingResponse>>> GetWeeklyBookings(int year, int week)
         {
             //Get current year
-            var year = DateTime.Now.Year;
+            var currentYear = DateTime.Now.Year;
 
+            //current year and 2 years ahead
+            if (year < currentYear || year > currentYear + 2)
+            {
+                return BadRequest($"Year must be between {currentYear} and {currentYear + 2}");
+            }
+
+            var totalWeeks = ISOWeek.GetWeeksInYear(year);
+
+            if(week <1 || week > totalWeeks)
+            {
+                return BadRequest($"Week must be between 1 and {totalWeeks} for year {year}");
+            }
             var startOfWeek = ISOWeek.ToDateTime(year, week, DayOfWeek.Monday);
             //The week starts at Monday
             var endOfWeek = startOfWeek.AddDays(7);
@@ -89,11 +101,7 @@ namespace REST_aurant.API.Controllers
             {
                 return BadRequest("Month is required.");
             }
-            //Check if year is invalid
-            if (year <= 0)
-            {
-                return BadRequest("Type in a valid year.");
-            }
+
             int monthNumber; 
             //Check if input is already a number 
             if (!int.TryParse(month, out monthNumber))
@@ -119,9 +127,9 @@ namespace REST_aurant.API.Controllers
                 return BadRequest($"Year must be between {currentYear} and {currentYear + 2}");
             }
 
-            //1 choosen month
+            //1st date of choosen month
             var startOfMonth = new DateTime(currentYear, monthNumber, 1);
-            //End of choosen month ends the day right before 1st the next month 
+            //End of choosen month ends the day right before 1st date the next month 
             var endOfMonth = startOfMonth.AddMonths(1);
 
             var bookings = await _ctx.Bookings
