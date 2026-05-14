@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\REST-aurant.Test\Restaurant.Test.csproj" />
   </ItemGroup>
 
 </Project>

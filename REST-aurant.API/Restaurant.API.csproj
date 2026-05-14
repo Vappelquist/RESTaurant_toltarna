@@ -24,7 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\REST-aurant.Test\Restaurant.Test.csproj" />
     <ProjectReference Include="..\Restaurant.Models\Restaurant.Models.csproj" />
   </ItemGroup>
 
