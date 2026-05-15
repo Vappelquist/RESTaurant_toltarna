@@ -27,6 +27,10 @@ namespace REST_aurant.API.Data
                 .WithMany(t => t.Bookings)
                 .UsingEntity(j => j.ToTable("BookingTables")); // skapar en explicit kopplingstabell
 
+            modelBuilder.Entity<User>()
+                .Property(u => u.Password)
+                .IsRequired(false);
+
             //modelBuilder.Entity<User>()
             //    .HasDiscriminator<string>("UserType")
             //    .HasValue<Guest>("Guest")

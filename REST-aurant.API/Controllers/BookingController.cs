@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using REST_aurant.API.Data;
-using static REST_aurant.API.DTOs.Booking;
+using Restaurant.Models.Models;
 using System.Globalization;
+using Restaurant.Models.Models.Enums;
+using static REST_aurant.API.DTOs.Booking;
 
 namespace REST_aurant.API.Controllers
 {
@@ -36,11 +38,11 @@ namespace REST_aurant.API.Controllers
                     TableNumbers = b.Tables.Select(t => t.TableNumber).ToList()
                 })
                 .ToListAsync();
-            if(!bookings.Any())
+            if (!bookings.Any())
             {
                 return NotFound("No booking");
             }
-         
+
             return Ok(bookings);
         }
 
@@ -59,7 +61,7 @@ namespace REST_aurant.API.Controllers
 
             var totalWeeks = ISOWeek.GetWeeksInYear(year);
 
-            if(week <1 || week > totalWeeks)
+            if (week < 1 || week > totalWeeks)
             {
                 return BadRequest($"Week must be between 1 and {totalWeeks} for year {year}");
             }
@@ -84,7 +86,7 @@ namespace REST_aurant.API.Controllers
                 })
                 .ToListAsync();
 
-            if(!bookings.Any())
+            if (!bookings.Any())
             {
                 return NotFound("No booking this week");
             }
@@ -102,11 +104,11 @@ namespace REST_aurant.API.Controllers
                 return BadRequest("Month is required.");
             }
 
-            int monthNumber; 
+            int monthNumber;
             //Check if input is already a number 
             if (!int.TryParse(month, out monthNumber))
             {
-                if(!DateTime.TryParse($"1 {month} 2026", out var parsedDate))
+                if (!DateTime.TryParse($"1 {month} 2026", out var parsedDate))
                 {
                     return BadRequest("Type in a valid month or check the spelling.");
                 }
@@ -114,7 +116,7 @@ namespace REST_aurant.API.Controllers
                 monthNumber = parsedDate.Month;
             }
 
-            if(monthNumber <1 || monthNumber >12)
+            if (monthNumber < 1 || monthNumber > 12)
             {
                 return BadRequest("Month number must be between 1 and 12.");
             }
@@ -122,7 +124,7 @@ namespace REST_aurant.API.Controllers
             //Get current year
             var currentYear = DateTime.Now.Year;
 
-            if(year < currentYear || year > currentYear +2 )
+            if (year < currentYear || year > currentYear + 2)
             {
                 return BadRequest($"Year must be between {currentYear} and {currentYear + 2}");
             }
@@ -156,6 +158,78 @@ namespace REST_aurant.API.Controllers
 
             return Ok(bookings);
         }
+
+        //Endpoint to place a new booking
+        [HttpPost("PlaceBooking")]
+        public async Task<ActionResult> PlaceBooking(PlaceBookingRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request.FirstName) || string.IsNullOrWhiteSpace(request.LastName))
+            {
+                return BadRequest("To place a booking you must enter your first name and last name.");
+            }
+
+            if (string.IsNullOrWhiteSpace(request.Email) && string.IsNullOrWhiteSpace(request.PhoneNumber))
+            {
+                return BadRequest("You must provide either an email or phone number.");
+            }
+
+            if (request.AmountOfGuests < 1)
+            {
+                return BadRequest("Amount of guests must be at least 1.");
+            }
+
+            //2 hours session
+            var endTime = request.StartTime.AddHours(2);
+
+            var guest = await _ctx.Guests
+                .FirstOrDefaultAsync(g => g.Email == request.Email || g.PhoneNumber == request.PhoneNumber);
+
+            //Password was required to create new guest
+            if (guest == null)
+            {
+                guest = new Guest
+                {
+                    FirstName = request.FirstName,
+                    LastName = request.LastName,
+                    Email = request.Email,
+                    PhoneNumber = request.PhoneNumber,
+                };
+                await _ctx.Guests.AddAsync(guest);
+            }
+
+            //Search for existing guest
+            var unavailableTableNumbers = await _ctx.Bookings
+                .AsNoTracking()
+                .Where(b => b.Status != BookingStatus.Canceled)
+                .Where(b => b.StartTime < endTime && b.EndTime > request.StartTime)
+                .SelectMany(b => b.Tables)
+                .Select(t => t.TableNumber)
+                .ToListAsync();
+
+            var availableTables = await _ctx.Tables
+                .Where(t => !unavailableTableNumbers.Contains(t.TableNumber))
+                .ToListAsync();
+
+            var seats = availableTables.Sum(t => t.Seats);
+            if(seats < request.AmountOfGuests)
+            {
+                return BadRequest("This requested time is fully booked, please choose another available time.");
+            }
+
+            var placeBooking = new Booking
+            {
+                Guest = guest,
+                AmountOfGuests = request.AmountOfGuests,
+                DateBooked = DateTime.Now,
+                StartTime = request.StartTime,
+                EndTime = endTime,
+                Status = BookingStatus.Confirmed,
+                BookingNotes = request.BookingNotes
+            };
+            await _ctx.Bookings.AddAsync(placeBooking);
+            await _ctx.SaveChangesAsync();
+            return Ok("Thank you, your booking has been received!");
+
+        }
     }
-    
 }

@@ -5,7 +5,7 @@ namespace REST_aurant.API.DTOs
 {
     public class Booking
     {
-        public class GetAllBookingResponse
+        public record GetAllBookingResponse
         {
             public int BookingId { get; set; }
             public string? GuestName { get; set; }
@@ -16,6 +16,17 @@ namespace REST_aurant.API.DTOs
             public DateTime EndTime { get; set; }
             public string? BookingNotes { get; set; }
             public List<int> TableNumbers { get; set; } = new List<int>();
+        }
+
+        public record PlaceBookingRequest
+        {
+            public string? FirstName { get; set; }
+            public string? LastName { get; set; }
+            public string? Email { get; set; }
+            public string? PhoneNumber { get; set; }
+            public int AmountOfGuests { get; set; }
+            public DateTime StartTime { get; set; }
+            public string? BookingNotes { get; set; }
         }
     }
 }
