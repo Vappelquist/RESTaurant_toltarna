@@ -2,9 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using REST_aurant.API.Data;
+using REST_aurant.API.DTOs;
 using Restaurant.Models.Models;
-using System.Globalization;
 using Restaurant.Models.Models.Enums;
+using System.Globalization;
 using static REST_aurant.API.DTOs.Booking;
 
 namespace REST_aurant.API.Controllers
@@ -165,6 +166,8 @@ namespace REST_aurant.API.Controllers
             return Ok(bookings);
         }
 
+
+
         //Endpoint to place a new booking
         [HttpPost("PlaceBooking")]
         public async Task<ActionResult> PlaceBooking(PlaceBookingRequest request)
@@ -236,7 +239,7 @@ namespace REST_aurant.API.Controllers
                 return BadRequest("This requested time is fully booked, please choose another available time.");
             }
 
-            var placeBooking = new Booking
+            var placeBooking = new Restaurant.Models.Models.Booking
             {
                 Guest = guest,
                 AmountOfGuests = request.AmountOfGuests,
@@ -250,6 +253,18 @@ namespace REST_aurant.API.Controllers
             await _ctx.SaveChangesAsync();
             return Ok("Thank you, your booking has been received!");
 
+        }
+
+        [HttpGet("{id}/date", Name = "GetBookingDate")]
+        public async Task<ActionResult<BookingDateDto>> GetBookingDate(int id)
+        {
+            var booking = await _ctx.Bookings.FindAsync(id);
+            if (booking == null)
+            {
+                return NotFound("No booking with this id");
+            }
+            var bookingDateDto = new BookingDateDto(DateOnly.FromDateTime(booking.DateBooked), $"{TimeOnly.FromDateTime(booking.StartTime).ToString("HH:mm")} - {TimeOnly.FromDateTime(booking.EndTime).ToString("HH:mm")}");
+            return Ok(bookingDateDto);
         }
     }
 }
