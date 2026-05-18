@@ -32,8 +32,10 @@ namespace REST_aurant.API.Controllers
                     AmountOfGuests = b.AmountOfGuests,
                     Status = b.Status,
                     DateBooked = DateOnly.FromDateTime(b.DateBooked),
-                    StartTime = b.StartTime,
-                    EndTime = b.EndTime,
+                    StartDate = DateOnly.FromDateTime(b.StartTime),
+                    StartTime = TimeOnly.FromDateTime(b.EndTime),
+                    EndDate = DateOnly.FromDateTime(b.EndTime),
+                    EndTime = TimeOnly.FromDateTime(b.EndTime),
                     BookingNotes = b.BookingNotes,
                     TableNumbers = b.Tables.Select(t => t.TableNumber).ToList()
                 })
@@ -79,8 +81,10 @@ namespace REST_aurant.API.Controllers
                     AmountOfGuests = b.AmountOfGuests,
                     Status = b.Status,
                     DateBooked = DateOnly.FromDateTime(b.DateBooked),
-                    StartTime = b.StartTime,
-                    EndTime = b.EndTime,
+                    StartDate = DateOnly.FromDateTime(b.StartTime),
+                    StartTime = TimeOnly.FromDateTime(b.EndTime),
+                    EndDate = DateOnly.FromDateTime(b.EndTime),
+                    EndTime = TimeOnly.FromDateTime(b.EndTime),
                     BookingNotes = b.BookingNotes,
                     TableNumbers = b.Tables.Select(t => t.TableNumber).ToList()
                 })
@@ -144,8 +148,10 @@ namespace REST_aurant.API.Controllers
                     AmountOfGuests = b.AmountOfGuests,
                     Status = b.Status,
                     DateBooked = DateOnly.FromDateTime(b.DateBooked),
-                    StartTime = b.StartTime,
-                    EndTime = b.EndTime,
+                    StartDate = DateOnly.FromDateTime(b.StartTime),
+                    StartTime = TimeOnly.FromDateTime(b.EndTime),
+                    EndDate = DateOnly.FromDateTime(b.EndTime),
+                    EndTime = TimeOnly.FromDateTime(b.EndTime),
                     BookingNotes = b.BookingNotes,
                     TableNumbers = b.Tables.Select(t => t.TableNumber).ToList()
                 })

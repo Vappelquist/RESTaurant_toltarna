@@ -12,8 +12,10 @@ namespace REST_aurant.API.DTOs
             public int AmountOfGuests { get; set; }
             public BookingStatus Status { get; set; }
             public DateOnly DateBooked { get; set; }
-            public DateTime StartTime { get; set; }
-            public DateTime EndTime { get; set; }
+            public DateOnly StartDate { get; set; }
+            public TimeOnly StartTime { get; set; }
+            public DateOnly EndDate { get; set; }
+            public TimeOnly EndTime { get; set; }
             public string? BookingNotes { get; set; }
             public List<int> TableNumbers { get; set; } = new List<int>();
         }
