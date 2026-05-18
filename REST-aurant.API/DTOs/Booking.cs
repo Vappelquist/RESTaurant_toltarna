@@ -27,7 +27,8 @@ namespace REST_aurant.API.DTOs
             public string? Email { get; set; }
             public string? PhoneNumber { get; set; }
             public int AmountOfGuests { get; set; }
-            public DateTime StartTime { get; set; }
+            public DateOnly BookingDate { get; set; }
+            public string? StartTime { get; set; }
             public string? BookingNotes { get; set; }
         }
     }
