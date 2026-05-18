@@ -197,7 +197,14 @@ namespace REST_aurant.API.Controllers
             var guest = await _ctx.Guests
                 .FirstOrDefaultAsync(g => g.Email == request.Email || g.PhoneNumber == request.PhoneNumber);
 
-            //Password was required to create new guest
+            if (guest != null)
+            {
+                if (guest.FirstName != request.FirstName || guest.LastName != request.LastName)
+                {
+                    return BadRequest("This email or phone number already belongs to another guest.");
+                }
+            }
+
             if (guest == null)
             {
                 guest = new Guest
