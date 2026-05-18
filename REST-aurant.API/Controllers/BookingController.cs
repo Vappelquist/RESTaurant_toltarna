@@ -184,8 +184,15 @@ namespace REST_aurant.API.Controllers
                 return BadRequest("Amount of guests must be at least 1.");
             }
 
+            if (!TimeOnly.TryParse(request.StartTime, out var startTime))
+            {
+                return BadRequest("Time must be entered in format HH:mm. For example 18:30");
+            }
+
+            var startDateTime = request.BookingDate.ToDateTime(startTime);
+
             //2 hours session
-            var endTime = request.StartTime.AddHours(2);
+            var endTime = startDateTime.AddHours(2);
 
             var guest = await _ctx.Guests
                 .FirstOrDefaultAsync(g => g.Email == request.Email || g.PhoneNumber == request.PhoneNumber);
@@ -207,7 +214,7 @@ namespace REST_aurant.API.Controllers
             var unavailableTableNumbers = await _ctx.Bookings
                 .AsNoTracking()
                 .Where(b => b.Status != BookingStatus.Canceled)
-                .Where(b => b.StartTime < endTime && b.EndTime > request.StartTime)
+                .Where(b => b.StartTime < endTime && b.EndTime > startDateTime)
                 .SelectMany(b => b.Tables)
                 .Select(t => t.TableNumber)
                 .ToListAsync();
@@ -227,7 +234,7 @@ namespace REST_aurant.API.Controllers
                 Guest = guest,
                 AmountOfGuests = request.AmountOfGuests,
                 DateBooked = DateTime.Now,
-                StartTime = request.StartTime,
+                StartTime = startDateTime,
                 EndTime = endTime,
                 Status = BookingStatus.Confirmed,
                 BookingNotes = request.BookingNotes
