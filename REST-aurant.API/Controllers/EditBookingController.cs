@@ -27,11 +27,11 @@ namespace Restaurant.API.Controllers
             var booking = await _ctx.Bookings.FindAsync(id);
             if (booking == null)
             {
-                return NotFound("Bokningen finns inte");
+                return NotFound("This booking does not exist");
             }
             if (booking.Status == BookingStatus.Canceled)
             {
-                return BadRequest("Bokningen är redan avbokad");
+                return BadRequest("This booking is already canceled");
             }
             booking.Status = BookingStatus.Canceled;
             await _ctx.SaveChangesAsync();
@@ -45,11 +45,11 @@ namespace Restaurant.API.Controllers
             var booking = await _ctx.Bookings.FindAsync(id);
             if (booking == null)
             {
-                return NotFound("Bokningen finns inte");
+                return NotFound("This booking does not exist");
             }
             if (booking.Status == BookingStatus.Confirmed)
             {
-                return BadRequest("Bokningen är redan bekräftad");
+                return BadRequest("This booking is already confirmed");
             }
             booking.Status = BookingStatus.Confirmed;
             await _ctx.SaveChangesAsync();
@@ -63,11 +63,11 @@ namespace Restaurant.API.Controllers
             var booking = await _ctx.Bookings.FindAsync(id);
             if (booking == null)
             {
-                return NotFound("Bokningen finns inte");
+                return NotFound("This booking does not exist");
             }
             if (booking.Status == BookingStatus.Complete)
             {
-                return BadRequest("Bokningen är redan slutförd");
+                return BadRequest("This booking is already done.");
             }
             booking.Status = BookingStatus.Complete;
             await _ctx.SaveChangesAsync();
