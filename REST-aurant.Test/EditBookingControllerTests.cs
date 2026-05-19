@@ -20,13 +20,16 @@ public class EditBookingControllerTests
 
     [TestMethod]
     public async Task CancelBooking_WhenBookingDoesNotExist_ReturnNotFound()
-    {
+    {   
+        // Arrange
         var ctx = CreateInMemoryDb();
         var mockTableService = new Mock<ITableService>();
         var controller = new EditBookingController(ctx, mockTableService.Object);
 
+        // Act
         var result = await controller.CancelBooking(999);
 
+        // Assert
         Assert.IsInstanceOfType(result, typeof(NotFoundObjectResult));
     }
 }
