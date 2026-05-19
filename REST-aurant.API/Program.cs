@@ -13,6 +13,9 @@ namespace Restaurant.API
 
             // Add services to the container.
 
+            //Adds the table service to the dependency injection container, allowing it to be injected into controllers and other services where needed.
+            builder.Services.AddScoped<ITableService, TableService>();
+
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();

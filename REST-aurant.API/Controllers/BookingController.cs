@@ -32,7 +32,7 @@ namespace Restaurant.API.Controllers
                     Status = b.Status,
                     DateBooked = DateOnly.FromDateTime(b.DateBooked),
                     StartDate = DateOnly.FromDateTime(b.StartTime),
-                    StartTime = TimeOnly.FromDateTime(b.EndTime),
+                    StartTime = TimeOnly.FromDateTime(b.StartTime),
                     EndDate = DateOnly.FromDateTime(b.EndTime),
                     EndTime = TimeOnly.FromDateTime(b.EndTime),
                     BookingNotes = b.BookingNotes,
@@ -81,7 +81,7 @@ namespace Restaurant.API.Controllers
                     Status = b.Status,
                     DateBooked = DateOnly.FromDateTime(b.DateBooked),
                     StartDate = DateOnly.FromDateTime(b.StartTime),
-                    StartTime = TimeOnly.FromDateTime(b.EndTime),
+                    StartTime = TimeOnly.FromDateTime(b.StartTime),
                     EndDate = DateOnly.FromDateTime(b.EndTime),
                     EndTime = TimeOnly.FromDateTime(b.EndTime),
                     BookingNotes = b.BookingNotes,
@@ -164,6 +164,8 @@ namespace Restaurant.API.Controllers
             return Ok(bookings);
         }
 
+
+
         //Endpoint to place a new booking
         [HttpPost("PlaceBooking")]
         public async Task<ActionResult> PlaceBooking(PlaceBookingRequest request)
@@ -235,7 +237,7 @@ namespace Restaurant.API.Controllers
                 return BadRequest("This requested time is fully booked, please choose another available time.");
             }
 
-            var placeBooking = new Booking
+            var placeBooking = new Restaurant.Models.Models.Booking
             {
                 Guest = guest,
                 AmountOfGuests = request.AmountOfGuests,
@@ -249,6 +251,18 @@ namespace Restaurant.API.Controllers
             await _ctx.SaveChangesAsync();
             return Ok("Thank you, your booking has been received!");
 
+        }
+
+        [HttpGet("{id}/date", Name = "GetBookingDate")]
+        public async Task<ActionResult<BookingDateDto>> GetBookingDate(int id)
+        {
+            var booking = await _ctx.Bookings.FindAsync(id);
+            if (booking == null)
+            {
+                return NotFound("No booking with this id");
+            }
+            var bookingDateDto = new BookingDateDto(DateOnly.FromDateTime(booking.DateBooked), $"{TimeOnly.FromDateTime(booking.StartTime).ToString("HH:mm")} - {TimeOnly.FromDateTime(booking.EndTime).ToString("HH:mm")}");
+            return Ok(bookingDateDto);
         }
     }
 }
