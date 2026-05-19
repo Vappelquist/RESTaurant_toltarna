@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Restaurant.API.Data;
 using Restaurant.API.DTOs;
+using Restaurant.API.Services;
 using Restaurant.Models.Models;
 using Restaurant.Models.Models.Enums;
 using System.Globalization;
@@ -14,10 +15,13 @@ namespace Restaurant.API.Controllers
     public class BookingController : ControllerBase
     {
         private readonly RestaurantDbContext _ctx;
+        private readonly IBookingService _bookingService;
 
-        public BookingController(RestaurantDbContext ctx)
+        public BookingController(RestaurantDbContext ctx, IBookingService bookingService)
         {
             _ctx = ctx;
+            _bookingService = bookingService;
+            
         }
         //Get: AllBookings
         [HttpGet(Name = "GetAllBookings")]
@@ -191,65 +195,10 @@ namespace Restaurant.API.Controllers
                 return BadRequest("Time must be entered in format HH:mm. For example 18:30");
             }
 
-            var startDateTime = request.BookingDate.ToDateTime(startTime);
+            var error = await _bookingService.PlaceBookingAsync(request);
+            if (error != null)
+                return BadRequest(error);
 
-            //2 hours session
-            var endTime = startDateTime.AddHours(2);
-
-            var guest = await _ctx.Guests
-                .FirstOrDefaultAsync(g => g.Email == request.Email || g.PhoneNumber == request.PhoneNumber);
-
-            if (guest != null)
-            {
-                if (guest.FirstName != request.FirstName || guest.LastName != request.LastName)
-                {
-                    return BadRequest("This email or phone number already belongs to another guest.");
-                }
-            }
-
-            if (guest == null)
-            {
-                guest = new Guest
-                {
-                    FirstName = request.FirstName,
-                    LastName = request.LastName,
-                    Email = request.Email,
-                    PhoneNumber = request.PhoneNumber,
-                };
-                await _ctx.Guests.AddAsync(guest);
-            }
-
-            //Search for existing guest
-            var unavailableTableNumbers = await _ctx.Bookings
-                .AsNoTracking()
-                .Where(b => b.Status != BookingStatus.Canceled)
-                .Where(b => b.StartTime < endTime && b.EndTime > startDateTime)
-                .SelectMany(b => b.Tables)
-                .Select(t => t.TableNumber)
-                .ToListAsync();
-
-            var availableTables = await _ctx.Tables
-                .Where(t => !unavailableTableNumbers.Contains(t.TableNumber))
-                .ToListAsync();
-
-            var seats = availableTables.Sum(t => t.Seats);
-            if(seats < request.AmountOfGuests)
-            {
-                return BadRequest("This requested time is fully booked, please choose another available time.");
-            }
-
-            var placeBooking = new Restaurant.Models.Models.Booking
-            {
-                Guest = guest,
-                AmountOfGuests = request.AmountOfGuests,
-                DateBooked = DateTime.Now,
-                StartTime = startDateTime,
-                EndTime = endTime,
-                Status = BookingStatus.Confirmed,
-                BookingNotes = request.BookingNotes
-            };
-            await _ctx.Bookings.AddAsync(placeBooking);
-            await _ctx.SaveChangesAsync();
             return Ok("Thank you, your booking has been received!");
 
         }
