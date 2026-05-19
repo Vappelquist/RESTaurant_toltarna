@@ -1,6 +1,6 @@
 ﻿using Restaurant.Models.Models.Enums;
 
-namespace REST_aurant.API.DTOs
+namespace Restaurant.API.DTOs
 
 {
     public class Booking

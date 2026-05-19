@@ -1,6 +1,6 @@
 
 using Microsoft.EntityFrameworkCore;
-using REST_aurant.API.Data;
+using Restaurant.API.Data;
 using System.Text.Json.Serialization;
 
 namespace Restaurant.API

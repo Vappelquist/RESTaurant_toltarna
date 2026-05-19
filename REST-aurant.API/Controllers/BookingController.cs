@@ -1,13 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using REST_aurant.API.Data;
+using Restaurant.API.Data;
 using Restaurant.Models.Models;
-using System.Globalization;
 using Restaurant.Models.Models.Enums;
-using static REST_aurant.API.DTOs.Booking;
+using System.Globalization;
+using static Restaurant.API.DTOs.Booking;
 
-namespace REST_aurant.API.Controllers
+namespace Restaurant.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

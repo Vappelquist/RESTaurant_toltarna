@@ -1,6 +1,7 @@
+using Microsoft.EntityFrameworkCore;
 using Restaurant.Models.Models;
 
-namespace REST_aurant.Test;
+namespace Restaurant.Test;
 
 [TestClass]
 public class BookingTest
@@ -12,6 +13,15 @@ public class BookingTest
     {
         _booking = new Booking();
     }
+
+    // In-memory-database:
+    //private RestaurantDbContext CreateInMemoryDb()
+    //{
+    //    var options = new DbContextOptionsBuilder<RestaurantDbContext>()
+    //        .UseInMemoryDatabase(Guid.NewGuid().ToString())
+    //        .Options;
+    //    return new RestaurantDbContext(options);
+    //}
 
     [TestMethod]
     public void TestMethod1()
