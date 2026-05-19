@@ -3,7 +3,7 @@ using global::Restaurant.Models.Models.Enums;
 using Microsoft.EntityFrameworkCore;
 using Restaurant.Models.Models;
 
-namespace REST_aurant.API.Data
+namespace Restaurant.API.Data
 {
     public class RestaurantDbContext : DbContext
     {

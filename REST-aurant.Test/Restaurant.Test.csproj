@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <RootNamespace>REST_aurant.Test</RootNamespace>
+    <RootNamespace>Restaurant.Test</RootNamespace>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -22,6 +22,11 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="MSTest" Version="4.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\REST-aurant.API\Restaurant.API.csproj" />
+    <ProjectReference Include="..\Restaurant.Models\Restaurant.Models.csproj" />
   </ItemGroup>
 
   <ItemGroup>

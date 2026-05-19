@@ -1,4 +1,4 @@
-﻿namespace REST_aurant.Test
+﻿namespace Restaurant.Test
 {
     [TestClass]
     public sealed class Test1
