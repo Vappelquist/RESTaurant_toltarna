@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using REST_aurant.API.Data;
+using Restaurant.API.Data;
 using Restaurant.Models.Models;
 using Restaurant.Models.Models.Enums;
 
-namespace REST_aurant.API.Services
+namespace Restaurant.API.Services
 {
     public class TableService : ITableService
     {

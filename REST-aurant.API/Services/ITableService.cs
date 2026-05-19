@@ -1,6 +1,6 @@
 ﻿using Restaurant.Models.Models;
 
-namespace REST_aurant.API.Services
+namespace Restaurant.API.Services
 {
     public interface ITableService
     {

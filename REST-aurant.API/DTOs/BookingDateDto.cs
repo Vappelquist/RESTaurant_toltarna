@@ -1,4 +1,4 @@
-﻿namespace REST_aurant.API.DTOs
+﻿namespace Restaurant.API.DTOs
 {
     public record BookingDateDto(DateOnly Date, string Timespan);
 }
