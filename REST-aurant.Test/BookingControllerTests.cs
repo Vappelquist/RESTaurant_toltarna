@@ -32,7 +32,7 @@ public class BookingControllerTests
         {
             FirstName = "",
             LastName = "Svensson",
-            Email = "anna@mail.com",
+            Email = "sven@mail.com",
             AmountOfGuests = 2,
             StartTime = "18:00",
             BookingDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1))
@@ -57,7 +57,33 @@ public class BookingControllerTests
         {
             FirstName = "Sven",
             LastName = "",
-            Email = "anna@mail.com",
+            Email = "sven@mail.com",
+            AmountOfGuests = 2,
+            StartTime = "18:00",
+            BookingDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1))
+        };
+
+        // Act
+        var result = await controller.PlaceBooking(request);
+
+        // Assert
+        Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+    }
+
+    [TestMethod]
+    public async Task PlaceBooking_WhenEmailAndPhoneIsMissing_ReturnBadRequest()
+    {
+        // Arrange
+        var mockBookingService = new Mock<IBookingService>();
+        var ctx = CreateInMemoryDb();
+        var controller = new BookingController(ctx, mockBookingService.Object); 
+
+        var request = new PlaceBookingRequest
+        {
+            FirstName = "Sven",
+            LastName = "Svensson",
+            Email = "",
+            PhoneNumber = "",
             AmountOfGuests = 2,
             StartTime = "18:00",
             BookingDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1))
