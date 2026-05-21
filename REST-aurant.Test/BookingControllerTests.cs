@@ -20,6 +20,7 @@ public class BookingControllerTests
         return new RestaurantDbContext(options);
     }
 
+    // PlaceBooking-tests ---------------------------------------------------------------V
     [TestMethod]
     public async Task PlaceBooking_WhenFirstNameIsMissing_ReturnBadRequest()
     {
@@ -120,4 +121,20 @@ public class BookingControllerTests
         // Assert
         Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
     }
+
+    // PlaceBooking-tests ---------------------------------------------------------------^
+
+
+
+    // GetMonthlyBookings-tests ---------------------------------------------------------------V
+
+    // GetMonthlyBookings-tests ---------------------------------------------------------------^
+
+
+
+    // GetWeeklyBookings-tests ---------------------------------------------------------------V
+
+    // GetWeeklyBookings-tests ---------------------------------------------------------------^
+
+
 }
