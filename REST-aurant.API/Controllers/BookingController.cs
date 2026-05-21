@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Restaurant.API.Data;
 using Restaurant.API.DTOs;
 using Restaurant.API.Services;
@@ -21,7 +22,7 @@ namespace Restaurant.API.Controllers
         {
             _ctx = ctx;
             _bookingService = bookingService;
-            
+
         }
         //Get: AllBookings
         [HttpGet(Name = "GetAllBookings")]
@@ -50,6 +51,38 @@ namespace Restaurant.API.Controllers
             }
 
             return Ok(bookings);
+        }
+
+        [HttpGet("{id}", Name = "GetBookingById")]
+        public async Task<ActionResult> GetBookingById(int id)
+        {
+            var selectedBooking = await _ctx.Bookings
+                .Include(b => b.Guest)
+                .Include(b => b.Tables)
+                .FirstOrDefaultAsync(b => b.Id == id);
+            if (selectedBooking == null)
+            {
+                return NotFound();
+            }
+            else if (selectedBooking != null)
+            {
+                return Ok(new GetAllBookingResponse
+                {
+                    BookingId = selectedBooking.Id,
+                    GuestName = $"{selectedBooking.Guest?.FirstName} {selectedBooking.Guest?.LastName}",
+                    AmountOfGuests = selectedBooking.AmountOfGuests,
+                    Status = selectedBooking.Status,
+                    DateBooked = DateOnly.FromDateTime(selectedBooking.DateBooked),
+                    StartDate = DateOnly.FromDateTime(selectedBooking.StartTime),
+                    StartTime = TimeOnly.FromDateTime(selectedBooking.StartTime),
+                    EndDate = DateOnly.FromDateTime(selectedBooking.EndTime),
+                    EndTime = TimeOnly.FromDateTime(selectedBooking.EndTime),
+                    BookingNotes = selectedBooking.BookingNotes,
+                    TableNumbers = selectedBooking.Tables.Select(t => t.TableNumber).ToList()
+                });
+            }
+            return BadRequest();
+
         }
 
         //Get: weekly bookings by week
@@ -214,5 +247,8 @@ namespace Restaurant.API.Controllers
             var bookingDateDto = new BookingDateDto(DateOnly.FromDateTime(booking.DateBooked), $"{TimeOnly.FromDateTime(booking.StartTime).ToString("HH:mm")} - {TimeOnly.FromDateTime(booking.EndTime).ToString("HH:mm")}");
             return Ok(bookingDateDto);
         }
+
+
+
     }
 }
