@@ -65,7 +65,10 @@ namespace Restaurant.API.Services
             // Retrieve or create the guest using the helper method above
             // If something went wrong, return the error message directly
             var (guest, error) = await GetOrCreateGuestAsync(request);
-            if (error != null) return error;
+            if (error != null)
+            {
+                return error;
+            }
 
             // Ask ITableService to find and allocate available tables for the selected time interval
             // This logic is implemented in TableService
