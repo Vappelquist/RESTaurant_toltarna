@@ -4,6 +4,7 @@ using Moq;
 using Restaurant.API.Controllers;
 using Restaurant.API.Data;
 using Restaurant.API.Services;
+using Restaurant.Models.Models;
 using static Restaurant.API.DTOs.Booking;
 
 namespace Restaurant.Test;
@@ -20,6 +21,7 @@ public class BookingControllerTests
         return new RestaurantDbContext(options);
     }
 
+    // PlaceBooking-tests ---------------------------------------------------------------V
     [TestMethod]
     public async Task PlaceBooking_WhenFirstNameIsMissing_ReturnBadRequest()
     {
@@ -32,7 +34,7 @@ public class BookingControllerTests
         {
             FirstName = "",
             LastName = "Svensson",
-            Email = "anna@mail.com",
+            Email = "sven@mail.com",
             AmountOfGuests = 2,
             StartTime = "18:00",
             BookingDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1))
@@ -57,7 +59,7 @@ public class BookingControllerTests
         {
             FirstName = "Sven",
             LastName = "",
-            Email = "anna@mail.com",
+            Email = "sven@mail.com",
             AmountOfGuests = 2,
             StartTime = "18:00",
             BookingDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1))
@@ -69,4 +71,103 @@ public class BookingControllerTests
         // Assert
         Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
     }
+
+    [TestMethod]
+    public async Task PlaceBooking_WhenEmailAndPhoneIsMissing_ReturnBadRequest()
+    {
+        // Arrange
+        var mockBookingService = new Mock<IBookingService>();
+        var ctx = CreateInMemoryDb();
+        var controller = new BookingController(ctx, mockBookingService.Object); 
+
+        var request = new PlaceBookingRequest
+        {
+            FirstName = "Sven",
+            LastName = "Svensson",
+            Email = "",
+            PhoneNumber = "",
+            AmountOfGuests = 2,
+            StartTime = "18:00",
+            BookingDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1))
+        };
+
+        // Act
+        var result = await controller.PlaceBooking(request);
+
+        // Assert
+        Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+    }
+
+    [TestMethod]
+    public async Task PlaceBooking_WhenAmountOfGuestsIsMissing_ReturnBadRequest()
+    {
+        // Arrange
+        var mockBookingService = new Mock<IBookingService>();
+        var ctx = CreateInMemoryDb();
+        var controller = new BookingController(ctx, mockBookingService.Object); 
+
+        var request = new PlaceBookingRequest
+        {
+            FirstName = "Sven",
+            LastName = "Svensson",
+            Email = "sven@mail.com",
+            AmountOfGuests = 0,
+            StartTime = "18:00",
+            BookingDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1))
+        };
+
+        // Act
+        var result = await controller.PlaceBooking(request);
+
+        // Assert
+        Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+    }
+
+    [TestMethod]
+    public async Task PlaceBooking_IfEndTimeIsTwoHoursAfterStartTime_ReturnTrue()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDb();
+
+        var mockTableService = new Mock<ITableService>();
+        mockTableService
+        .Setup(s => s.AllocateTablesAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>(), It.IsAny<int?>())) // It.IsAny<T>() = Mock-specific, dont worry about what value it is, always match.
+        .ReturnsAsync(new List<Table> { new Table { TableNumber = 1, Seats = 4 } });
+
+        var service = new BookingService(ctx, mockTableService.Object);
+
+        var request = new PlaceBookingRequest
+        {
+            FirstName = "Sven",
+            LastName = "Svensson",
+            Email = "sven@mail.com",
+            AmountOfGuests = 2,
+            StartTime = "18:00",
+            BookingDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1))
+        };
+
+        // Act
+        await service.PlaceBookingAsync(request);
+
+        // Assert
+        var booking = await ctx.Bookings.FirstOrDefaultAsync();
+        Assert.IsNotNull(booking);
+        Assert.AreEqual(booking.EndTime, booking.StartTime.AddHours(2));
+    }
+
+    // PlaceBooking-tests ---------------------------------------------------------------^
+
+
+
+    // GetMonthlyBookings-tests ---------------------------------------------------------------V
+
+    // GetMonthlyBookings-tests ---------------------------------------------------------------^
+
+
+
+    // GetWeeklyBookings-tests ---------------------------------------------------------------V
+
+    // GetWeeklyBookings-tests ---------------------------------------------------------------^
+
+
 }
