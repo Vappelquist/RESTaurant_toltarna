@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Restaurant.API.Data;
+using Restaurant.API.Services;
 using Restaurant.Models.Models;
 using static Restaurant.API.DTOs.GuestDTOs;
 
@@ -11,10 +12,12 @@ namespace Restaurant.API.Controllers
     public class GuestController : ControllerBase
     {
         private readonly RestaurantDbContext _context;
+        private readonly IGuestService _guestService;
 
-        public GuestController(RestaurantDbContext context)
+        public GuestController(RestaurantDbContext context, IGuestService guestService)
         {
             _context = context;
+            _guestService = guestService;
         }
 
         [HttpGet]
@@ -28,23 +31,13 @@ namespace Restaurant.API.Controllers
         [EndpointSummary("Register new guest")]
         public async Task<IActionResult> AddGuest(CreateAddGuestRequest addGuestRequest)
         {
-            if (addGuestRequest == null)
+            var guest = await _guestService.AddGuestAsync(addGuestRequest);
+            if (guest == null)
             {
                 return BadRequest("User was not registered.");
             }
-            var guestToAdd = new Guest
-            {
-                FirstName = addGuestRequest.FirstName,
-                LastName = addGuestRequest.LastName,
-                Email = addGuestRequest.Email,
-                Password = addGuestRequest.Password,
-                PhoneNumber = addGuestRequest.PhoneNumber,
-                Allergies = addGuestRequest.Allergies,
-                Note = addGuestRequest.Note
-            };
-            await _context.Guests.AddAsync(guestToAdd);
-            await _context.SaveChangesAsync();
-            return Ok(guestToAdd);
+            
+            return Ok(guest);
         }
     }
 }
