@@ -186,6 +186,7 @@ public class BookingControllerTests
         var tableService = new TableService(ctx);
         var bookingService = new BookingService(ctx, tableService);
 
+        // Place new booking at the same time-slot as the cancelled one:
         var newBooking = new PlaceBookingRequest
         {
             FirstName = "Lars",
@@ -238,6 +239,7 @@ public class BookingControllerTests
         var tableService = new TableService(ctx);
         var bookingService = new BookingService(ctx, tableService);
 
+        // Place new booking at the same time-slot as the existing one:
         var newBooking = new PlaceBookingRequest
         {
             FirstName = "Lars",
