@@ -1,6 +1,7 @@
 ﻿using Restaurant.API.Data;
 using Restaurant.Models.Models;
 using static Restaurant.API.DTOs.GuestDTOs;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Restaurant.API.Services
 {
@@ -11,11 +12,16 @@ namespace Restaurant.API.Services
         {
             _context = context;
         }
-        public async Task<Guest?> AddGuestAsync(CreateAddGuestRequest addGuestRequest)
+        public async Task<(Guest?guest, string? error)> AddGuestAsync(CreateAddGuestRequest addGuestRequest)
         {
-            if(addGuestRequest == null)
+            if (addGuestRequest == null)
             {
-                return null;
+                return (null, "Request is missing");
+            }
+
+            if (string.IsNullOrWhiteSpace(addGuestRequest.FirstName) || string.IsNullOrWhiteSpace(addGuestRequest.LastName))
+            {
+                return (null, "FirstName and LastName has to be filled");
             }
 
             var guestToAdd = new Guest
@@ -31,7 +37,7 @@ namespace Restaurant.API.Services
 
             await _context.Guests.AddAsync(guestToAdd);
             await _context.SaveChangesAsync();
-            return guestToAdd;
+            return (guestToAdd, null);
         }
     }
 }

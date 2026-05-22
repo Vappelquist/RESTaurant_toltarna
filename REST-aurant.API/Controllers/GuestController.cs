@@ -31,10 +31,10 @@ namespace Restaurant.API.Controllers
         [EndpointSummary("Register new guest")]
         public async Task<IActionResult> AddGuest(CreateAddGuestRequest addGuestRequest)
         {
-            var guest = await _guestService.AddGuestAsync(addGuestRequest);
-            if (guest == null)
+            var (guest, error) = await _guestService.AddGuestAsync(addGuestRequest);
+            if (error != null)
             {
-                return BadRequest("User was not registered.");
+                return BadRequest(error);
             }
             
             return Ok(guest);
