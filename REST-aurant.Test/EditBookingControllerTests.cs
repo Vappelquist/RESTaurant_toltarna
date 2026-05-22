@@ -1,9 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.Identity.Client;
 using Moq;
 using Restaurant.API.Controllers;
 using Restaurant.API.Data;
 using Restaurant.API.Services;
+using Restaurant.Models.Models;
+using Restaurant.Models.Models.Enums;
 
 namespace Restaurant.Test;
 
@@ -31,5 +35,26 @@ public class EditBookingControllerTests
 
         // Assert
         Assert.IsInstanceOfType(result, typeof(NotFoundObjectResult));
+    }
+
+    [TestMethod]
+    public async Task CancelBooking_WhenBookingAlreadyCancelled_ReturnBadRequest()
+    {
+        var _ctx = CreateInMemoryDb();
+        var _controller = new EditBookingController(_ctx, new Mock<ITableService>().Object);
+        //Arrange
+        var booking = new Booking
+        {
+            Id = 1,
+            Status = BookingStatus.Canceled
+        };
+        _ctx.Bookings.Add(booking);
+        await _ctx.SaveChangesAsync();
+
+        //Act
+        var result = await _controller.CancelBooking(1);
+
+        //Assert
+        Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
     }
 }
