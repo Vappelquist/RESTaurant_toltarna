@@ -5,6 +5,7 @@ using Restaurant.API.Controllers;
 using Restaurant.API.Data;
 using Restaurant.API.Services;
 using Restaurant.Models.Models;
+using Restaurant.Models.Models.Enums;
 using static Restaurant.API.DTOs.Booking;
 
 namespace Restaurant.Test;
@@ -153,6 +154,58 @@ public class BookingControllerTests
         var booking = await ctx.Bookings.FirstOrDefaultAsync();
         Assert.IsNotNull(booking);
         Assert.AreEqual(booking.EndTime, booking.StartTime.AddHours(2));
+    }
+
+    [TestMethod]
+    public async Task PlaceBooking_WhenBookingIsCanceled_TableIsAvailableForNewBooking()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDb();
+
+        var table = new Table { TableNumber = 1, Seats = 4 };
+        ctx.Tables.Add(table);
+        await ctx.SaveChangesAsync();
+
+        ctx.Bookings.Add(new Booking
+        {
+            AmountOfGuests = 2,
+            StartTime = DateTime.Now.AddDays(1).Date.AddHours(18),
+            EndTime = DateTime.Now.AddDays(1).Date.AddHours(20),
+            DateBooked = DateTime.Now,
+            Status = BookingStatus.Canceled,
+            Guest = new Guest { 
+                FirstName = "Sven", 
+                LastName = "Svensson", 
+                Email = "sven@mail.com", 
+                PhoneNumber = "0701234567" 
+            },
+            Tables = new List<Table> { table }
+        });
+        await ctx.SaveChangesAsync();
+
+        var tableService = new TableService(ctx);
+        var bookingService = new BookingService(ctx, tableService);
+
+        var newBooking = new PlaceBookingRequest
+        {
+            FirstName = "Lars",
+            LastName = "Larsson",
+            Email = "lars@mail.com",
+            PhoneNumber = "0709876543",
+            AmountOfGuests = 2,
+            StartTime = "18:00",
+            BookingDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1))
+        };
+
+        // Act
+        var error = await bookingService.PlaceBookingAsync(newBooking);
+
+        // Assert
+        Assert.IsNull(error);
+
+        var bookings = await ctx.Bookings.ToListAsync();
+        // Check that booth bookings are registered:
+        Assert.AreEqual(2, bookings.Count);
     }
 
     // PlaceBooking-tests ---------------------------------------------------------------^
