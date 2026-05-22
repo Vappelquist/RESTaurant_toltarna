@@ -73,6 +73,25 @@ public class EditBookingControllerTests
         Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
     }
 
-    
+    [TestMethod]
+    public async Task ConfirmBooking_WhenBookingAlreadyConfirmed_ReturnBadRequest()
+    {
+        var _ctx = CreateInMemoryDb();
+        var _controller = new EditBookingController(_ctx, new Mock<ITableService>().Object);
+        //Arrange
+        var booking = new Booking
+        {
+            Id = 1,
+            Status = BookingStatus.Confirmed
+        };
+        _ctx.Bookings.Add(booking);
+        await _ctx.SaveChangesAsync();
+
+        //Act
+        var result = await _controller.ConfirmBooking(1);
+
+        //Assert
+        Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+    }
 
 }
