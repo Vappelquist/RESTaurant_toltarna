@@ -5,6 +5,6 @@ namespace Restaurant.API.Services
 {
     public interface IGuestService
     {
-        Task<Guest?> AddGuestAsync(CreateAddGuestRequest addGuestRequest);
+        Task<(Guest? guest, string? error)> AddGuestAsync(CreateAddGuestRequest addGuestRequest);
     }
 }
