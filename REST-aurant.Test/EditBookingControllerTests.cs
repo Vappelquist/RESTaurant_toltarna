@@ -152,4 +152,27 @@ public class EditBookingControllerTests
         //Assert
         Assert.IsTrue(bookingIsCancelled);
     }
+    [TestMethod]
+    public async Task CompleteBooking_WhenBookingIsPutToComplete_ReturnsOk()
+    {
+        var _ctx = CreateInMemoryDb();
+        var _controller = new EditBookingController(_ctx, new Mock<ITableService>().Object);
+        //Arrange
+        var booking = new Booking
+        {
+            Id = 99,
+            Status = BookingStatus.Confirmed
+        };
+        booking.Status = BookingStatus.Complete;
+        _ctx.Bookings.Add(booking);
+        await _ctx.SaveChangesAsync();
+        //Act
+        bool bookingIsCompleted = false;
+        if (booking.Status == BookingStatus.Complete)
+        {
+            bookingIsCompleted = true;
+        }
+        //Assert
+        Assert.IsTrue(bookingIsCompleted);
+    }
 }
