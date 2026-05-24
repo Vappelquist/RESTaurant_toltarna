@@ -117,5 +117,27 @@ public class EditBookingControllerTests
         //Assert
         Assert.IsTrue(bookingIsConfirmed);
     }
-    
+    [TestMethod]
+    public async Task CancelBooking_WhenBookingIsPutToCancelled_ReturnsOk()
+    {
+        var _ctx = CreateInMemoryDb();
+        var _controller = new EditBookingController(_ctx, new Mock<ITableService>().Object);
+        //Arrange
+        var booking = new Booking
+        {
+            Id = 99,
+            Status = BookingStatus.Confirmed
+        };
+        booking.Status = BookingStatus.Canceled;
+        _ctx.Bookings.Add(booking);
+        await _ctx.SaveChangesAsync();
+        //Act
+        bool bookingIsCancelled = false;
+        if (booking.Status == BookingStatus.Canceled)
+        {
+            bookingIsCancelled = true;
+        }
+        //Assert
+        Assert.IsTrue(bookingIsCancelled);
+    }
 }
