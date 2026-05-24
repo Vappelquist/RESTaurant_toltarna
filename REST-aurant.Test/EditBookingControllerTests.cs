@@ -51,6 +51,18 @@ public class EditBookingControllerTests
         // Assert
         Assert.IsInstanceOfType(result, typeof(NotFoundObjectResult));
     }
+    [TestMethod]
+    public async Task CompleteBooking_WhenBookingDoesNotExist_ReturnNotFound()
+    {
+        var ctx = CreateInMemoryDb();
+        var mockTableService = new Mock<ITableService>();
+        //arrange
+        var controller = new EditBookingController(ctx, mockTableService.Object);
+        //act
+        var result = await controller.CompleteBooking(999);
+        //assert
+        Assert.IsInstanceOfType(result, typeof(NotFoundObjectResult));
+    }
 
     [TestMethod]
     public async Task CancelBooking_WhenBookingAlreadyCancelled_ReturnBadRequest()
