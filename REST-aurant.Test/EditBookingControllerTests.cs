@@ -107,6 +107,25 @@ public class EditBookingControllerTests
     }
 
     [TestMethod]
+    public async Task CompleteBooking_WhenBookingAlreadyCompleted_ReturnBadRequest()
+    {
+        var _ctx = CreateInMemoryDb();
+        var _controller = new EditBookingController(_ctx, new Mock<ITableService>().Object);
+        //Arrange
+        var booking = new Booking
+        {
+            Id = 1,
+            Status = BookingStatus.Complete
+        };
+        _ctx.Bookings.Add(booking);
+        await _ctx.SaveChangesAsync();
+        //Act
+        var result = await _controller.CompleteBooking(1);
+        //Assert
+        Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+    }
+
+    [TestMethod]
     public async Task ConfirmBooking_WhenBookingIsPutToConfirmed_ReturnsOk()
     {
         var _ctx = CreateInMemoryDb();
