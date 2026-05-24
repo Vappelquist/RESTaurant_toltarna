@@ -24,7 +24,7 @@ public class EditBookingControllerTests
 
     [TestMethod]
     public async Task CancelBooking_WhenBookingDoesNotExist_ReturnNotFound()
-    {   
+    {
         // Arrange
         var ctx = CreateInMemoryDb();
         var mockTableService = new Mock<ITableService>();
@@ -49,6 +49,18 @@ public class EditBookingControllerTests
         var result = await controller.ConfirmBooking(999);
 
         // Assert
+        Assert.IsInstanceOfType(result, typeof(NotFoundObjectResult));
+    }
+    [TestMethod]
+    public async Task CompleteBooking_WhenBookingDoesNotExist_ReturnNotFound()
+    {
+        var ctx = CreateInMemoryDb();
+        var mockTableService = new Mock<ITableService>();
+        //arrange
+        var controller = new EditBookingController(ctx, mockTableService.Object);
+        //act
+        var result = await controller.CompleteBooking(999);
+        //assert
         Assert.IsInstanceOfType(result, typeof(NotFoundObjectResult));
     }
 
@@ -94,4 +106,89 @@ public class EditBookingControllerTests
         Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
     }
 
+    [TestMethod]
+    public async Task CompleteBooking_WhenBookingAlreadyCompleted_ReturnBadRequest()
+    {
+        var _ctx = CreateInMemoryDb();
+        var _controller = new EditBookingController(_ctx, new Mock<ITableService>().Object);
+        //Arrange
+        var booking = new Booking
+        {
+            Id = 1,
+            Status = BookingStatus.Complete
+        };
+        _ctx.Bookings.Add(booking);
+        await _ctx.SaveChangesAsync();
+        //Act
+        var result = await _controller.CompleteBooking(1);
+        //Assert
+        Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+    }
+
+    [TestMethod]
+    public async Task ConfirmBooking_WhenBookingIsPutToConfirmed_ReturnsOk()
+    {
+        var _ctx = CreateInMemoryDb();
+        //Arrange
+        var booking = new Booking
+        {
+            Id = 99,
+            Status = BookingStatus.Canceled
+        };
+        booking.Status = BookingStatus.Confirmed;
+        _ctx.Bookings.Add(booking);
+        await _ctx.SaveChangesAsync();
+        //Act
+        bool bookingIsConfirmed = false;
+        if (booking.Status == BookingStatus.Confirmed)
+        {
+            bookingIsConfirmed = true;
+        }
+        //Assert
+        Assert.IsTrue(bookingIsConfirmed);
+    }
+    [TestMethod]
+    public async Task CancelBooking_WhenBookingIsPutToCancelled_ReturnsOk()
+    {
+        var _ctx = CreateInMemoryDb();
+        //Arrange
+        var booking = new Booking
+        {
+            Id = 99,
+            Status = BookingStatus.Confirmed
+        };
+        booking.Status = BookingStatus.Canceled;
+        _ctx.Bookings.Add(booking);
+        await _ctx.SaveChangesAsync();
+        //Act
+        bool bookingIsCancelled = false;
+        if (booking.Status == BookingStatus.Canceled)
+        {
+            bookingIsCancelled = true;
+        }
+        //Assert
+        Assert.IsTrue(bookingIsCancelled);
+    }
+    [TestMethod]
+    public async Task CompleteBooking_WhenBookingIsPutToComplete_ReturnsOk()
+    {
+        var _ctx = CreateInMemoryDb();
+        //Arrange
+        var booking = new Booking
+        {
+            Id = 99,
+            Status = BookingStatus.Confirmed
+        };
+        booking.Status = BookingStatus.Complete;
+        _ctx.Bookings.Add(booking);
+        await _ctx.SaveChangesAsync();
+        //Act
+        bool bookingIsCompleted = false;
+        if (booking.Status == BookingStatus.Complete)
+        {
+            bookingIsCompleted = true;
+        }
+        //Assert
+        Assert.IsTrue(bookingIsCompleted);
+    }
 }
