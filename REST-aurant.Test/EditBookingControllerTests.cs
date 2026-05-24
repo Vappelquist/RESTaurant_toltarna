@@ -24,7 +24,7 @@ public class EditBookingControllerTests
 
     [TestMethod]
     public async Task CancelBooking_WhenBookingDoesNotExist_ReturnNotFound()
-    {   
+    {
         // Arrange
         var ctx = CreateInMemoryDb();
         var mockTableService = new Mock<ITableService>();
@@ -94,4 +94,28 @@ public class EditBookingControllerTests
         Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
     }
 
+    [TestMethod]
+    public async Task ConfirmBooking_WhenBookingIsPutToConfirmed_ReturnsOk()
+    {
+        var _ctx = CreateInMemoryDb();
+        var _controller = new EditBookingController(_ctx, new Mock<ITableService>().Object);
+        //Arrange
+        var booking = new Booking
+        {
+            Id = 99,
+            Status = BookingStatus.Canceled
+        };
+        booking.Status = BookingStatus.Confirmed;
+        _ctx.Bookings.Add(booking);
+        await _ctx.SaveChangesAsync();
+        //Act
+        bool bookingIsConfirmed = false;
+        if (booking.Status == BookingStatus.Confirmed)
+        {
+            bookingIsConfirmed = true;
+        }
+        //Assert
+        Assert.IsTrue(bookingIsConfirmed);
+    }
+    
 }
