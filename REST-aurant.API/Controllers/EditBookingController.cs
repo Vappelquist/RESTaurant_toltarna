@@ -35,7 +35,7 @@ namespace Restaurant.API.Controllers
             }
             booking.Status = BookingStatus.Canceled;
             await _ctx.SaveChangesAsync();
-            return NoContent();
+            return Ok("Booking canceled.");
         }
 
         //Use this endpoint to revert accidentally canceled bookings back to confirmed status.
@@ -53,7 +53,7 @@ namespace Restaurant.API.Controllers
             }
             booking.Status = BookingStatus.Confirmed;
             await _ctx.SaveChangesAsync();
-            return NoContent();
+            return Ok("Booking confirmed.");
         }
 
         //Use this endpoint to mark a booking as complete after the guests have finished dining.
@@ -71,7 +71,7 @@ namespace Restaurant.API.Controllers
             }
             booking.Status = BookingStatus.Complete;
             await _ctx.SaveChangesAsync();
-            return NoContent();
+            return Ok("Booking marked as complete.");
         }
 
         // Use this endpoint to try and change the date of the booking
