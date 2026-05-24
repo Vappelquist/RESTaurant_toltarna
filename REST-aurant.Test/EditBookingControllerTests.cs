@@ -129,7 +129,6 @@ public class EditBookingControllerTests
     public async Task ConfirmBooking_WhenBookingIsPutToConfirmed_ReturnsOk()
     {
         var _ctx = CreateInMemoryDb();
-        var _controller = new EditBookingController(_ctx, new Mock<ITableService>().Object);
         //Arrange
         var booking = new Booking
         {
@@ -152,7 +151,6 @@ public class EditBookingControllerTests
     public async Task CancelBooking_WhenBookingIsPutToCancelled_ReturnsOk()
     {
         var _ctx = CreateInMemoryDb();
-        var _controller = new EditBookingController(_ctx, new Mock<ITableService>().Object);
         //Arrange
         var booking = new Booking
         {
@@ -175,7 +173,6 @@ public class EditBookingControllerTests
     public async Task CompleteBooking_WhenBookingIsPutToComplete_ReturnsOk()
     {
         var _ctx = CreateInMemoryDb();
-        var _controller = new EditBookingController(_ctx, new Mock<ITableService>().Object);
         //Arrange
         var booking = new Booking
         {
