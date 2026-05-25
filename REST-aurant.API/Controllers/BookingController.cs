@@ -218,6 +218,12 @@ namespace Restaurant.API.Controllers
                 return BadRequest("You must provide either an email or phone number.");
             }
 
+            bool isNumericString = request.PhoneNumber!.All(Char.IsDigit);
+            if(!isNumericString)
+            {
+                return BadRequest("Phone number can only contain numbers.");
+            }
+
             if (request.AmountOfGuests < 1)
             {
                 return BadRequest("Amount of guests must be at least 1.");

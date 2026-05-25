@@ -31,7 +31,7 @@ namespace Restaurant.API.Services
             {
                 // Guest already exists — check that the name matches
                 // If not, someone else may be attempting to use another person's contact details
-                if (guest.FirstName != request.FirstName || guest.LastName != request.LastName)
+                if (guest.FirstName == request.FirstName || guest.LastName == request.LastName)
                 {
                     return (null, "This email or phone number already belongs to another guest.");
                 }
