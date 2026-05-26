@@ -254,6 +254,44 @@ namespace Restaurant.API.Controllers
             return Ok(bookingDateDto);
         }
 
+        // Get: Bookings by Email
+        [HttpGet("GetBookingsByEmail/{email}", Name = "GetBookingsByEmail")]
+        public async Task<ActionResult<IEnumerable<GetAllBookingResponse>>> GetBookingsByEmail(string email)
+        {
+            // Validate email input
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return BadRequest("Email is required.");
+            }
+
+            // Look for bookings in the database where the guest's email matches the provided email (case-insensitive)
+            var bookings = await _ctx.Bookings
+                .AsNoTracking()
+                .Where(b => b.Guest != null && b.Guest.Email.ToLower() == email.ToLower())
+                .Select(b => new GetAllBookingResponse
+                {
+                    BookingId = b.Id,
+                    GuestName = $"{b.Guest.FirstName} {b.Guest.LastName}",
+                    AmountOfGuests = b.AmountOfGuests,
+                    Status = b.Status,
+                    DateBooked = DateOnly.FromDateTime(b.DateBooked),
+                    StartDate = DateOnly.FromDateTime(b.StartTime),
+                    StartTime = TimeOnly.FromDateTime(b.StartTime),
+                    EndDate = DateOnly.FromDateTime(b.EndTime),
+                    EndTime = TimeOnly.FromDateTime(b.EndTime),
+                    BookingNotes = b.BookingNotes,
+                    TableNumbers = b.Tables.Select(t => t.TableNumber).ToList()
+                })
+                .ToListAsync();
+
+            //  Did we find shit?
+            if (!bookings.Any())
+            {
+                return NotFound($"No bookings found for the email: {email}");
+            }
+
+            return Ok(bookings);
+        }
 
 
     }
