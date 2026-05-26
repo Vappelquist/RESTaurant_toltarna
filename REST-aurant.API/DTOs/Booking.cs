@@ -31,5 +31,6 @@ namespace Restaurant.API.DTOs
             public string? StartTime { get; set; }
             public string? BookingNotes { get; set; }
         }
+
     }
 }

@@ -17,11 +17,13 @@ namespace Restaurant.API.Controllers
     {
         private readonly RestaurantDbContext _ctx;
         private readonly IBookingService _bookingService;
+        private readonly ITableService _tableService;
 
-        public BookingController(RestaurantDbContext ctx, IBookingService bookingService)
+        public BookingController(RestaurantDbContext ctx, IBookingService bookingService, ITableService tableService)
         {
             _ctx = ctx;
             _bookingService = bookingService;
+            _tableService = tableService;
 
         }
         //Get: AllBookings
@@ -293,6 +295,34 @@ namespace Restaurant.API.Controllers
             return Ok(bookings);
         }
 
+        // Get: View table availability by specific time
+        [HttpGet("ViewBookingsByTime")]
+        public async Task<ActionResult<IEnumerable<TableStatusDto>>> ViewBookingsByTime([FromQuery] DateOnly date, [FromQuery] string time)
+        {
+            // Validate the time input
+            if (!TimeOnly.TryParse(time, out var startTime))
+            {
+                return BadRequest("Time must be entered in format HH:mm. For example 18:30");
+            }
 
+            var startDateTime = date.ToDateTime(startTime);
+            var endTime = startDateTime.AddHours(2); // Standard sittningstid på 2 timmar
+
+            // Get all the tables in the resturant
+            var allTables = await _ctx.Tables.ToListAsync();
+
+            // Use TableService to get the list of available tables for the specified time
+            var availableTables = await _tableService.GetAvailableTablesAsync(startDateTime, endTime);
+
+            // Create a list of TableStatusDto to represent the status of each table
+            var tableStatuses = allTables.Select(t => new TableStatusDto
+            (
+                t.TableNumber,
+                t.Seats,
+                availableTables.Any(at => at.TableNumber == t.TableNumber)
+            )).ToList();
+
+            return Ok(tableStatuses);
+        }
     }
 }
