@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Restaurant.API.Data;
 using Restaurant.API.DTOs;
+using Restaurant.API.Services.Enums;
 using Restaurant.Models.Models;
 using Restaurant.Models.Models.Enums;
 using System.Globalization;
@@ -19,7 +20,7 @@ namespace Restaurant.API.Services
             _tableService = tableService;
         }
 
-        public async Task<(Guest? guest, string? errorMessage)> GetOrCreateGuestAsync(PlaceBookingRequest request)
+        private async Task<(Guest? guest, string? errorMessage)> GetOrCreateGuestAsync(PlaceBookingRequest request)
         {
             var guest = await _ctx.Guests
                 .FirstOrDefaultAsync(g => g.Email == request.Email || g.PhoneNumber == request.PhoneNumber);
@@ -44,18 +45,28 @@ namespace Restaurant.API.Services
             return (guest, null);
         }
 
-        public async Task<string?> PlaceBookingAsync(PlaceBookingRequest request)
+        public async Task<ServiceResult> PlaceBookingAsync(PlaceBookingRequest request)
         {
             var startTime = TimeOnly.Parse(request.StartTime);
             var startDateTime = request.BookingDate.ToDateTime(startTime);
             var endTime = startDateTime.AddHours(2);
 
             var (guest, error) = await GetOrCreateGuestAsync(request);
-            if (error != null) return error;
+            if (error != null)
+                return new ServiceResult
+                {
+                    Success = false,
+                    ErrorType = ErrorType.ContactDetailsTaken
+                };
+
 
             var allocatedTables = await _tableService.AllocateTablesAsync(startDateTime, endTime, request.AmountOfGuests);
             if (!allocatedTables.Any())
-                return "This requested time is fully booked, please choose another available time.";
+                return new ServiceResult
+                {
+                    Success = false,
+                    ErrorType = ErrorType.FullyBooked
+                };
 
             var booking = new Models.Models.Booking
             {
@@ -71,7 +82,10 @@ namespace Restaurant.API.Services
 
             await _ctx.Bookings.AddAsync(booking);
             await _ctx.SaveChangesAsync();
-            return null;
+            return new ServiceResult 
+            { 
+                Success = true 
+            };
         }
 
         public async Task<List<GetAllBookingResponse>> GetAllBookingsAsync()
@@ -228,60 +242,141 @@ namespace Restaurant.API.Services
 
 
 
-        public async Task<string?> CancelBookingAsync(int id)
+        public async Task<ServiceResult> CancelBookingAsync(int id)
         {
             var booking = await _ctx.Bookings.FindAsync(id);
-            if (booking == null) return "notfound";
-            if (booking.Status == BookingStatus.Canceled) return "already_canceled";
+            if (booking == null)
+            {
+                return new ServiceResult
+                {
+                    Success = false,
+                    ErrorType = Enums.ErrorType.BookingNotFound
+                };
+            }
+            if (booking.Status == BookingStatus.Canceled)
+            {
+                return new ServiceResult
+                {
+                    Success = false,
+                    ErrorType = Enums.ErrorType.AlreadyCanceled
+                };
+            }
             booking.Status = BookingStatus.Canceled;
             await _ctx.SaveChangesAsync();
-            return null;
+            return new ServiceResult
+            {
+                Success = true
+            };
         }
 
-        public async Task<string?> ConfirmBookingAsync(int id)
+        public async Task<ServiceResult> ConfirmBookingAsync(int id)
         {
             var booking = await _ctx.Bookings.FindAsync(id);
-            if (booking == null) return "notfound";
-            if (booking.Status == BookingStatus.Confirmed) return "already_confirmed";
+            if (booking == null)
+            {
+                return new ServiceResult 
+                { 
+                    Success = false, 
+                    ErrorType = ErrorType.BookingNotFound 
+                };
+            }
+            if (booking.Status == BookingStatus.Confirmed)
+            {
+                return new ServiceResult 
+                { 
+                    Success = false, 
+                    ErrorType = ErrorType.AlreadyConfirmed 
+                };
+            }
+
             booking.Status = BookingStatus.Confirmed;
             await _ctx.SaveChangesAsync();
-            return null;
+            return new ServiceResult 
+            { 
+                Success = true 
+            };
         }
 
-        public async Task<string?> CompleteBookingAsync(int id)
+        public async Task<ServiceResult> CompleteBookingAsync(int id)
         {
             var booking = await _ctx.Bookings.FindAsync(id);
-            if (booking == null) return "notfound";
-            if (booking.Status == BookingStatus.Complete) return "already_complete";
+            if (booking == null)
+            {
+                return new ServiceResult
+                {
+                    Success = false,
+                    ErrorType = ErrorType.BookingNotFound
+                };
+            }
+            if (booking.Status == BookingStatus.Confirmed)
+            {
+                return new ServiceResult
+                {
+                    Success = false,
+                    ErrorType = ErrorType.AlreadyComplete
+                };
+            }
+
             booking.Status = BookingStatus.Complete;
             await _ctx.SaveChangesAsync();
-            return null;
+            return new ServiceResult
+            {
+                Success = true
+            };
         }
 
-        public async Task<string?> ChangeBookingDateAsync(int id, BookingDateChangeDto request)
+        public async Task<ServiceResult> ChangeBookingDateAsync(int id, BookingDateChangeDto request)
         {
             var booking = await _ctx.Bookings
                 .Include(b => b.Tables)
                 .FirstOrDefaultAsync(b => b.Id == id);
-            if (booking == null) return "notfound";
+            if (booking == null)
+            {
+                return new ServiceResult
+                {
+                    Success = false,
+                    ErrorType = ErrorType.BookingNotFound
+                };
+            }
 
             if (!TimeOnly.TryParse(request.NewStartTime, out var startTime))
-                return "invalid_time";
+            {
+                return new ServiceResult
+                {
+                    Success = false,
+                    ErrorType = ErrorType.InvalidTime
+                };
+            }
 
             var startDateTime = request.NewBookingDate.ToDateTime(startTime);
             if (startDateTime <= DateTime.Now)
-                return "not_in_future";
+            {
+                return new ServiceResult
+                {
+                    Success = false,
+                    ErrorType = ErrorType.DateInThePast
+                };
+            }
 
             var endTime = startDateTime.AddHours(2);
             var allocatedTables = await _tableService.AllocateTablesAsync(startDateTime, endTime, booking.AmountOfGuests, id);
             if (!allocatedTables.Any())
-                return "fully_booked";
+            {
+                return new ServiceResult
+                {
+                    Success = false,
+                    ErrorType = ErrorType.FullyBooked
+                };
+            }
 
             booking.StartTime = startDateTime;
             booking.EndTime = endTime;
             booking.Tables = allocatedTables;
             await _ctx.SaveChangesAsync();
-            return null;
+            return new ServiceResult
+            {
+                Success = true
+            };
         }
     }
 }

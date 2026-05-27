@@ -11,19 +11,21 @@ namespace Restaurant.API.Controllers
     [ApiController]
     public class GuestController : ControllerBase
     {
-        private readonly RestaurantDbContext _context;
         private readonly IGuestService _guestService;
 
         public GuestController(RestaurantDbContext context, IGuestService guestService)
         {
-            _context = context;
             _guestService = guestService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Guest>>> GetAllGuests()
+        public async Task<ActionResult> GetAllGuests()
         {
-            var guests = await _context.Guests.ToListAsync();
+            var guests = await _guestService.GetAllGuestsAsync();
+            if (!guests.Any())
+            {
+                return NotFound("No guests found.");
+            }
             return Ok(guests);
         }
 
