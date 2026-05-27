@@ -28,9 +28,7 @@ public class BookingControllerTests
     {
         // Arrange
         var mockBookingService = new Mock<IBookingService>();
-        var mockTableService = new Mock<ITableService>();
-        var ctx = CreateInMemoryDb();
-        var controller = new BookingController(ctx, mockBookingService.Object, mockTableService.Object); 
+        var controller = new BookingController(mockBookingService.Object); 
 
         var request = new PlaceBookingRequest
         {
@@ -54,9 +52,7 @@ public class BookingControllerTests
     {
         // Arrange
         var mockBookingService = new Mock<IBookingService>();
-        var mockTableService = new Mock<ITableService>();
-        var ctx = CreateInMemoryDb();
-        var controller = new BookingController(ctx, mockBookingService.Object, mockTableService.Object);
+        var controller = new BookingController(mockBookingService.Object);
 
         var request = new PlaceBookingRequest
         {
@@ -80,9 +76,7 @@ public class BookingControllerTests
     {
         // Arrange
         var mockBookingService = new Mock<IBookingService>();
-        var mockTableService = new Mock<ITableService>();
-        var ctx = CreateInMemoryDb();
-        var controller = new BookingController(ctx, mockBookingService.Object, mockTableService.Object);
+        var controller = new BookingController(mockBookingService.Object);
 
         var request = new PlaceBookingRequest
         {
@@ -107,9 +101,7 @@ public class BookingControllerTests
     {
         // Arrange
         var mockBookingService = new Mock<IBookingService>();
-        var mockTableService = new Mock<ITableService>();
-        var ctx = CreateInMemoryDb();
-        var controller = new BookingController(ctx, mockBookingService.Object, mockTableService.Object);
+        var controller = new BookingController(mockBookingService.Object);
 
         var request = new PlaceBookingRequest
         {

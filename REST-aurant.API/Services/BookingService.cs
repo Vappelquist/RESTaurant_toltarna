@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Restaurant.API.Data;
+using Restaurant.API.DTOs;
 using Restaurant.Models.Models;
 using Restaurant.Models.Models.Enums;
+using System.Globalization;
 using static Restaurant.API.DTOs.Booking;
 
 namespace Restaurant.API.Services
@@ -17,31 +19,20 @@ namespace Restaurant.API.Services
             _tableService = tableService;
         }
 
-
-        // This method handles the guest logic:
-        // - If the guest already exists, verify the name matches
-        // - If the guest does not exist, create a new one
         public async Task<(Guest? guest, string? errorMessage)> GetOrCreateGuestAsync(PlaceBookingRequest request)
         {
-            // Search for an existing guest with the same email or phone number
             var guest = await _ctx.Guests
                 .FirstOrDefaultAsync(g => g.Email == request.Email || g.PhoneNumber == request.PhoneNumber);
 
             if (guest != null)
             {
-                // Guest already exists — check that the name matches
-                // If not, someone else may be attempting to use another person's contact details
-                if (guest.FirstName == request.FirstName || guest.LastName == request.LastName)
+                if (guest.FirstName != request.FirstName || guest.LastName != request.LastName)
                 {
                     return (null, "This email or phone number already belongs to another guest.");
                 }
-
-                // Name matches — return the existing guest
                 return (guest, null);
             }
 
-            // No guest found — create a new one
-            // We add it to the context but don't save yet (SaveChanges occurs in PlaceBookingAsync)
             guest = new Guest
             {
                 FirstName = request.FirstName,
@@ -50,38 +41,23 @@ namespace Restaurant.API.Services
                 PhoneNumber = request.PhoneNumber,
             };
             await _ctx.Guests.AddAsync(guest);
-
-            // Return the new guest without an error message
             return (guest, null);
         }
 
         public async Task<string?> PlaceBookingAsync(PlaceBookingRequest request)
         {
-            // Convert the string "18:30" to a DateTime that the database can store
             var startTime = TimeOnly.Parse(request.StartTime);
             var startDateTime = request.BookingDate.ToDateTime(startTime);
             var endTime = startDateTime.AddHours(2);
 
-            // Retrieve or create the guest using the helper method above
-            // If something went wrong, return the error message directly
             var (guest, error) = await GetOrCreateGuestAsync(request);
-            if (error != null)
-            {
-                return error;
-            }
+            if (error != null) return error;
 
-            // Ask ITableService to find and allocate available tables for the selected time interval
-            // This logic is implemented in TableService
             var allocatedTables = await _tableService.AllocateTablesAsync(startDateTime, endTime, request.AmountOfGuests);
-
-            // If the list is empty there are not enough available seats
             if (!allocatedTables.Any())
-            {
                 return "This requested time is fully booked, please choose another available time.";
-            }
 
-            // Everything is OK — create the booking and link it to the guest and tables
-            var booking = new Booking
+            var booking = new Models.Models.Booking
             {
                 Guest = guest,
                 AmountOfGuests = request.AmountOfGuests,
@@ -94,12 +70,160 @@ namespace Restaurant.API.Services
             };
 
             await _ctx.Bookings.AddAsync(booking);
-
-            // Save everything to the database at once — both the guest (if new) and the booking
             await _ctx.SaveChangesAsync();
-
-            // null means no errors occurred
             return null;
+        }
+
+        public async Task<List<GetAllBookingResponse>> GetAllBookingsAsync()
+        {
+            return await _ctx.Bookings
+                .AsNoTracking()
+                .Select(b => new GetAllBookingResponse
+                {
+                    BookingId = b.Id,
+                    GuestName = $"{b.Guest.FirstName} {b.Guest.LastName}",
+                    AmountOfGuests = b.AmountOfGuests,
+                    Status = b.Status,
+                    DateBooked = DateOnly.FromDateTime(b.DateBooked),
+                    StartDate = DateOnly.FromDateTime(b.StartTime),
+                    StartTime = TimeOnly.FromDateTime(b.StartTime),
+                    EndDate = DateOnly.FromDateTime(b.EndTime),
+                    EndTime = TimeOnly.FromDateTime(b.EndTime),
+                    BookingNotes = b.BookingNotes,
+                    TableNumbers = b.Tables.Select(t => t.TableNumber).ToList()
+                })
+                .ToListAsync();
+        }
+
+        public async Task<GetAllBookingResponse?> GetBookingByIdAsync(int id)
+        {
+            var booking = await _ctx.Bookings
+                .Include(b => b.Guest)
+                .Include(b => b.Tables)
+                .FirstOrDefaultAsync(b => b.Id == id);
+
+            if (booking == null) return null;
+
+            return new GetAllBookingResponse
+            {
+                BookingId = booking.Id,
+                GuestName = $"{booking.Guest?.FirstName} {booking.Guest?.LastName}",
+                AmountOfGuests = booking.AmountOfGuests,
+                Status = booking.Status,
+                DateBooked = DateOnly.FromDateTime(booking.DateBooked),
+                StartDate = DateOnly.FromDateTime(booking.StartTime),
+                StartTime = TimeOnly.FromDateTime(booking.StartTime),
+                EndDate = DateOnly.FromDateTime(booking.EndTime),
+                EndTime = TimeOnly.FromDateTime(booking.EndTime),
+                BookingNotes = booking.BookingNotes,
+                TableNumbers = booking.Tables.Select(t => t.TableNumber).ToList()
+            };
+        }
+
+        public async Task<List<GetAllBookingResponse>> GetWeeklyBookingsAsync(int year, int week)
+        {
+            var startOfWeek = ISOWeek.ToDateTime(year, week, DayOfWeek.Monday);
+            var endOfWeek = startOfWeek.AddDays(7);
+
+            return await _ctx.Bookings
+                .AsNoTracking()
+                .Where(b => b.StartTime >= startOfWeek && b.StartTime < endOfWeek)
+                .Select(b => new GetAllBookingResponse
+                {
+                    BookingId = b.Id,
+                    GuestName = $"{b.Guest.FirstName} {b.Guest.LastName}",
+                    AmountOfGuests = b.AmountOfGuests,
+                    Status = b.Status,
+                    DateBooked = DateOnly.FromDateTime(b.DateBooked),
+                    StartDate = DateOnly.FromDateTime(b.StartTime),
+                    StartTime = TimeOnly.FromDateTime(b.StartTime),
+                    EndDate = DateOnly.FromDateTime(b.EndTime),
+                    EndTime = TimeOnly.FromDateTime(b.EndTime),
+                    BookingNotes = b.BookingNotes,
+                    TableNumbers = b.Tables.Select(t => t.TableNumber).ToList()
+                })
+                .ToListAsync();
+        }
+
+        public async Task<List<GetAllBookingResponse>> GetMonthlyBookingsAsync(int year, string month)
+        {
+            int monthNumber;
+            if (!int.TryParse(month, out monthNumber))
+            {
+                DateTime.TryParse($"1 {month} 2026", out var parsedDate);
+                monthNumber = parsedDate.Month;
+            }
+
+            var startOfMonth = new DateTime(year, monthNumber, 1);
+            var endOfMonth = startOfMonth.AddMonths(1);
+
+            return await _ctx.Bookings
+                .AsNoTracking()
+                .Where(b => b.StartTime >= startOfMonth && b.StartTime < endOfMonth)
+                .Select(b => new GetAllBookingResponse
+                {
+                    BookingId = b.Id,
+                    GuestName = $"{b.Guest.FirstName} {b.Guest.LastName}",
+                    AmountOfGuests = b.AmountOfGuests,
+                    Status = b.Status,
+                    DateBooked = DateOnly.FromDateTime(b.DateBooked),
+                    StartDate = DateOnly.FromDateTime(b.StartTime),
+                    StartTime = TimeOnly.FromDateTime(b.StartTime),
+                    EndDate = DateOnly.FromDateTime(b.EndTime),
+                    EndTime = TimeOnly.FromDateTime(b.EndTime),
+                    BookingNotes = b.BookingNotes,
+                    TableNumbers = b.Tables.Select(t => t.TableNumber).ToList()
+                })
+                .ToListAsync();
+        }
+
+        public async Task<BookingDateDto?> GetBookingDateAsync(int id)
+        {
+            var booking = await _ctx.Bookings.FindAsync(id);
+            if (booking == null) return null;
+
+            return new BookingDateDto(
+                DateOnly.FromDateTime(booking.DateBooked),
+                $"{TimeOnly.FromDateTime(booking.StartTime):HH:mm} - {TimeOnly.FromDateTime(booking.EndTime):HH:mm}"
+            );
+        }
+
+        public async Task<List<GetAllBookingResponse>> GetBookingsByEmailAsync(string email)
+        {
+            return await _ctx.Bookings
+                .AsNoTracking()
+                .Where(b => b.Guest != null && b.Guest.Email.ToLower() == email.ToLower())
+                .Select(b => new GetAllBookingResponse
+                {
+                    BookingId = b.Id,
+                    GuestName = $"{b.Guest.FirstName} {b.Guest.LastName}",
+                    AmountOfGuests = b.AmountOfGuests,
+                    Status = b.Status,
+                    DateBooked = DateOnly.FromDateTime(b.DateBooked),
+                    StartDate = DateOnly.FromDateTime(b.StartTime),
+                    StartTime = TimeOnly.FromDateTime(b.StartTime),
+                    EndDate = DateOnly.FromDateTime(b.EndTime),
+                    EndTime = TimeOnly.FromDateTime(b.EndTime),
+                    BookingNotes = b.BookingNotes,
+                    TableNumbers = b.Tables.Select(t => t.TableNumber).ToList()
+                })
+                .ToListAsync();
+        }
+
+        public async Task<List<TableStatusDto>> ViewBookingsByTimeAsync(DateOnly date, string time)
+        {
+            var startTime = TimeOnly.Parse(time);
+            var startDateTime = date.ToDateTime(startTime);
+            var endTime = startDateTime.AddHours(2);
+
+            var allTables = await _ctx.Tables.ToListAsync();
+            var availableTables = await _tableService.GetAvailableTablesAsync(startDateTime, endTime);
+
+            return allTables.Select(t => new TableStatusDto(
+                t.TableNumber,
+                t.Seats,
+                availableTables.Any(at => at.TableNumber == t.TableNumber)
+            )).ToList();
         }
     }
 }
