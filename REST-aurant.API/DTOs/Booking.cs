@@ -1,4 +1,5 @@
 ﻿using Restaurant.Models.Models.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace Restaurant.API.DTOs
 
@@ -7,12 +8,20 @@ namespace Restaurant.API.DTOs
     {
         public record GetAllBookingResponse
         {
+            [Required]
             public int BookingId { get; set; }
+            [Required]
             public string? GuestName { get; set; }
+            [Required]
             public int AmountOfGuests { get; set; }
+            [Required]
             public BookingStatus Status { get; set; }
             public DateOnly DateBooked { get; set; }
+            [Required]
+            [DataType(DataType.Date)]
             public DateOnly StartDate { get; set; }
+            [Required]
+            [DataType(DataType.Time)]
             public TimeOnly StartTime { get; set; }
             public DateOnly EndDate { get; set; }
             public TimeOnly EndTime { get; set; }
