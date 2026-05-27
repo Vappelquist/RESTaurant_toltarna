@@ -1,13 +1,12 @@
 ﻿using Restaurant.API.DTOs;
-using Restaurant.Models.Models;
 using static Restaurant.API.DTOs.Booking;
 
 namespace Restaurant.API.Services
 {
     public interface IBookingService
     {
-        Task<(Guest? guest, string? errorMessage)> GetOrCreateGuestAsync(PlaceBookingRequest request);
-        Task<string?> PlaceBookingAsync(PlaceBookingRequest request);
+        //Task<(Guest? guest, string? errorMessage)> GetOrCreateGuestAsync(PlaceBookingRequest request);
+        Task<ServiceResult> PlaceBookingAsync(PlaceBookingRequest request);
         Task<List<GetAllBookingResponse>> GetAllBookingsAsync();
         Task<GetAllBookingResponse?> GetBookingByIdAsync(int id);
         Task<List<GetAllBookingResponse>> GetWeeklyBookingsAsync(int year, int week);
@@ -16,9 +15,9 @@ namespace Restaurant.API.Services
         Task<List<GetAllBookingResponse>> GetBookingsByEmailAsync(string email);
         Task<List<TableStatusDto>> ViewBookingsByTimeAsync(DateOnly date, string time);
 
-        Task<string?> CancelBookingAsync(int id);
-        Task<string?> ConfirmBookingAsync(int id);
-        Task<string?> CompleteBookingAsync(int id);
-        Task<string?> ChangeBookingDateAsync(int id, BookingDateChangeDto request);
+        Task<ServiceResult> CancelBookingAsync(int id);
+        Task<ServiceResult> ConfirmBookingAsync(int id);
+        Task<ServiceResult> CompleteBookingAsync(int id);
+        Task<ServiceResult> ChangeBookingDateAsync(int id, BookingDateChangeDto request);
     }
 }

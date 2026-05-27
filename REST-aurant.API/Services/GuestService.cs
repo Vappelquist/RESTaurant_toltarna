@@ -1,4 +1,5 @@
-﻿using Restaurant.API.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using Restaurant.API.Data;
 using Restaurant.Models.Models;
 using static Restaurant.API.DTOs.GuestDTOs;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -11,6 +12,10 @@ namespace Restaurant.API.Services
         public GuestService(RestaurantDbContext context)
         {
             _context = context;
+        }
+        public async Task<List<Guest>> GetAllGuestsAsync()
+        {
+            return await _context.Guests.ToListAsync();
         }
         public async Task<(Guest?guest, string? error)> AddGuestAsync(CreateAddGuestRequest addGuestRequest)
         {

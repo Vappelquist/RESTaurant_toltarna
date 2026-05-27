@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Restaurant.API.DTOs;
 using Restaurant.API.Services;
-using Restaurant.Models.Models.Enums;
+using Restaurant.API.Services.Enums;
 using System.Globalization;
 using static Restaurant.API.DTOs.Booking;
 
@@ -98,9 +98,15 @@ namespace Restaurant.API.Controllers
             if (!TimeOnly.TryParse(request.StartTime, out _))
                 return BadRequest("Time must be entered in format HH:mm. For example 18:30");
 
-            var error = await _bookingService.PlaceBookingAsync(request);
-            if (error != null)
-                return BadRequest(error);
+            var result = await _bookingService.PlaceBookingAsync(request);
+            if (!result.Success)
+            {
+                return result.ErrorType switch 
+                { 
+                    ErrorType.ContactDetailsTaken => BadRequest("This email or phone number already belongs to another guest."), 
+                    ErrorType.FullyBooked => BadRequest("This time is fully booked, please choose another time."), 
+                    _ => BadRequest() };
+            }
 
             return Ok("Thank you, your booking has been received!");
         }
@@ -139,43 +145,46 @@ namespace Restaurant.API.Controllers
 
 
 
-        [HttpPut("{id}/cancel", Name = "CancelBooking")]
+        [HttpPut("{id}/cancel")]
         public async Task<ActionResult> CancelBooking(int id)
         {
             var result = await _bookingService.CancelBookingAsync(id);
-            return result switch
-            {
-                null => Ok("Booking canceled."),
-                "notfound" => NotFound("This booking does not exist"),
-                "already_canceled" => BadRequest("This booking is already canceled"),
-                _ => BadRequest()
-            };
+            if (!result.Success)
+                return result.ErrorType switch
+                {
+                    ErrorType.BookingNotFound => NotFound("This booking does not exist"),
+                    ErrorType.AlreadyCanceled => BadRequest("This booking is already canceled"),
+                    var unknownError => throw new InvalidOperationException($"Unhandled error type: {unknownError}")
+                };
+            return Ok("Booking canceled.");
         }
 
         [HttpPut("{id}/confirm", Name = "ConfirmBooking")]
         public async Task<ActionResult> ConfirmBooking(int id)
         {
             var result = await _bookingService.ConfirmBookingAsync(id);
-            return result switch
-            {
-                null => Ok("Booking confirmed."),
-                "notfound" => NotFound("This booking does not exist"),
-                "already_confirmed" => BadRequest("This booking is already confirmed"),
-                _ => BadRequest()
-            };
+            if (!result.Success)
+                return result.ErrorType switch
+                {
+                    ErrorType.BookingNotFound => NotFound("This booking does not exist"),
+                    ErrorType.AlreadyConfirmed => BadRequest("This booking is already confirmed"),
+                    var unknownError => throw new InvalidOperationException($"Unhandled error type: {unknownError}")
+                };
+            return Ok("Booking confirmed.");
         }
 
         [HttpPut("{id}/complete", Name = "CompleteBooking")]
         public async Task<ActionResult> CompleteBooking(int id)
         {
             var result = await _bookingService.CompleteBookingAsync(id);
-            return result switch
-            {
-                null => Ok("Booking marked as complete."),
-                "notfound" => NotFound("This booking does not exist"),
-                "already_complete" => BadRequest("This booking is already done."),
-                _ => BadRequest()
-            };
+            if (!result.Success)
+                return result.ErrorType switch
+                {
+                    ErrorType.BookingNotFound => NotFound("This booking does not exist"),
+                    ErrorType.AlreadyComplete => BadRequest("This booking is already complete"),
+                    var unknownError => throw new InvalidOperationException($"Unhandled error type: {unknownError}")
+                };
+            return Ok("Booking complete.");
         }
 
         [HttpPut("{id}/date", Name = "ChangeBookingDate")]
@@ -189,13 +198,15 @@ namespace Restaurant.API.Controllers
                 return BadRequest("The new booking date and time must be in the future.");
 
             var result = await _bookingService.ChangeBookingDateAsync(id, request);
-            return result switch
-            {
-                null => NoContent(),
-                "notfound" => NotFound("This booking does not exist"),
-                "fully_booked" => BadRequest("This requested time is fully booked, please choose another available time."),
-                _ => BadRequest()
-            };
+            if (!result.Success)
+                return result.ErrorType switch
+                {
+                    ErrorType.BookingNotFound => NotFound("This booking does not exist"),
+                    ErrorType.FullyBooked => BadRequest("This requested time is fully booked, please choose another available time"),
+                    var unknownError => throw new InvalidOperationException($"Unhandled error type: {unknownError}")
+                };
+            return Ok("Booking successfully changed.");
+            
         }
     }
 }
