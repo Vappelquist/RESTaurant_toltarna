@@ -225,5 +225,63 @@ namespace Restaurant.API.Services
                 availableTables.Any(at => at.TableNumber == t.TableNumber)
             )).ToList();
         }
+
+
+
+        public async Task<string?> CancelBookingAsync(int id)
+        {
+            var booking = await _ctx.Bookings.FindAsync(id);
+            if (booking == null) return "notfound";
+            if (booking.Status == BookingStatus.Canceled) return "already_canceled";
+            booking.Status = BookingStatus.Canceled;
+            await _ctx.SaveChangesAsync();
+            return null;
+        }
+
+        public async Task<string?> ConfirmBookingAsync(int id)
+        {
+            var booking = await _ctx.Bookings.FindAsync(id);
+            if (booking == null) return "notfound";
+            if (booking.Status == BookingStatus.Confirmed) return "already_confirmed";
+            booking.Status = BookingStatus.Confirmed;
+            await _ctx.SaveChangesAsync();
+            return null;
+        }
+
+        public async Task<string?> CompleteBookingAsync(int id)
+        {
+            var booking = await _ctx.Bookings.FindAsync(id);
+            if (booking == null) return "notfound";
+            if (booking.Status == BookingStatus.Complete) return "already_complete";
+            booking.Status = BookingStatus.Complete;
+            await _ctx.SaveChangesAsync();
+            return null;
+        }
+
+        public async Task<string?> ChangeBookingDateAsync(int id, BookingDateChangeDto request)
+        {
+            var booking = await _ctx.Bookings
+                .Include(b => b.Tables)
+                .FirstOrDefaultAsync(b => b.Id == id);
+            if (booking == null) return "notfound";
+
+            if (!TimeOnly.TryParse(request.NewStartTime, out var startTime))
+                return "invalid_time";
+
+            var startDateTime = request.NewBookingDate.ToDateTime(startTime);
+            if (startDateTime <= DateTime.Now)
+                return "not_in_future";
+
+            var endTime = startDateTime.AddHours(2);
+            var allocatedTables = await _tableService.AllocateTablesAsync(startDateTime, endTime, booking.AmountOfGuests, id);
+            if (!allocatedTables.Any())
+                return "fully_booked";
+
+            booking.StartTime = startDateTime;
+            booking.EndTime = endTime;
+            booking.Tables = allocatedTables;
+            await _ctx.SaveChangesAsync();
+            return null;
+        }
     }
 }

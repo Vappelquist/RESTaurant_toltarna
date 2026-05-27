@@ -15,5 +15,10 @@ namespace Restaurant.API.Services
         Task<BookingDateDto?> GetBookingDateAsync(int id);
         Task<List<GetAllBookingResponse>> GetBookingsByEmailAsync(string email);
         Task<List<TableStatusDto>> ViewBookingsByTimeAsync(DateOnly date, string time);
+
+        Task<string?> CancelBookingAsync(int id);
+        Task<string?> ConfirmBookingAsync(int id);
+        Task<string?> CompleteBookingAsync(int id);
+        Task<string?> ChangeBookingDateAsync(int id, BookingDateChangeDto request);
     }
 }
