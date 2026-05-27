@@ -10,6 +10,7 @@ namespace Restaurant.Models.Models
         [Required]
         [MaxLength(50)]
         public string? LastName { get; set; }
+        [Phone]
         public string? PhoneNumber { get; set; }
         public string? Allergies { get; set; }
         public string? Note { get; set; }

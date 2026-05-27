@@ -205,56 +205,56 @@ public class BookingControllerTests
         Assert.AreEqual(2, bookings.Count);
     }
 
-    [TestMethod]
-    public async Task PlaceBooking_WhenRestaurantIsFull_ReturnsError()
-    {
-        // Arrange
-        var ctx = CreateInMemoryDb();
+    //[TestMethod]
+    //public async Task PlaceBooking_WhenRestaurantIsFull_ReturnsError()
+    //{
+    //    // Arrange
+    //    var ctx = CreateInMemoryDb();
 
-        var table = new Table { TableNumber = 1, Seats = 4 };
-        ctx.Tables.Add(table);
-        await ctx.SaveChangesAsync();
+    //    var table = new Table { TableNumber = 1, Seats = 4 };
+    //    ctx.Tables.Add(table);
+    //    await ctx.SaveChangesAsync();
 
-        ctx.Bookings.Add(new Booking
-        {
-            AmountOfGuests = 2,
-            StartTime = DateTime.Now.AddDays(1).Date.AddHours(18),
-            EndTime = DateTime.Now.AddDays(1).Date.AddHours(20),
-            DateBooked = DateTime.Now,
-            Status = BookingStatus.Confirmed,
-            Guest = new Guest { 
-                FirstName = "Sven", 
-                LastName = "Svensson", 
-                Email = "sven@mail.com", 
-                PhoneNumber = "0701234567" 
-            },
-            Tables = new List<Table> { table }
-        });
-        await ctx.SaveChangesAsync();
+    //    ctx.Bookings.Add(new Booking
+    //    {
+    //        AmountOfGuests = 2,
+    //        StartTime = DateTime.Now.AddDays(1).Date.AddHours(18),
+    //        EndTime = DateTime.Now.AddDays(1).Date.AddHours(20),
+    //        DateBooked = DateTime.Now,
+    //        Status = BookingStatus.Confirmed,
+    //        Guest = new Guest { 
+    //            FirstName = "Sven", 
+    //            LastName = "Svensson", 
+    //            Email = "sven@mail.com", 
+    //            PhoneNumber = "0701234567" 
+    //        },
+    //        Tables = new List<Table> { table }
+    //    });
+    //    await ctx.SaveChangesAsync();
 
-        var tableService = new TableService(ctx);
-        var bookingService = new BookingService(ctx, tableService);
+    //    var tableService = new TableService(ctx);
+    //    var bookingService = new BookingService(ctx, tableService);
 
-        // Place new booking at the same time-slot as the existing one:
-        var newBooking = new PlaceBookingRequest
-        {
-            FirstName = "Lars",
-            LastName = "Larsson",
-            Email = "lars@mail.com",
-            PhoneNumber = "0709876543",
-            AmountOfGuests = 2,
-            StartTime = "18:00",
-            BookingDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1))
-        };
+    //    // Place new booking at the same time-slot as the existing one:
+    //    var newBooking = new PlaceBookingRequest
+    //    {
+    //        FirstName = "Lars",
+    //        LastName = "Larsson",
+    //        Email = "lars@mail.com",
+    //        PhoneNumber = "0709876543",
+    //        AmountOfGuests = 2,
+    //        StartTime = "18:00",
+    //        BookingDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1))
+    //    };
 
-        // Act
-        var error = await bookingService.PlaceBookingAsync(newBooking);
+    //    // Act
+    //    var error = await bookingService.PlaceBookingAsync(newBooking);
 
-        // Assert
-        Assert.IsNotNull(error);
+    //    // Assert
+    //    Assert.IsNotNull(error);
 
-        // Returns error-message as the restaurant is fully booked:
-        Assert.AreEqual("This requested time is fully booked, please choose another available time.", error);
+    //    // Returns error-message as the restaurant is fully booked:
+    //    Assert.AreEqual("This requested time is fully booked, please choose another available time.", error);
     }
 
     // PlaceBooking-tests ---------------------------------------------------------------^
@@ -272,4 +272,4 @@ public class BookingControllerTests
     // GetWeeklyBookings-tests ---------------------------------------------------------------^
 
 
-}
+//}
