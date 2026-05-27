@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Restaurant.API.DTOs;
 using Restaurant.API.Services;
+using Restaurant.Models.Models.Enums;
 using System.Globalization;
 using static Restaurant.API.DTOs.Booking;
 
@@ -132,6 +134,68 @@ namespace Restaurant.API.Controllers
 
             var tableStatuses = await _bookingService.ViewBookingsByTimeAsync(date, time);
             return Ok(tableStatuses);
+        }
+
+
+
+
+        [HttpPut("{id}/cancel", Name = "CancelBooking")]
+        public async Task<ActionResult> CancelBooking(int id)
+        {
+            var result = await _bookingService.CancelBookingAsync(id);
+            return result switch
+            {
+                null => Ok("Booking canceled."),
+                "notfound" => NotFound("This booking does not exist"),
+                "already_canceled" => BadRequest("This booking is already canceled"),
+                _ => BadRequest()
+            };
+        }
+
+        [HttpPut("{id}/confirm", Name = "ConfirmBooking")]
+        public async Task<ActionResult> ConfirmBooking(int id)
+        {
+            var result = await _bookingService.ConfirmBookingAsync(id);
+            return result switch
+            {
+                null => Ok("Booking confirmed."),
+                "notfound" => NotFound("This booking does not exist"),
+                "already_confirmed" => BadRequest("This booking is already confirmed"),
+                _ => BadRequest()
+            };
+        }
+
+        [HttpPut("{id}/complete", Name = "CompleteBooking")]
+        public async Task<ActionResult> CompleteBooking(int id)
+        {
+            var result = await _bookingService.CompleteBookingAsync(id);
+            return result switch
+            {
+                null => Ok("Booking marked as complete."),
+                "notfound" => NotFound("This booking does not exist"),
+                "already_complete" => BadRequest("This booking is already done."),
+                _ => BadRequest()
+            };
+        }
+
+        [HttpPut("{id}/date", Name = "ChangeBookingDate")]
+        public async Task<ActionResult> ChangeBookingDate(int id, BookingDateChangeDto request)
+        {
+            if (!TimeOnly.TryParse(request.NewStartTime, out _))
+                return BadRequest("Time must be entered in format HH:mm. For example 18:30");
+
+            var startDateTime = request.NewBookingDate.ToDateTime(TimeOnly.Parse(request.NewStartTime));
+            if (startDateTime <= DateTime.Now)
+                return BadRequest("The new booking date and time must be in the future.");
+
+            var result = await _bookingService.ChangeBookingDateAsync(id, request);
+            return result switch
+            {
+                null => NoContent(),
+                "notfound" => NotFound("This booking does not exist"),
+                "fully_booked" => BadRequest("This requested time is fully booked, please choose another available time."),
+                _ => BadRequest()
+            };
         }
     }
 }
