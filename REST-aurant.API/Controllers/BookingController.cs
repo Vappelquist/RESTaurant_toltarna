@@ -1,11 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Restaurant.API.Data;
-using Restaurant.API.DTOs;
 using Restaurant.API.Services;
-using Restaurant.Models.Models;
-using Restaurant.Models.Models.Enums;
 using System.Globalization;
 using static Restaurant.API.DTOs.Booking;
 
@@ -15,412 +9,129 @@ namespace Restaurant.API.Controllers
     [ApiController]
     public class BookingController : ControllerBase
     {
-        private readonly RestaurantDbContext _ctx;
         private readonly IBookingService _bookingService;
-        private readonly ITableService _tableService;
 
-        public BookingController(RestaurantDbContext ctx, IBookingService bookingService, ITableService tableService)
+        public BookingController(IBookingService bookingService)
         {
-            _ctx = ctx;
             _bookingService = bookingService;
-            _tableService = tableService;
-
         }
-        //Get: AllBookings
-        [HttpGet(Name = "GetAllBookings")]
-        public async Task<ActionResult<IEnumerable<GetAllBookingResponse>>> GetAllBookings()
-        {
-            var bookings = await _ctx.Bookings
-                .AsNoTracking()
-                .Select(b => new GetAllBookingResponse
-                {
-                    BookingId = b.Id,
-                    GuestName = $"{b.Guest.FirstName} {b.Guest.LastName}",
-                    AmountOfGuests = b.AmountOfGuests,
-                    Status = b.Status,
-                    DateBooked = DateOnly.FromDateTime(b.DateBooked),
-                    StartDate = DateOnly.FromDateTime(b.StartTime),
-                    StartTime = TimeOnly.FromDateTime(b.StartTime),
-                    EndDate = DateOnly.FromDateTime(b.EndTime),
-                    EndTime = TimeOnly.FromDateTime(b.EndTime),
-                    BookingNotes = b.BookingNotes,
-                    TableNumbers = b.Tables.Select(t => t.TableNumber).ToList()
-                })
-                .ToListAsync();
-            if (!bookings.Any())
-            {
-                return NotFound("No booking");
-            }
 
+        [HttpGet(Name = "GetAllBookings")]
+        public async Task<ActionResult> GetAllBookings()
+        {
+            var bookings = await _bookingService.GetAllBookingsAsync();
+            if (!bookings.Any())
+                return NotFound("No booking");
             return Ok(bookings);
         }
 
         [HttpGet("{id}", Name = "GetBookingById")]
         public async Task<ActionResult> GetBookingById(int id)
         {
-            var selectedBooking = await _ctx.Bookings
-                .Include(b => b.Guest)
-                .Include(b => b.Tables)
-                .FirstOrDefaultAsync(b => b.Id == id);
-            if (selectedBooking == null)
-            {
+            var booking = await _bookingService.GetBookingByIdAsync(id);
+            if (booking == null)
                 return NotFound();
-            }
-            else if (selectedBooking != null)
-            {
-                return Ok(new GetAllBookingResponse
-                {
-                    BookingId = selectedBooking.Id,
-                    GuestName = $"{selectedBooking.Guest?.FirstName} {selectedBooking.Guest?.LastName}",
-                    AmountOfGuests = selectedBooking.AmountOfGuests,
-                    Status = selectedBooking.Status,
-                    DateBooked = DateOnly.FromDateTime(selectedBooking.DateBooked),
-                    StartDate = DateOnly.FromDateTime(selectedBooking.StartTime),
-                    StartTime = TimeOnly.FromDateTime(selectedBooking.StartTime),
-                    EndDate = DateOnly.FromDateTime(selectedBooking.EndTime),
-                    EndTime = TimeOnly.FromDateTime(selectedBooking.EndTime),
-                    BookingNotes = selectedBooking.BookingNotes,
-                    TableNumbers = selectedBooking.Tables.Select(t => t.TableNumber).ToList()
-                });
-            }
-            return BadRequest();
-
+            return Ok(booking);
         }
 
-        //Get: weekly bookings by week
         [HttpGet("GetWeeklyBookings")]
-        public async Task<ActionResult<IEnumerable<GetAllBookingResponse>>> GetWeeklyBookings(int year, int week)
+        public async Task<ActionResult> GetWeeklyBookings(int year, int week)
         {
-            //Get current year
             var currentYear = DateTime.Now.Year;
-
-            //current year and 2 years ahead
             if (year < currentYear || year > currentYear + 2)
-            {
                 return BadRequest($"Year must be between {currentYear} and {currentYear + 2}");
-            }
 
             var totalWeeks = ISOWeek.GetWeeksInYear(year);
-
             if (week < 1 || week > totalWeeks)
-            {
                 return BadRequest($"Week must be between 1 and {totalWeeks} for year {year}");
-            }
-            var startOfWeek = ISOWeek.ToDateTime(year, week, DayOfWeek.Monday);
-            //The week starts at Monday
-            var endOfWeek = startOfWeek.AddDays(7);
 
-            var bookings = await _ctx.Bookings
-                .AsNoTracking()
-                .Where(b => b.StartTime >= startOfWeek && b.StartTime < endOfWeek)
-                .Select(b => new GetAllBookingResponse
-                {
-                    BookingId = b.Id,
-                    GuestName = $"{b.Guest.FirstName} {b.Guest.LastName}",
-                    AmountOfGuests = b.AmountOfGuests,
-                    Status = b.Status,
-                    DateBooked = DateOnly.FromDateTime(b.DateBooked),
-                    StartDate = DateOnly.FromDateTime(b.StartTime),
-                    StartTime = TimeOnly.FromDateTime(b.StartTime),
-                    EndDate = DateOnly.FromDateTime(b.EndTime),
-                    EndTime = TimeOnly.FromDateTime(b.EndTime),
-                    BookingNotes = b.BookingNotes,
-                    TableNumbers = b.Tables.Select(t => t.TableNumber).ToList()
-                })
-                .ToListAsync();
-
+            var bookings = await _bookingService.GetWeeklyBookingsAsync(year, week);
             if (!bookings.Any())
-            {
                 return NotFound("No booking this week");
-            }
-
             return Ok(bookings);
         }
 
-        //Get: MonthlyBookings
         [HttpGet("GetMonthlyBookings")]
-        public async Task<ActionResult<IEnumerable<GetAllBookingResponse>>> GetMonthlyBookings(int year, string month)
+        public async Task<ActionResult> GetMonthlyBookings(int year, string month)
         {
-            //Check if month is empty
             if (string.IsNullOrWhiteSpace(month))
-            {
                 return BadRequest("Month is required.");
-            }
 
             int monthNumber;
-            //Check if input is already a number 
             if (!int.TryParse(month, out monthNumber))
             {
                 if (!DateTime.TryParse($"1 {month} 2026", out var parsedDate))
-                {
                     return BadRequest("Type in a valid month or check the spelling.");
-                }
-
                 monthNumber = parsedDate.Month;
             }
 
             if (monthNumber < 1 || monthNumber > 12)
-            {
                 return BadRequest("Month number must be between 1 and 12.");
-            }
 
-            //Get current year
             var currentYear = DateTime.Now.Year;
-
             if (year < currentYear || year > currentYear + 2)
-            {
                 return BadRequest($"Year must be between {currentYear} and {currentYear + 2}");
-            }
 
-            //1st date of choosen month
-            var startOfMonth = new DateTime(currentYear, monthNumber, 1);
-            //End of choosen month ends the day right before 1st date the next month 
-            var endOfMonth = startOfMonth.AddMonths(1);
-
-            var bookings = await _ctx.Bookings
-                .AsNoTracking()
-                .Where(b => b.StartTime >= startOfMonth && b.StartTime < endOfMonth)
-                .Select(b => new GetAllBookingResponse
-                {
-                    BookingId = b.Id,
-                    GuestName = $"{b.Guest.FirstName} {b.Guest.LastName}",
-                    AmountOfGuests = b.AmountOfGuests,
-                    Status = b.Status,
-                    DateBooked = DateOnly.FromDateTime(b.DateBooked),
-                    StartDate = DateOnly.FromDateTime(b.StartTime),
-                    StartTime = TimeOnly.FromDateTime(b.EndTime),
-                    EndDate = DateOnly.FromDateTime(b.EndTime),
-                    EndTime = TimeOnly.FromDateTime(b.EndTime),
-                    BookingNotes = b.BookingNotes,
-                    TableNumbers = b.Tables.Select(t => t.TableNumber).ToList()
-                })
-                .ToListAsync();
-
+            var bookings = await _bookingService.GetMonthlyBookingsAsync(year, month);
             if (!bookings.Any())
-            {
                 return NotFound("No booking this month");
-            }
-
             return Ok(bookings);
         }
 
-
-
-        //Endpoint to place a new booking
         [HttpPost("PlaceBooking")]
         public async Task<ActionResult> PlaceBooking(PlaceBookingRequest request)
         {
             if (string.IsNullOrWhiteSpace(request.FirstName) || string.IsNullOrWhiteSpace(request.LastName))
-            {
                 return BadRequest("To place a booking you must enter your first name and last name.");
-            }
 
             if (string.IsNullOrWhiteSpace(request.Email) && string.IsNullOrWhiteSpace(request.PhoneNumber))
-            {
                 return BadRequest("You must provide either an email or phone number.");
-            }
 
-            bool isNumericString = request.PhoneNumber!.All(Char.IsDigit);
-            if(!isNumericString)
-            {
+            if (!request.PhoneNumber!.All(Char.IsDigit))
                 return BadRequest("Phone number can only contain numbers.");
-            }
 
             if (request.AmountOfGuests < 1)
-            {
                 return BadRequest("Amount of guests must be at least 1.");
-            }
 
-            if (!TimeOnly.TryParse(request.StartTime, out var startTime))
-            {
+            if (!TimeOnly.TryParse(request.StartTime, out _))
                 return BadRequest("Time must be entered in format HH:mm. For example 18:30");
-            }
 
             var error = await _bookingService.PlaceBookingAsync(request);
             if (error != null)
                 return BadRequest(error);
 
             return Ok("Thank you, your booking has been received!");
-
         }
 
         [HttpGet("{id}/date", Name = "GetBookingDate")]
-        public async Task<ActionResult<BookingDateDto>> GetBookingDate(int id)
+        public async Task<ActionResult> GetBookingDate(int id)
         {
-            var booking = await _ctx.Bookings.FindAsync(id);
+            var booking = await _bookingService.GetBookingDateAsync(id);
             if (booking == null)
-            {
                 return NotFound("No booking with this id");
-            }
-            var bookingDateDto = new BookingDateDto(DateOnly.FromDateTime(booking.DateBooked), $"{TimeOnly.FromDateTime(booking.StartTime).ToString("HH:mm")} - {TimeOnly.FromDateTime(booking.EndTime).ToString("HH:mm")}");
-            return Ok(bookingDateDto);
+            return Ok(booking);
         }
 
-        // Get: Bookings by Email
         [HttpGet("GetBookingsByEmail/{email}", Name = "GetBookingsByEmail")]
-        public async Task<ActionResult<IEnumerable<GetAllBookingResponse>>> GetBookingsByEmail(string email)
+        public async Task<ActionResult> GetBookingsByEmail(string email)
         {
-            // Validate email input
             if (string.IsNullOrWhiteSpace(email))
-            {
                 return BadRequest("Email is required.");
-            }
 
-            // Look for bookings in the database where the guest's email matches the provided email (case-insensitive)
-            var bookings = await _ctx.Bookings
-                .AsNoTracking()
-                .Where(b => b.Guest != null && b.Guest.Email.ToLower() == email.ToLower())
-                .Select(b => new GetAllBookingResponse
-                {
-                    BookingId = b.Id,
-                    GuestName = $"{b.Guest.FirstName} {b.Guest.LastName}",
-                    AmountOfGuests = b.AmountOfGuests,
-                    Status = b.Status,
-                    DateBooked = DateOnly.FromDateTime(b.DateBooked),
-                    StartDate = DateOnly.FromDateTime(b.StartTime),
-                    StartTime = TimeOnly.FromDateTime(b.StartTime),
-                    EndDate = DateOnly.FromDateTime(b.EndTime),
-                    EndTime = TimeOnly.FromDateTime(b.EndTime),
-                    BookingNotes = b.BookingNotes,
-                    TableNumbers = b.Tables.Select(t => t.TableNumber).ToList()
-                })
-                .ToListAsync();
-
-            //  Did we find shit?
+            var bookings = await _bookingService.GetBookingsByEmailAsync(email);
             if (!bookings.Any())
-            {
                 return NotFound($"No bookings found for the email: {email}");
-            }
-
             return Ok(bookings);
         }
 
-        // Get: View table availability by specific time
         [HttpGet("ViewBookingsByTime")]
-        public async Task<ActionResult<IEnumerable<TableStatusDto>>> ViewBookingsByTime([FromQuery] DateOnly date, [FromQuery] string time)
+        public async Task<ActionResult> ViewBookingsByTime([FromQuery] DateOnly date, [FromQuery] string time)
         {
-            // Validate the time input
-            if (!TimeOnly.TryParse(time, out var startTime))
-            {
+            if (!TimeOnly.TryParse(time, out _))
                 return BadRequest("Time must be entered in format HH:mm. For example 18:30");
-            }
 
-            var startDateTime = date.ToDateTime(startTime);
-            var endTime = startDateTime.AddHours(2); // Standard sittningstid på 2 timmar
-
-            // Get all the tables in the resturant
-            var allTables = await _ctx.Tables.ToListAsync();
-
-            // Use TableService to get the list of available tables for the specified time
-            var availableTables = await _tableService.GetAvailableTablesAsync(startDateTime, endTime);
-
-            // Create a list of TableStatusDto to represent the status of each table
-            var tableStatuses = allTables.Select(t => new TableStatusDto
-            (
-                t.TableNumber,
-                t.Seats,
-                availableTables.Any(at => at.TableNumber == t.TableNumber)
-            )).ToList();
-
+            var tableStatuses = await _bookingService.ViewBookingsByTimeAsync(date, time);
             return Ok(tableStatuses);
         }
-        [HttpPut("{id}/cancel", Name = "CancelBooking")]
-        public async Task<ActionResult> CancelBooking(int id)
-        {
-            var booking = await _ctx.Bookings.FindAsync(id);
-            if (booking == null)
-            {
-                return NotFound("This booking does not exist");
-            }
-            if (booking.Status == BookingStatus.Canceled)
-            {
-                return BadRequest("This booking is already canceled");
-            }
-            booking.Status = BookingStatus.Canceled;
-            await _ctx.SaveChangesAsync();
-            return Ok("Booking canceled.");
-        }
-
-        //Use this endpoint to revert accidentally canceled bookings back to confirmed status.
-        [HttpPut("{id}/confirm", Name = "ConfirmBooking")]
-        public async Task<ActionResult> ConfirmBooking(int id)
-        {
-            var booking = await _ctx.Bookings.FindAsync(id);
-            if (booking == null)
-            {
-                return NotFound("This booking does not exist");
-            }
-            if (booking.Status == BookingStatus.Confirmed)
-            {
-                return BadRequest("This booking is already confirmed");
-            }
-            booking.Status = BookingStatus.Confirmed;
-            await _ctx.SaveChangesAsync();
-            return Ok("Booking confirmed.");
-        }
-
-        //Use this endpoint to mark a booking as complete after the guests have finished dining.
-        [HttpPut("{id}/complete", Name = "CompleteBooking")]
-        public async Task<ActionResult> CompleteBooking(int id)
-        {
-            var booking = await _ctx.Bookings.FindAsync(id);
-            if (booking == null)
-            {
-                return NotFound("This booking does not exist");
-            }
-            if (booking.Status == BookingStatus.Complete)
-            {
-                return BadRequest("This booking is already done.");
-            }
-            booking.Status = BookingStatus.Complete;
-            await _ctx.SaveChangesAsync();
-            return Ok("Booking marked as complete.");
-        }
-
-        // Use this endpoint to try and change the date of the booking
-        [HttpPut("{id}/date", Name = "ChangeBookingDate")]
-        public async Task<ActionResult> ChangeBookingDate(int id, BookingDateChangeDto request)
-        {
-            // 1. FIX: Lägg till .Include(b => b.Tables) så EF kan hantera relationsändringen
-            var booking = await _ctx.Bookings
-                .Include(b => b.Tables)
-                .FirstOrDefaultAsync(b => b.Id == id);
-
-            if (booking == null)
-            {
-                return NotFound("This booking does not exist");
-            }
-
-            // Validate the new start time format
-            if (!TimeOnly.TryParse(request.NewStartTime, out var startTime))
-            {
-                return BadRequest("Time must be entered in format HH:mm. For example 18:30");
-            }
-
-            // Check if the new booking date and time is in the future
-            var startDateTime = request.NewBookingDate.ToDateTime(startTime);
-            if (startDateTime <= DateTime.Now)
-            {
-                return BadRequest("The new booking date and time must be in the future.");
-            }
-
-            var endTime = startDateTime.AddHours(2);
-            var allocatedTables = await _tableService.AllocateTablesAsync(startDateTime, endTime, booking.AmountOfGuests, id);
-
-            // If the list is empty, it means there are no or not enough available tables for the requested time slot
-            if (!allocatedTables.Any())
-            {
-                return BadRequest("This requested time is fully booked, please choose another available time.");
-            }
-
-            // Uppdatera bokningen
-            booking.StartTime = startDateTime;
-            booking.EndTime = endTime;
-            booking.Tables = allocatedTables;
-
-            await _ctx.SaveChangesAsync();
-            return NoContent();
-        }
-    
-}
+    }
 }
