@@ -64,7 +64,7 @@ namespace Restaurant.API.Services
                 DateBooked = DateTime.Now,
                 StartTime = startDateTime,
                 EndTime = endTime,
-                Status = BookingStatus.Confirmed,
+                Status = BookingStatus.Pending,
                 BookingNotes = request.BookingNotes,
                 Tables = allocatedTables
             };
