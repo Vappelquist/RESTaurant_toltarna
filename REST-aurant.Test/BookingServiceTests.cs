@@ -38,18 +38,19 @@ public class BookingServiceTests
             FirstName = "Sven",
             LastName = "Svensson",
             Email = "sven@mail.com",
+            PhoneNumber = "0701234567",
             AmountOfGuests = 2,
             StartTime = "18:00",
             BookingDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1))
         };
 
         // Act
-        await service.PlaceBookingAsync(request);
+        var restult = await service.PlaceBookingAsync(request);
 
         // Assert
         var booking = await ctx.Bookings.FirstOrDefaultAsync();
         Assert.IsNotNull(booking);
-        Assert.AreEqual(booking.EndTime, booking.StartTime.AddHours(2));
+        Assert.AreEqual(booking.StartTime.AddHours(2), booking.EndTime);
     }
 
     [TestMethod]
