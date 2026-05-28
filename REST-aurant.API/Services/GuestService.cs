@@ -36,6 +36,15 @@ namespace Restaurant.API.Services
                 };
             }
 
+            if (string.IsNullOrWhiteSpace(addGuestRequest.Email))
+            {
+                return new ServiceResult<Guest>
+                {
+                    Success = false,
+                    ErrorType = Enums.ErrorType.InvalidInput
+                };
+            }
+
             var guestToAdd = new Guest
             {
                 FirstName = addGuestRequest.FirstName,

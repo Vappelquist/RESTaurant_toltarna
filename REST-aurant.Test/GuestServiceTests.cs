@@ -77,4 +77,31 @@ public class GuestServiceTests
         Assert.IsTrue(result.Success);
         Assert.IsNotNull(result.Data);
     }
+
+    [DataTestMethod]
+    [DataRow(null, "Email is null, should not be accepted since it's required")]
+    [DataRow("", "Email is empty, should not be accepted since it's required")]
+    [DataRow("   ", "Email is whitespace, should not be accepted since it's required")]
+    public async Task AddGuest_WhenEmailIsMissing_ShouldReturnInvalidInputErrorType(string email, string errorMessage)
+    {
+        //Arrange
+        var ctx = CreateInMemoryDb();
+        var service = new GuestService(ctx);
+
+        var request = new CreateAddGuestRequest
+        {
+            FirstName = "Anna",
+            LastName = "Svensson",
+            Email = email,
+            Password = "password123",
+            PhoneNumber = "0701234567"
+        };
+
+        //Act
+        var result = await service.AddGuestAsync(request);
+
+        //Assert
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ErrorType.InvalidInput, result.ErrorType);
+    }
 }

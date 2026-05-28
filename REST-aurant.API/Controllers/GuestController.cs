@@ -40,7 +40,7 @@ namespace Restaurant.API.Controllers
                 return result.ErrorType switch
                 {
                     ErrorType.RequestMissing => BadRequest("Request is missing."),
-                    ErrorType.InvalidInput => BadRequest("FirstName and LastName has to be filled."),
+                    ErrorType.InvalidInput => BadRequest("FirstName, LastName and Email has to be filled."),
                     _ => BadRequest()
                 };
             }
