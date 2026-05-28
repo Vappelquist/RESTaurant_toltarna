@@ -51,4 +51,30 @@ public class GuestServiceTests
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ErrorType.InvalidInput, result.ErrorType);
     }
+
+    [DataTestMethod]
+    [DataRow(null, "PhoneNumber is null, should still be accepted since it's not required")]
+    [DataRow("", "PhoneNumber is empty, should still be accepted since it's not required")]
+    public async Task AddGuest_WhenPhoneNumberIsNullOrEmpty_ShouldSucceed(string phoneNumber, string errorMessage)
+    {
+        //Arrange
+        var ctx = CreateInMemoryDb();
+        var service = new GuestService(ctx);
+
+        var request = new CreateAddGuestRequest
+        {
+            FirstName = "Anna",
+            LastName = "Svensson",
+            Email = "anna@mail.com",
+            Password = "password123",
+            PhoneNumber = phoneNumber
+        };
+
+        //Act
+        var result = await service.AddGuestAsync(request);
+
+        //Assert
+        Assert.IsTrue(result.Success);
+        Assert.IsNotNull(result.Data);
+    }
 }
