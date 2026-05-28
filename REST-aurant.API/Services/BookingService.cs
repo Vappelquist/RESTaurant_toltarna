@@ -308,7 +308,7 @@ namespace Restaurant.API.Services
                     ErrorType = ErrorType.BookingNotFound
                 };
             }
-            if (booking.Status == BookingStatus.Confirmed)
+            if (booking.Status == BookingStatus.Complete)
             {
                 return new ServiceResult
                 {

@@ -101,6 +101,7 @@ public class BookingControllerTests
             FirstName = "Sven",
             LastName = "Svensson",
             Email = "sven@mail.com",
+            PhoneNumber = "+4676-5487999",
             AmountOfGuests = 0,
             StartTime = "18:00",
             BookingDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1))
