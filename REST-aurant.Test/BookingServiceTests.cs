@@ -152,13 +152,16 @@ public class BookingServiceTests
     [TestMethod]
     public async Task CancelBooking_WhenAlreadyCanceled_ReturnsAlreadyCanceled()
     {
+        //arrange
         var ctx = CreateInMemoryDb();
         ctx.Bookings.Add(new Booking { Id = 1, Status = BookingStatus.Canceled });
         await ctx.SaveChangesAsync();
 
+        //act
         var service = new BookingService(ctx, new Mock<ITableService>().Object);
         var result = await service.CancelBookingAsync(1);
 
+        //assert
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ErrorType.AlreadyCanceled, result.ErrorType);
     }
@@ -166,13 +169,16 @@ public class BookingServiceTests
     [TestMethod]
     public async Task ConfirmBooking_WhenAlreadyConfirmed_ReturnsAlreadyConfirmed()
     {
+        //arrange
         var ctx = CreateInMemoryDb();
         ctx.Bookings.Add(new Booking { Id = 1, Status = BookingStatus.Confirmed });
         await ctx.SaveChangesAsync();
 
+        //act
         var service = new BookingService(ctx, new Mock<ITableService>().Object);
         var result = await service.ConfirmBookingAsync(1);
 
+        //assert
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ErrorType.AlreadyConfirmed, result.ErrorType);
     }
@@ -180,13 +186,16 @@ public class BookingServiceTests
     [TestMethod]
     public async Task CompleteBooking_WhenAlreadyComplete_ReturnsAlreadyComplete()
     {
+        //arrange
         var ctx = CreateInMemoryDb();
         ctx.Bookings.Add(new Booking { Id = 1, Status = BookingStatus.Complete });
         await ctx.SaveChangesAsync();
 
+        //act
         var service = new BookingService(ctx, new Mock<ITableService>().Object);
         var result = await service.CompleteBookingAsync(1);
 
+        //assert
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ErrorType.AlreadyComplete, result.ErrorType);
     }
@@ -194,13 +203,16 @@ public class BookingServiceTests
     [TestMethod]
     public async Task CancelBooking_WhenBookingIsConfirmed_StatusSetToCanceled()
     {
+        //arrange
         var ctx = CreateInMemoryDb();
         ctx.Bookings.Add(new Booking { Id = 1, Status = BookingStatus.Confirmed });
         await ctx.SaveChangesAsync();
 
+        //act
         var service = new BookingService(ctx, new Mock<ITableService>().Object);
         var result = await service.CancelBookingAsync(1);
 
+        //assert
         Assert.IsTrue(result.Success);
         var booking = await ctx.Bookings.FindAsync(1);
         Assert.AreEqual(BookingStatus.Canceled, booking!.Status);
@@ -209,13 +221,16 @@ public class BookingServiceTests
     [TestMethod]
     public async Task ConfirmBooking_WhenBookingIsCanceled_StatusSetToConfirmed()
     {
+        //arrange
         var ctx = CreateInMemoryDb();
         ctx.Bookings.Add(new Booking { Id = 1, Status = BookingStatus.Canceled });
         await ctx.SaveChangesAsync();
 
+        //act
         var service = new BookingService(ctx, new Mock<ITableService>().Object);
         var result = await service.ConfirmBookingAsync(1);
 
+        //assert
         Assert.IsTrue(result.Success);
         var booking = await ctx.Bookings.FindAsync(1);
         Assert.AreEqual(BookingStatus.Confirmed, booking!.Status);
@@ -224,13 +239,16 @@ public class BookingServiceTests
     [TestMethod]
     public async Task CompleteBooking_WhenBookingIsConfirmed_StatusSetToComplete()
     {
+        //arrange
         var ctx = CreateInMemoryDb();
         ctx.Bookings.Add(new Booking { Id = 1, Status = BookingStatus.Confirmed });
         await ctx.SaveChangesAsync();
 
+        //act
         var service = new BookingService(ctx, new Mock<ITableService>().Object);
         var result = await service.CompleteBookingAsync(1);
 
+        //assert
         Assert.IsTrue(result.Success);
         var booking = await ctx.Bookings.FindAsync(1);
         Assert.AreEqual(BookingStatus.Complete, booking!.Status);
