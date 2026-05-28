@@ -135,6 +135,30 @@ public class BookingControllerTests
         Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
     }
 
+    [TestMethod]
+    [DataRow("1")]
+    [DataRow("12")]
+    [DataRow("september")]
+    public async Task GetMonthlyBookings_WhenMonthIsValid_ReturnOk(string month)
+    {
+        //arrange
+        var mockBookingService = new Mock<IBookingService>();
+        mockBookingService
+            .Setup(s => s.GetMonthlyBookingsAsync(It.IsAny<int>(), It.IsAny<string>()))
+            .ReturnsAsync(new List<GetAllBookingResponse>
+            {
+                new GetAllBookingResponse()
+            });
+
+        var controller = new BookingController(mockBookingService.Object);
+
+        //act
+        var result = await controller.GetMonthlyBookings(2026, month);
+
+        //assert
+        Assert.IsInstanceOfType(result, typeof(OkObjectResult));
+    }
+
     // GetMonthlyBookings-tests ---------------------------------------------------------------^
 
 
