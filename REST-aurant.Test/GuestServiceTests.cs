@@ -5,6 +5,7 @@ using Restaurant.API.Controllers;
 using Restaurant.API.Data;
 using Restaurant.API.Services;
 using Restaurant.Models.Models;
+using Restaurant.API.Services.Enums;
 using static Restaurant.API.DTOs.GuestDTOs;
 
 namespace Restaurant.Test;
@@ -27,7 +28,9 @@ public class GuestServiceTests
     [DataRow("", "", "both FirstName and LastName cannot be empty")]
     [DataRow(null, "Svensson", "FirstName cannot be null")]
     [DataRow("Anna", null, "LastName cannot be null")]
-    public async Task AddGuest_WhenNameIsMissing_ShouldReturnNull(string firstName, string lastName, string errorMessage)
+    [DataRow("   ", "Svensson", "FirstName containing whitespace should not pass")]
+    [DataRow("Anna", "   ", "LastName containing whitespace should not pass")]
+    public async Task AddGuest_WhenNameIsMissing_ShouldReturnInvaldInputErrorType(string firstName, string lastName, string errorMessage)
     {
         //Arrange
         var ctx = CreateInMemoryDb();
@@ -45,6 +48,7 @@ public class GuestServiceTests
         var result = await service.AddGuestAsync(request);
 
         //Assert
-        Assert.IsNull(result.guest);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ErrorType.InvalidInput, result.ErrorType);
     }
 }

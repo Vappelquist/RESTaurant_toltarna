@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Restaurant.API.Data;
 using Restaurant.API.Services;
+using Restaurant.API.Services.Enums;
 using Restaurant.Models.Models;
 using static Restaurant.API.DTOs.GuestDTOs;
 
@@ -33,13 +34,18 @@ namespace Restaurant.API.Controllers
         [EndpointSummary("Register new guest")]
         public async Task<IActionResult> AddGuest(CreateAddGuestRequest addGuestRequest)
         {
-            var (guest, error) = await _guestService.AddGuestAsync(addGuestRequest);
-            if (error != null)
+            var result = await _guestService.AddGuestAsync(addGuestRequest);
+            if (!result.Success)
             {
-                return BadRequest(error);
+                return result.ErrorType switch
+                {
+                    ErrorType.RequestMissing => BadRequest("Request is missing."),
+                    ErrorType.InvalidInput => BadRequest("FirstName and LastName has to be filled."),
+                    _ => BadRequest()
+                };
             }
             
-            return Ok(guest);
+            return Ok(result.Data);
         }
     }
 }

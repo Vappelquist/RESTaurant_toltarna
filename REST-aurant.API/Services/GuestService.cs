@@ -17,16 +17,23 @@ namespace Restaurant.API.Services
         {
             return await _context.Guests.ToListAsync();
         }
-        public async Task<(Guest?guest, string? error)> AddGuestAsync(CreateAddGuestRequest addGuestRequest)
+        public async Task<ServiceResult<Guest>> AddGuestAsync(CreateAddGuestRequest addGuestRequest)
         {
             if (addGuestRequest == null)
             {
-                return (null, "Request is missing");
+                return new ServiceResult<Guest>
+                {
+                    Success = false, ErrorType = Enums.ErrorType.RequestMissing
+                };
             }
 
             if (string.IsNullOrWhiteSpace(addGuestRequest.FirstName) || string.IsNullOrWhiteSpace(addGuestRequest.LastName))
             {
-                return (null, "FirstName and LastName has to be filled");
+                return new ServiceResult<Guest>
+                {
+                    Success = false,
+                    ErrorType = Enums.ErrorType.InvalidInput
+                };
             }
 
             var guestToAdd = new Guest
@@ -42,7 +49,11 @@ namespace Restaurant.API.Services
 
             await _context.Guests.AddAsync(guestToAdd);
             await _context.SaveChangesAsync();
-            return (guestToAdd, null);
+            return new ServiceResult<Guest>
+            {
+                Success = true,
+                Data = guestToAdd
+            };
         }
     }
 }
