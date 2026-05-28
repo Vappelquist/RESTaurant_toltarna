@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Restaurant.API.Controllers;
 using Restaurant.API.Services;
+using System.ComponentModel.DataAnnotations;
 using static Restaurant.API.DTOs.Booking;
 
 namespace Restaurant.Test;
@@ -9,8 +10,6 @@ namespace Restaurant.Test;
 [TestClass]
 public class BookingControllerTests
 {
-    
-
     // PlaceBooking-tests ---------------------------------------------------------------V
     [TestMethod]
     public async Task PlaceBooking_WhenFirstNameIsMissing_ReturnBadRequest()
