@@ -9,5 +9,8 @@ namespace Restaurant.API.Services
         Task<ServiceResult<Guest>> AddGuestAsync([FromBody]CreateAddGuestRequest addGuestRequest);
         Task<List<Guest>> GetAllGuestsAsync();
         Task<ServiceResult<Guest>> UpdateGuestAsync(int id, UpdateGuestRequest request);
+
+        Task<Guest?> GetGuestByEmailAsync(string email);
+        Task<ServiceResult> DeleteGuestByIdAsync(int id);
     }
 }

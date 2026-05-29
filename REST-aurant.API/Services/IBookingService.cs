@@ -20,5 +20,6 @@ namespace Restaurant.API.Services
         Task<ServiceResult> CompleteBookingAsync(int id);
         Task<ServiceResult> ChangeBookingDateAsync(int id, BookingDateChangeDto request);
         Task<ServiceResult> UpdateBookingDetailsAsync(int id, UpdateBookingDetailsRequest request);
+
     }
 }
