@@ -44,8 +44,27 @@ namespace Restaurant.API.Controllers
                     _ => BadRequest()
                 };
             }
-            
+
             return Ok(result.Data);
         }
+
+        [HttpPut("{id}", Name = "UpdateGuest")]
+        [EndpointSummary("Update existing guest information")]
+        public async Task<IActionResult> UpdateGuest(int id, UpdateGuestRequest request)
+        {
+            var result = await _guestService.UpdateGuestAsync(id, request);
+
+            if (!result.Success)
+            {
+                return result.ErrorType switch
+                {
+                    ErrorType.GuestNotFound => NotFound($"Could not find a guest with ID {id}."),
+                    _ => BadRequest("Something went wrong while updating the guest.")
+                };
+            }
+
+            return Ok(result.Data);
+        }
+
     }
 }

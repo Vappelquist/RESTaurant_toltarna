@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Restaurant.API.Data;
+using Restaurant.API.Services.Enums;
 using Restaurant.Models.Models;
 using static Restaurant.API.DTOs.GuestDTOs;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -62,6 +63,42 @@ namespace Restaurant.API.Services
             {
                 Success = true,
                 Data = guestToAdd
+            };
+
+
+        }
+
+        public async Task<ServiceResult<Guest>> UpdateGuestAsync(int id, UpdateGuestRequest request)
+        {
+            // finds the guest in the database
+            var guest = await _context.Guests.FindAsync(id);
+
+            if (guest == null)
+            {
+                return new ServiceResult<Guest>
+                {
+                    Success = false,
+                    ErrorType = ErrorType.GuestNotFound
+                };
+            }
+
+            // Only update the fileds that are not empty.
+            if (!string.IsNullOrWhiteSpace(request.FirstName)) guest.FirstName = request.FirstName;
+            if (!string.IsNullOrWhiteSpace(request.LastName)) guest.LastName = request.LastName;
+            if (!string.IsNullOrWhiteSpace(request.Email)) guest.Email = request.Email;
+            if (!string.IsNullOrWhiteSpace(request.PhoneNumber)) guest.PhoneNumber = request.PhoneNumber;
+
+            // Let them remove their alergies if they wanna. 
+            if (request.Allergies != null) guest.Allergies = request.Allergies;
+            if (request.Note != null) guest.Note = request.Note;
+
+            // Save!
+            await _context.SaveChangesAsync();
+
+            return new ServiceResult<Guest>
+            {
+                Success = true,
+                Data = guest
             };
         }
     }
