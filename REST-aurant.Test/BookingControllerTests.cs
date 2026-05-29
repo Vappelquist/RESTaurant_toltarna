@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Restaurant.API.Controllers;
 using Restaurant.API.Services;
-using System.ComponentModel.DataAnnotations;
 using static Restaurant.API.DTOs.Booking;
 
 namespace Restaurant.Test;
@@ -11,53 +10,57 @@ namespace Restaurant.Test;
 public class BookingControllerTests
 {
     // PlaceBooking-tests ---------------------------------------------------------------V
-    //[TestMethod]
-    //public async Task PlaceBooking_WhenFirstNameIsMissing_ReturnBadRequest()
-    //{
-    //    // Arrange
-    //    var mockBookingService = new Mock<IBookingService>();
-    //    var controller = new BookingController(mockBookingService.Object); 
+    [TestMethod]
+    public async Task PlaceBooking_WhenFirstNameIsMissing_ReturnBadRequest()
+    {
+        // Arrange
+        var mockBookingService = new Mock<IBookingService>();
+        var controller = new BookingController(mockBookingService.Object);
 
-    //    var request = new PlaceBookingRequest
-    //    {
-    //        FirstName = "",
-    //        LastName = "Svensson",
-    //        Email = "sven@mail.com",
-    //        AmountOfGuests = 2,
-    //        StartTime = "18:00",
-    //        BookingDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1))
-    //    };
+        var request = new PlaceBookingRequest
+        {
+            FirstName = "",
+            LastName = "Svensson",
+            Email = "sven@mail.com",
+            AmountOfGuests = 2,
+            StartTime = "18:00",
+            BookingDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1))
+        };
 
-    //    // Act
-    //    var result = await controller.PlaceBooking(request);
+        controller.ModelState.AddModelError("FirstName", "FirstName is required");
 
-    //    // Assert
-    //    Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
-    //}
+        // Act
+        var result = await controller.PlaceBooking(request);
 
-    //[TestMethod]
-    //public async Task PlaceBooking_WhenLastNameIsMissing_ReturnBadRequest()
-    //{
-    //    // Arrange
-    //    var mockBookingService = new Mock<IBookingService>();
-    //    var controller = new BookingController(mockBookingService.Object);
+        // Assert
+        Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+    }
 
-    //    var request = new PlaceBookingRequest
-    //    {
-    //        FirstName = "Sven",
-    //        LastName = "",
-    //        Email = "sven@mail.com",
-    //        AmountOfGuests = 2,
-    //        StartTime = "18:00",
-    //        BookingDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1))
-    //    };
+    [TestMethod]
+    public async Task PlaceBooking_WhenLastNameIsMissing_ReturnBadRequest()
+    {
+        // Arrange
+        var mockBookingService = new Mock<IBookingService>();
+        var controller = new BookingController(mockBookingService.Object);
 
-    //    // Act
-    //    var result = await controller.PlaceBooking(request);
+        var request = new PlaceBookingRequest
+        {
+            FirstName = "Sven",
+            LastName = "",
+            Email = "sven@mail.com",
+            AmountOfGuests = 2,
+            StartTime = "18:00",
+            BookingDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1))
+        };
 
-    //    // Assert
-    //    Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
-    //}
+        controller.ModelState.AddModelError("LastName", "LastName is required");
+
+        // Act
+        var result = await controller.PlaceBooking(request);
+
+        // Assert
+        Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+    }
 
     [TestMethod]
     public async Task PlaceBooking_WhenEmailAndPhoneIsMissing_ReturnBadRequest()
@@ -84,30 +87,32 @@ public class BookingControllerTests
         Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
     }
 
-    //[TestMethod]
-    //public async Task PlaceBooking_WhenAmountOfGuestsIsMissing_ReturnBadRequest()
-    //{
-    //    // Arrange
-    //    var mockBookingService = new Mock<IBookingService>();
-    //    var controller = new BookingController(mockBookingService.Object);
+    [TestMethod]
+    public async Task PlaceBooking_WhenAmountOfGuestsIsMissing_ReturnBadRequest()
+    {
+        // Arrange
+        var mockBookingService = new Mock<IBookingService>();
+        var controller = new BookingController(mockBookingService.Object);
 
-    //    var request = new PlaceBookingRequest
-    //    {
-    //        FirstName = "Sven",
-    //        LastName = "Svensson",
-    //        Email = "sven@mail.com",
-    //        PhoneNumber = "+4676-5487999",
-    //        AmountOfGuests = 0,
-    //        StartTime = "18:00",
-    //        BookingDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1))
-    //    };
+        var request = new PlaceBookingRequest
+        {
+            FirstName = "Sven",
+            LastName = "Svensson",
+            Email = "sven@mail.com",
+            PhoneNumber = "+4676-5487999",
+            AmountOfGuests = 0,
+            StartTime = "18:00",
+            BookingDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1))
+        };
 
-    //    // Act
-    //    var result = await controller.PlaceBooking(request);
+        controller.ModelState.AddModelError("AmountOfGuests", "Amount of guests is required");
 
-    //    // Assert
-    //    Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
-    //}
+        // Act
+        var result = await controller.PlaceBooking(request);
+
+        // Assert
+        Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+    }
 
     // PlaceBooking-tests ---------------------------------------------------------------^
 

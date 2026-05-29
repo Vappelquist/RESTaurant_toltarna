@@ -83,6 +83,10 @@ namespace Restaurant.API.Controllers
         [HttpPost("PlaceBooking")]
         public async Task<ActionResult> PlaceBooking(PlaceBookingRequest request)
         {
+            // For testing:
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             if (string.IsNullOrWhiteSpace(request.Email) && string.IsNullOrWhiteSpace(request.PhoneNumber))
                 return BadRequest("You must provide either an email or phone number.");
 
