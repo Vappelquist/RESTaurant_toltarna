@@ -378,5 +378,35 @@ namespace Restaurant.API.Services
                 Success = true
             };
         }
+
+        public async Task<ServiceResult> UpdateBookingDetailsAsync(int id, UpdateBookingDetailsRequest request)
+        {
+            var booking = await _ctx.Bookings
+                .Include(b => b.Guest)
+                .FirstOrDefaultAsync(b => b.Id == id);
+
+            if (booking == null)
+            {
+                return new ServiceResult { Success = false, ErrorType = ErrorType.BookingNotFound };
+            }
+
+            // Only update the things actually sent in the request, and ignore null or whitespace values.
+            // Since we are changing the guest objectm future bookings will get the same details (We want this cuz this is often done cuz of a missspelling)
+            if (booking.Guest != null)
+            {
+                if (!string.IsNullOrWhiteSpace(request.FirstName)) booking.Guest.FirstName = request.FirstName;
+                if (!string.IsNullOrWhiteSpace(request.LastName)) booking.Guest.LastName = request.LastName;
+                if (!string.IsNullOrWhiteSpace(request.BookingNotes)) booking.BookingNotes = request.BookingNotes;
+            }
+
+            if (request.BookingNotes != null)
+            {
+                booking.BookingNotes = request.BookingNotes;
+            }
+
+            await _ctx.SaveChangesAsync();
+
+            return new ServiceResult { Success = true };
+        }
     }
 }

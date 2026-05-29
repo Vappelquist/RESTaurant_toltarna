@@ -137,9 +137,6 @@ namespace Restaurant.API.Controllers
             return Ok(tableStatuses);
         }
 
-
-
-
         [HttpPut("{id}/cancel")]
         public async Task<ActionResult> CancelBooking(int id)
         {
@@ -202,6 +199,24 @@ namespace Restaurant.API.Controllers
                 };
             return Ok("Booking successfully changed.");
             
+        }
+
+        [HttpPut("{id}/details", Name = "UpdateBookingDetails")]
+        public async Task<ActionResult> UpdateBookingDetails(int id, UpdateBookingDetailsRequest request)
+        {
+            var result = await _bookingService.UpdateBookingDetailsAsync(id, request);
+
+            if (!result.Success)
+            {
+                return result.ErrorType switch
+                {
+                    // _ means basically the same as default: 
+                    ErrorType.BookingNotFound => NotFound("This booking does not exist"),
+                    _ => BadRequest("Could not update booking details.")
+                };
+            }
+
+            return Ok("Booking details successfully updated.");
         }
     }
 }
