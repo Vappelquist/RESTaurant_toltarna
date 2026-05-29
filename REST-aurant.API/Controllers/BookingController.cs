@@ -83,17 +83,12 @@ namespace Restaurant.API.Controllers
         [HttpPost("PlaceBooking")]
         public async Task<ActionResult> PlaceBooking(PlaceBookingRequest request)
         {
-            if (string.IsNullOrWhiteSpace(request.FirstName) || string.IsNullOrWhiteSpace(request.LastName))
-                return BadRequest("To place a booking you must enter your first name and last name.");
+            // For testing:
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             if (string.IsNullOrWhiteSpace(request.Email) && string.IsNullOrWhiteSpace(request.PhoneNumber))
                 return BadRequest("You must provide either an email or phone number.");
-
-            if (!request.PhoneNumber!.All(Char.IsDigit))
-                return BadRequest("Phone number can only contain numbers.");
-
-            if (request.AmountOfGuests < 1)
-                return BadRequest("Amount of guests must be at least 1.");
 
             if (!TimeOnly.TryParse(request.StartTime, out _))
                 return BadRequest("Time must be entered in format HH:mm. For example 18:30");

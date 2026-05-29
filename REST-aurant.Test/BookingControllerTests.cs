@@ -9,15 +9,13 @@ namespace Restaurant.Test;
 [TestClass]
 public class BookingControllerTests
 {
-    
-
     // PlaceBooking-tests ---------------------------------------------------------------V
     [TestMethod]
     public async Task PlaceBooking_WhenFirstNameIsMissing_ReturnBadRequest()
     {
         // Arrange
         var mockBookingService = new Mock<IBookingService>();
-        var controller = new BookingController(mockBookingService.Object); 
+        var controller = new BookingController(mockBookingService.Object);
 
         var request = new PlaceBookingRequest
         {
@@ -28,6 +26,8 @@ public class BookingControllerTests
             StartTime = "18:00",
             BookingDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1))
         };
+
+        controller.ModelState.AddModelError("FirstName", "FirstName is required");
 
         // Act
         var result = await controller.PlaceBooking(request);
@@ -52,6 +52,8 @@ public class BookingControllerTests
             StartTime = "18:00",
             BookingDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1))
         };
+
+        controller.ModelState.AddModelError("LastName", "LastName is required");
 
         // Act
         var result = await controller.PlaceBooking(request);
@@ -103,6 +105,8 @@ public class BookingControllerTests
             BookingDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1))
         };
 
+        controller.ModelState.AddModelError("AmountOfGuests", "Amount of guests is required");
+
         // Act
         var result = await controller.PlaceBooking(request);
 
@@ -115,6 +119,51 @@ public class BookingControllerTests
 
 
     // GetMonthlyBookings-tests ---------------------------------------------------------------V
+
+    [TestMethod]
+    [DataRow("")]
+    [DataRow("Muni")]
+    [DataRow("0")]
+    [DataRow("13")]
+    [DataRow("-5")]
+    [DataRow("99")]
+    public async Task GetMonthlyBookings_WhenMonthIsInvalid_ReturnBadRequest(string month)
+    {
+        //arrange
+        var mockBookingService = new Mock<IBookingService>();
+        var controller = new BookingController(mockBookingService.Object);
+
+        //act
+        var result = await controller.GetMonthlyBookings(2026, month);
+
+        //assert
+        Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+    }
+
+    [TestMethod]
+    [DataRow("1")]
+    [DataRow("12")]
+    [DataRow("september")]
+    [DataRow("auGUsTi")]
+    public async Task GetMonthlyBookings_WhenMonthIsValid_ReturnOk(string month)
+    {
+        //arrange
+        var mockBookingService = new Mock<IBookingService>();
+        mockBookingService
+            .Setup(s => s.GetMonthlyBookingsAsync(It.IsAny<int>(), It.IsAny<string>()))
+            .ReturnsAsync(new List<GetAllBookingResponse>
+            {
+                new GetAllBookingResponse()
+            });
+
+        var controller = new BookingController(mockBookingService.Object);
+
+        //act
+        var result = await controller.GetMonthlyBookings(2026, month);
+
+        //assert
+        Assert.IsInstanceOfType(result, typeof(OkObjectResult));
+    }
 
     // GetMonthlyBookings-tests ---------------------------------------------------------------^
 

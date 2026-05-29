@@ -31,10 +31,15 @@ namespace Restaurant.API.DTOs
 
         public record PlaceBookingRequest
         {
+            [Required]
             public string? FirstName { get; set; }
+            [Required]
             public string? LastName { get; set; }
+            [EmailAddress]
             public string? Email { get; set; }
+            [Phone]
             public string? PhoneNumber { get; set; }
+            [Range(1,28)]
             public int AmountOfGuests { get; set; }
             public DateOnly BookingDate { get; set; }
             public string? StartTime { get; set; }
