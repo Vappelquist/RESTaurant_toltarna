@@ -396,8 +396,7 @@ namespace Restaurant.API.Services
             {
                 if (!string.IsNullOrWhiteSpace(request.FirstName)) booking.Guest.FirstName = request.FirstName;
                 if (!string.IsNullOrWhiteSpace(request.LastName)) booking.Guest.LastName = request.LastName;
-                if (!string.IsNullOrWhiteSpace(request.Email)) booking.Guest.Email = request.Email;
-                if (!string.IsNullOrWhiteSpace(request.PhoneNumber)) booking.Guest.PhoneNumber = request.PhoneNumber;
+                if (!string.IsNullOrWhiteSpace(request.BookingNotes)) booking.BookingNotes = request.BookingNotes;
             }
 
             if (request.BookingNotes != null)
