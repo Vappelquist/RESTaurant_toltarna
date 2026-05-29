@@ -24,5 +24,23 @@ namespace Restaurant.API.DTOs
             public string? Allergies { get; init; }
             public string? Note { get; init; }
         }
+
+        public record UpdateGuestRequest
+        {
+            [MinLength(2)]
+            public string? FirstName { get; init; }
+
+            [MinLength(2)]
+            public string? LastName { get; init; }
+
+            [EmailAddress]
+            public string? Email { get; init; }
+
+            [Phone]
+            public string? PhoneNumber { get; init; }
+
+            public string? Allergies { get; init; }
+            public string? Note { get; init; }
+        }
     }
 }
