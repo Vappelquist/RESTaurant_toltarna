@@ -46,5 +46,15 @@ namespace Restaurant.API.DTOs
             public string? BookingNotes { get; set; }
         }
 
+        public record UpdateBookingDetailsRequest
+        {
+            public string? FirstName { get; init; }
+            public string? LastName { get; init; }
+            [EmailAddress]
+            public string? Email { get; init; }
+            [Phone]
+            public string? PhoneNumber { get; init; }
+            public string? BookingNotes { get; init; }
+        }
     }
 }
