@@ -6,6 +6,7 @@ using Restaurant.API.Data;
 using Restaurant.API.Services;
 using Restaurant.Models.Models;
 using Restaurant.API.Services.Enums;
+using System.ComponentModel.DataAnnotations;
 using static Restaurant.API.DTOs.GuestDTOs;
 
 namespace Restaurant.Test;
@@ -22,40 +23,32 @@ public class GuestServiceTests
         return new RestaurantDbContext(options);
     }
 
-    [DataTestMethod]
-    [DataRow("", "Svensson", "FirstName cannot be empty")]
-    [DataRow("Anna", "", "LastName cannot be empty")]
-    [DataRow("", "", "both FirstName and LastName cannot be empty")]
-    [DataRow(null, "Svensson", "FirstName cannot be null")]
-    [DataRow("Anna", null, "LastName cannot be null")]
-    [DataRow("   ", "Svensson", "FirstName containing whitespace should not pass")]
-    [DataRow("Anna", "   ", "LastName containing whitespace should not pass")]
-    public async Task AddGuest_WhenNameIsMissing_ShouldReturnInvaldInputErrorType(string firstName, string lastName, string errorMessage)
+    [TestMethod]
+    public async Task AddGuestAsync_WhenValid_ReturnSuccess()
     {
-        //Arrange
+        // Arrange
         var ctx = CreateInMemoryDb();
         var service = new GuestService(ctx);
-
         var request = new CreateAddGuestRequest
         {
-            FirstName = firstName,
-            LastName = lastName,
+            FirstName = "Anna",
+            LastName = "Svensson",
             Email = "anna@mail.com",
-            Password = "password123",
-            PhoneNumber = "0701234567"
+            Password = "password123"
         };
-        //Act
+
+        // Act
         var result = await service.AddGuestAsync(request);
 
-        //Assert
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ErrorType.InvalidInput, result.ErrorType);
+        // Assert
+        Assert.IsTrue(result.Success);
+        Assert.IsNotNull(result.Data);
     }
 
     [DataTestMethod]
     [DataRow(null, "PhoneNumber is null, should still be accepted since it's not required")]
     [DataRow("", "PhoneNumber is empty, should still be accepted since it's not required")]
-    public async Task AddGuest_WhenPhoneNumberIsNullOrEmpty_ShouldSucceed(string phoneNumber, string errorMessage)
+    public async Task AddGuestAsync_WhenPhoneNumberIsNullOrEmpty_ShouldSucceed(string phoneNumber, string errorMessage)
     {
         //Arrange
         var ctx = CreateInMemoryDb();
@@ -78,23 +71,29 @@ public class GuestServiceTests
         Assert.IsNotNull(result.Data);
     }
 
-    [DataTestMethod]
-    [DataRow(null, "Email is null, should not be accepted since it's required")]
-    [DataRow("", "Email is empty, should not be accepted since it's required")]
-    [DataRow("   ", "Email is whitespace, should not be accepted since it's required")]
-    public async Task AddGuest_WhenEmailIsMissing_ShouldReturnInvalidInputErrorType(string email, string errorMessage)
+    [TestMethod]
+    public async Task AddGuestAsync_WhenEmailAlreadyExists_ReturnContactDetailsTaken()
     {
         //Arrange
         var ctx = CreateInMemoryDb();
         var service = new GuestService(ctx);
 
-        var request = new CreateAddGuestRequest
+        ctx.Guests.Add(new Guest
         {
             FirstName = "Anna",
             LastName = "Svensson",
-            Email = email,
-            Password = "password123",
-            PhoneNumber = "0701234567"
+            Email = "anna@mail.com",
+            Password = "password123"
+        });
+
+        await ctx.SaveChangesAsync();
+
+        var request = new CreateAddGuestRequest
+        {
+            FirstName = "Mini",
+            LastName = "Momo",
+            Email = "anna@mail.com",
+            Password = "password456"
         };
 
         //Act
@@ -102,6 +101,38 @@ public class GuestServiceTests
 
         //Assert
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(ErrorType.InvalidInput, result.ErrorType);
+        Assert.AreEqual(ErrorType.ContactDetailsTaken, result.ErrorType);
+    }
+
+    [TestMethod]
+    public async Task GetAllGuestsAsync_WhenGuestsExist_ShouldReturnAllGuests()
+    {
+        //Arrange
+        var ctx = CreateInMemoryDb();
+        var service = new GuestService(ctx);
+
+        await ctx.Guests.AddAsync(new Guest
+        {
+            FirstName = "Anna",
+            LastName = "Svensson",
+            Email = "anna@mail.com",
+            Password = "password123"
+        });
+
+        await ctx.Guests.AddAsync(new Guest
+        {
+            FirstName = "Mini",
+            LastName = "Momo",
+            Email = "minimomo@mail.com",
+            Password = "password456"
+        });
+
+        await ctx.SaveChangesAsync();
+
+        //Act
+        var result = await service.GetAllGuestsAsync();
+
+        //Assert
+        Assert.AreEqual(2, result.Count);
     }
 }

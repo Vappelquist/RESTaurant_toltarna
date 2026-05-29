@@ -34,13 +34,17 @@ namespace Restaurant.API.Controllers
         [EndpointSummary("Register new guest")]
         public async Task<IActionResult> AddGuest(CreateAddGuestRequest addGuestRequest)
         {
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var result = await _guestService.AddGuestAsync(addGuestRequest);
             if (!result.Success)
             {
                 return result.ErrorType switch
                 {
-                    ErrorType.RequestMissing => BadRequest("Request is missing."),
-                    ErrorType.InvalidInput => BadRequest("FirstName, LastName and Email has to be filled."),
+                    ErrorType.ContactDetailsTaken => BadRequest("Account is already registed with the E-mail."),
                     _ => BadRequest()
                 };
             }
