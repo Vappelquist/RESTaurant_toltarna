@@ -144,6 +144,7 @@ public class BookingControllerTests
     [DataRow("1")]
     [DataRow("12")]
     [DataRow("september")]
+    [DataRow("auGUsTi")]
     public async Task GetMonthlyBookings_WhenMonthIsValid_ReturnOk(string month)
     {
         //arrange
