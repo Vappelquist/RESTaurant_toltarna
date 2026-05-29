@@ -43,22 +43,48 @@ namespace Restaurant.API.Services
         public async Task<List<Table>> AllocateTablesAsync(DateTime startDateTime, DateTime endTime, int amountOfGuests, int? ignoreBookingId = null)
         {
             var availableTables = await GetAvailableTablesAsync(startDateTime, endTime, ignoreBookingId);
+
+            var perfectTable = availableTables
+                .Where(t => t.Seats >= amountOfGuests)
+                .OrderBy(t => t.Seats)
+                .FirstOrDefault();
+
+            if (perfectTable != null)
+                return new List<Table> { perfectTable };
+
+
+            //if one table is not enough for booking, combine with biggest table first:
+            var remainingTables = availableTables.OrderByDescending(t => t.Seats).ToList();
             var tablesToAssign = new List<Table>();
-            int seatsAllocated = 0;
+            int seatsNeeded = amountOfGuests;
 
-            foreach (var table in availableTables)
+            while (seatsNeeded > 0 && remainingTables.Any())
             {
-                tablesToAssign.Add(table);
-                seatsAllocated += table.Seats;
+                // Find smallest possible table to cover the rest of the guests:
+                var bestFit = remainingTables
+                    .Where(t => t.Seats >= seatsNeeded)
+                    .OrderBy(t => t.Seats)
+                    .FirstOrDefault();
 
-                if (seatsAllocated >= amountOfGuests)
+                if (bestFit != null)
                 {
+                    tablesToAssign.Add(bestFit);
                     return tablesToAssign;
                 }
+
+                var largest = remainingTables.First();
+                tablesToAssign.Add(largest);
+                seatsNeeded -= largest.Seats;
+                remainingTables.Remove(largest);
+
+            }
+            if (seatsNeeded > 0)
+            {
+                // If we do not have enough seats in the resturant, we'll return an enmpty list. 
+                return new List<Table>();
             }
 
-            // If we do not have enough seats in the resturant, we'll return an enmpty list. 
-            return new List<Table>();
+            return tablesToAssign;
         }
     }
 }
