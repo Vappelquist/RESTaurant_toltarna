@@ -12,6 +12,7 @@ namespace Restaurant.API.DTOs
             [Required]
             [MinLength(2)]
             public string? LastName { get; init; }
+            [Required]
             [EmailAddress]
             public string? Email { get; init; }
             [Required]

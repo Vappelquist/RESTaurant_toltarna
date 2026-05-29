@@ -19,30 +19,10 @@ namespace Restaurant.API.Services
         }
         public async Task<ServiceResult<Guest>> AddGuestAsync(CreateAddGuestRequest addGuestRequest)
         {
-            if (addGuestRequest == null)
+            var exists = await _context.Guests.AnyAsync(g => g.Email == addGuestRequest.Email);
+            if (exists)
             {
-                return new ServiceResult<Guest>
-                {
-                    Success = false, ErrorType = Enums.ErrorType.RequestMissing
-                };
-            }
-
-            if (string.IsNullOrWhiteSpace(addGuestRequest.FirstName) || string.IsNullOrWhiteSpace(addGuestRequest.LastName))
-            {
-                return new ServiceResult<Guest>
-                {
-                    Success = false,
-                    ErrorType = Enums.ErrorType.InvalidInput
-                };
-            }
-
-            if (string.IsNullOrWhiteSpace(addGuestRequest.Email))
-            {
-                return new ServiceResult<Guest>
-                {
-                    Success = false,
-                    ErrorType = Enums.ErrorType.InvalidInput
-                };
+                return new ServiceResult<Guest> { Success = false, ErrorType = Enums.ErrorType.ContactDetailsTaken };
             }
 
             var guestToAdd = new Guest
