@@ -13,6 +13,7 @@
         AlreadyCanceled,
         AlreadyComplete,
         AlreadyConfirmed,
+        AlreadyPending,
         ContactDetailsTaken
     }
 }
