@@ -165,13 +165,64 @@ public class BookingControllerTests
         Assert.IsInstanceOfType(result, typeof(OkObjectResult));
     }
 
-    // GetMonthlyBookings-tests ---------------------------------------------------------------^
-
-
-
     // GetWeeklyBookings-tests ---------------------------------------------------------------V
 
-    // GetWeeklyBookings-tests ---------------------------------------------------------------^
+    [TestMethod]
+    [DataRow(2010)] // Too old
+    [DataRow(2029)] // To far in the future
+    public async Task GetWeeklyBookings_WhenYearIsInvalid_ReturnBadRequest(int invalidYear)
+    {
+        // Arrange
+        var mockBookingService = new Mock<IBookingService>();
+        var controller = new BookingController(mockBookingService.Object);
 
+        // Act
+        var result = await controller.GetWeeklyBookings(invalidYear, 10);
+
+        // Assert
+        Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+    }
+
+    [TestMethod]
+    [DataRow(0)]  // Weeks start at 1
+    [DataRow(54)] // Only 52 weeks in a year
+    public async Task GetWeeklyBookings_WhenWeekIsInvalid_ReturnBadRequest(int invalidWeek)
+    {
+        // Arrange
+        var mockBookingService = new Mock<IBookingService>();
+        var controller = new BookingController(mockBookingService.Object);
+        var validYear = DateTime.Now.Year;
+
+        // Act
+        var result = await controller.GetWeeklyBookings(validYear, invalidWeek);
+
+        // Assert
+        Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+    }
+
+    [TestMethod]
+    public async Task GetWeeklyBookings_WhenNoBookingsExist_ReturnNotFound()
+    {
+        // Arrange
+        var mockBookingService = new Mock<IBookingService>();
+        var validYear = DateTime.Now.Year;
+        var validWeek = 10;
+
+        // Force the fuck to return an empty list. 
+        mockBookingService
+            .Setup(s => s.GetWeeklyBookingsAsync(validYear, validWeek))
+            .ReturnsAsync(new List<GetAllBookingResponse>());
+
+        var controller = new BookingController(mockBookingService.Object);
+
+        // Act
+        var result = await controller.GetWeeklyBookings(validYear, validWeek);
+
+        // Assert
+        // The controller should return a NotFound result (404)
+        Assert.IsInstanceOfType(result, typeof(NotFoundObjectResult));
+    }
+
+    // GetWeeklyBookings-tests ---------------------------------------------------------------^
 
 }

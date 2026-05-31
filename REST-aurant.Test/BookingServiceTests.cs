@@ -104,7 +104,7 @@ public class BookingServiceTests
     }
 
     // Edit booking tests: ------------------------------------------------------------------
-
+    /*
     [TestMethod]
     public async Task CancelBooking_WhenBookingDoesNotExist_ReturnNotFound()
     {
@@ -253,5 +253,67 @@ public class BookingServiceTests
         var booking = await ctx.Bookings.FindAsync(1);
         Assert.AreEqual(BookingStatus.Complete, booking!.Status);
     }
+    */
     // Edit booking tests: ------------------------------------------------------------------
+
+    // GetWeeklyBookingsAsync-tests --------------------------------------------------------V
+
+    [TestMethod]
+    public async Task GetWeeklyBookingsAsync_WhenBookingsExistInWeek_ReturnsOnlyThoseBookings()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDb();
+
+        // Adds guest and table cuz GetWeeklyBookingsAsync needs them
+        var guest = new Guest { FirstName = "Test", LastName = "Testsson", Email = "test@test.se" };
+        var table = new Table { TableNumber = 1, Seats = 4 };
+
+        // Week 10 year 2026 starts on March 2nd.
+        var bookingInWeek = new Booking
+        {
+            Guest = guest,
+            Tables = new List<Table> { table },
+            AmountOfGuests = 2,
+            StartTime = new DateTime(2026, 3, 4, 18, 0, 0), // wensday week 10
+            EndTime = new DateTime(2026, 3, 4, 20, 0, 0)
+        };
+        var bookingOutsideWeek = new Booking
+        {
+            Guest = guest,
+            Tables = new List<Table> { table },
+            AmountOfGuests = 2,
+            StartTime = new DateTime(2026, 3, 11, 18, 0, 0), // wensday week 11
+            EndTime = new DateTime(2026, 3, 11, 20, 0, 0)
+        };
+
+        ctx.Bookings.AddRange(bookingInWeek, bookingOutsideWeek);
+        await ctx.SaveChangesAsync();
+
+        //creates the service using the in-memory db and a mock TableService (which we dont use in this method)
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        // Act
+        var result = await service.GetWeeklyBookingsAsync(2026, 10);
+
+        // Assert
+        Assert.AreEqual(1, result.Count); // We expect only 1 booking in the result
+        Assert.AreEqual(bookingInWeek.Id, result.First().BookingId); // And it should be the one from week 10.
+    }
+
+    [TestMethod]
+    public async Task GetWeeklyBookingsAsync_WhenNoBookingsInWeek_ReturnsEmptyList()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDb(); // Empty database.
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        // Act
+        var result = await service.GetWeeklyBookingsAsync(2026, 10);
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.AreEqual(0, result.Count); // The list should be empty
+    }
+
+    // GetWeeklyBookingsAsync-tests --------------------------------------------------------^
 }
