@@ -1,4 +1,5 @@
 ﻿using Restaurant.API.DTOs;
+using Restaurant.Models.Models.Enums;
 using static Restaurant.API.DTOs.Booking;
 
 namespace Restaurant.API.Services
@@ -14,11 +15,8 @@ namespace Restaurant.API.Services
         Task<BookingDateDto?> GetBookingDateAsync(int id);
         Task<List<GetAllBookingResponse>> GetBookingsByEmailAsync(string email);
         Task<List<TableStatusDto>> ViewBookingsByTimeAsync(DateOnly date, string time);
-
-        Task<ServiceResult> CancelBookingAsync(int id);
-        Task<ServiceResult> ConfirmBookingAsync(int id);
-        Task<ServiceResult> CompleteBookingAsync(int id);
         Task<ServiceResult> ChangeBookingDateAsync(int id, BookingDateChangeDto request);
         Task<ServiceResult> UpdateBookingDetailsAsync(int id, UpdateBookingDetailsRequest request);
+        Task<ServiceResult> EditBookingStatusAsync(int id, string request);
     }
 }
