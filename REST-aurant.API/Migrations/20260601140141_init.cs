@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace REST_aurant.API.Migrations
+namespace Restaurant.API.Migrations
 {
     /// <inheritdoc />
     public partial class init : Migration
@@ -17,8 +17,7 @@ namespace REST_aurant.API.Migrations
                 name: "Tables",
                 columns: table => new
                 {
-                    TableNumber = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TableNumber = table.Column<int>(type: "int", nullable: false),
                     Seats = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -33,7 +32,7 @@ namespace REST_aurant.API.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Discriminator = table.Column<string>(type: "nvarchar(5)", maxLength: 5, nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     LastName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
@@ -128,9 +127,9 @@ namespace REST_aurant.API.Migrations
                 columns: new[] { "Id", "AmountOfGuests", "BookingNotes", "DateBooked", "EndTime", "GuestId", "StartTime", "Status" },
                 values: new object[,]
                 {
-                    { 1, 2, "Dejt-kväll", new DateTime(2026, 5, 8, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 5, 8, 20, 0, 0, 0, DateTimeKind.Unspecified), 1, new DateTime(2026, 5, 8, 18, 0, 0, 0, DateTimeKind.Unspecified), 0 },
-                    { 2, 4, "Inställt pga sjukdom", new DateTime(2026, 5, 8, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 5, 10, 21, 0, 0, 0, DateTimeKind.Unspecified), 2, new DateTime(2026, 5, 10, 19, 0, 0, 0, DateTimeKind.Unspecified), 1 },
-                    { 3, 12, "Släktträff", new DateTime(2026, 5, 8, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 5, 15, 20, 0, 0, 0, DateTimeKind.Unspecified), 3, new DateTime(2026, 5, 15, 17, 0, 0, 0, DateTimeKind.Unspecified), 0 }
+                    { 1, 2, "Dejt-kväll", new DateTime(2026, 5, 8, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 5, 8, 20, 0, 0, 0, DateTimeKind.Unspecified), 1, new DateTime(2026, 5, 8, 18, 0, 0, 0, DateTimeKind.Unspecified), 1 },
+                    { 2, 4, "Inställt pga sjukdom", new DateTime(2026, 5, 8, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 5, 10, 21, 0, 0, 0, DateTimeKind.Unspecified), 2, new DateTime(2026, 5, 10, 19, 0, 0, 0, DateTimeKind.Unspecified), 2 },
+                    { 3, 12, "Släktträff", new DateTime(2026, 5, 8, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2026, 5, 15, 20, 0, 0, 0, DateTimeKind.Unspecified), 3, new DateTime(2026, 5, 15, 17, 0, 0, 0, DateTimeKind.Unspecified), 1 }
                 });
 
             migrationBuilder.InsertData(

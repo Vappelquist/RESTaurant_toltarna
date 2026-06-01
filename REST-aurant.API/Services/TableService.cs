@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Restaurant.API.Data;
+using Restaurant.API.Services.Enums;
 using Restaurant.Models.Models;
 using Restaurant.Models.Models.Enums;
 
@@ -85,6 +86,69 @@ namespace Restaurant.API.Services
             }
 
             return tablesToAssign;
+        }
+
+        public async Task<List<Table>> GetAllTablesAsync()
+        {
+            return await _ctx.Tables.OrderBy(t => t.TableNumber).ToListAsync();
+        }
+
+        public async Task<ServiceResult> AddTableAsync(int tableNumber, int seats)
+        {
+            var takenTable = await _ctx.Tables.AnyAsync(t => t.TableNumber == tableNumber);
+            if (takenTable)
+            {
+                return new ServiceResult
+                {
+                    Success = false,
+                    ErrorType = ErrorType.TableAlreadyExists
+                };
+            }
+
+            await _ctx.Tables.AddAsync(new Table
+            {
+                TableNumber = tableNumber,
+                Seats = seats
+            });
+            await _ctx.SaveChangesAsync();
+            return new ServiceResult
+            {
+                Success = true
+            };
+        }
+
+        public async Task<ServiceResult> DeleteTableAsync(int tableNumber)
+        {
+            var table = await _ctx.Tables.FindAsync(tableNumber);
+            if (table == null)
+            {
+                return new ServiceResult
+                {
+                    Success = false,
+                    ErrorType = ErrorType.TableNotFound
+                };
+
+            }
+            var hasActiveBookings = await _ctx.Bookings
+            .AnyAsync(b => b.Tables.Any(t => t.TableNumber == tableNumber)
+            && b.Status != BookingStatus.Canceled
+            && b.Status != BookingStatus.Complete);
+
+            if (hasActiveBookings)
+            {
+                return new ServiceResult
+                {
+                    Success = false,
+                    ErrorType = ErrorType.TableHasActiceBookings
+                };
+            }
+
+            _ctx.Tables.Remove(table);
+            await _ctx.SaveChangesAsync();
+            return new ServiceResult
+            {
+                Success = true
+            };
         }
     }
 }

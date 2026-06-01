@@ -14,6 +14,9 @@
         AlreadyComplete,
         AlreadyConfirmed,
         AlreadyPending,
-        ContactDetailsTaken
+        ContactDetailsTaken,
+        TableNotFound,
+        TableAlreadyExists,
+        TableHasActiceBookings
     }
 }

@@ -8,7 +8,7 @@ using Restaurant.API.Data;
 
 #nullable disable
 
-namespace REST_aurant.API.Migrations
+namespace Restaurant.API.Migrations
 {
     [DbContext(typeof(RestaurantDbContext))]
     partial class RestaurantDbContextModelSnapshot : ModelSnapshot
@@ -128,10 +128,7 @@ namespace REST_aurant.API.Migrations
             modelBuilder.Entity("Restaurant.Models.Models.Table", b =>
                 {
                     b.Property<int>("TableNumber")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TableNumber"));
 
                     b.Property<int>("Seats")
                         .HasColumnType("int");

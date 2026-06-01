@@ -19,6 +19,10 @@ namespace Restaurant.API.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Table>()
+                .Property(t => t.TableNumber)
+                .ValueGeneratedNever();
+
+            modelBuilder.Entity<Table>()
                 .HasIndex(t => t.TableNumber)
                 .IsUnique();
 
