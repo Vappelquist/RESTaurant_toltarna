@@ -82,9 +82,9 @@ namespace Restaurant.API.Services
 
             await _ctx.Bookings.AddAsync(booking);
             await _ctx.SaveChangesAsync();
-            return new ServiceResult 
-            { 
-                Success = true 
+            return new ServiceResult
+            {
+                Success = true
             };
         }
 
@@ -132,6 +132,31 @@ namespace Restaurant.API.Services
                 BookingNotes = booking.BookingNotes,
                 TableNumbers = booking.Tables.Select(t => t.TableNumber).ToList()
             };
+        }
+
+        public async Task<List<GetAllBookingResponse>> GetDailyBookingAsync(DateOnly date)
+        {
+            var startOfday = date.ToDateTime(TimeOnly.MinValue);
+            var endOfDay = date.ToDateTime(TimeOnly.MaxValue);
+
+            return await _ctx.Bookings
+                .AsNoTracking()
+                .Where(b => b.StartTime >= startOfday && b.StartTime < endOfDay)
+                .Select(b => new GetAllBookingResponse
+                {
+                    BookingId = b.Id,
+                    GuestName = $"{b.Guest.FirstName} {b.Guest.LastName}",
+                    AmountOfGuests = b.AmountOfGuests,
+                    Status = b.Status,
+                    DateBooked = DateOnly.FromDateTime(b.DateBooked),
+                    StartDate = DateOnly.FromDateTime(b.StartTime),
+                    StartTime = TimeOnly.FromDateTime(b.StartTime),
+                    EndDate = DateOnly.FromDateTime(b.EndTime),
+                    EndTime = TimeOnly.FromDateTime(b.EndTime),
+                    BookingNotes = b.BookingNotes,
+                    TableNumbers = b.Tables.Select(t => t.TableNumber).ToList()
+                })
+                .ToListAsync();
         }
 
         public async Task<List<GetAllBookingResponse>> GetWeeklyBookingsAsync(int year, int week)
@@ -256,7 +281,7 @@ namespace Restaurant.API.Services
 
             // "true" in this parse just makes ignores case, so "canceled", "Canceled" and "CANCELED" will all work
             //Its name is "ignoreCase"
-            if (Enum.TryParse(request,true, out BookingStatus newStatus))
+            if (Enum.TryParse(request, true, out BookingStatus newStatus))
             {
                 switch (newStatus)
                 {
@@ -298,10 +323,10 @@ namespace Restaurant.API.Services
 
                         booking.Status = BookingStatus.Complete;
                         await _ctx.SaveChangesAsync();
-                        return new ServiceResult{Success = true};
+                        return new ServiceResult { Success = true };
 
                     case BookingStatus.Pending:
-                        if(booking.Status == BookingStatus.Pending)
+                        if (booking.Status == BookingStatus.Pending)
                         {
                             return new ServiceResult
                             {
@@ -321,16 +346,17 @@ namespace Restaurant.API.Services
                         };
                 }
             }
-            else 
+            else
             {
-                return new ServiceResult 
-                { 
-                    Success = false, ErrorType = ErrorType.InvalidInput 
-                }; 
-            }          
+                return new ServiceResult
+                {
+                    Success = false,
+                    ErrorType = ErrorType.InvalidInput
+                };
+            }
         }
 
-        
+
         public async Task<ServiceResult> ChangeBookingDateAsync(int id, BookingDateChangeDto request)
         {
             var booking = await _ctx.Bookings
