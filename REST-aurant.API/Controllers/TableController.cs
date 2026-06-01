@@ -14,5 +14,16 @@ namespace Restaurant.API.Controllers
             _tableService = tableService;
         }
 
+        [HttpGet]
+        public async Task<ActionResult> GetAllTables()
+        {
+            var tables = await _tableService.GetAllTablesAsync();
+            if (!tables.Any())
+            {
+                return NotFound("No tables found.");
+            }
+            return Ok(tables);
+        }
+
     }
 }
