@@ -241,64 +241,9 @@ namespace Restaurant.API.Services
         }
 
 
-
-        public async Task<ServiceResult> CancelBookingAsync(int id)
+        public async Task<ServiceResult> EditBookingStatusAsync(int id, string request)
         {
-            var booking = await _ctx.Bookings.FindAsync(id);
-            if (booking == null)
-            {
-                return new ServiceResult
-                {
-                    Success = false,
-                    ErrorType = Enums.ErrorType.BookingNotFound
-                };
-            }
-            if (booking.Status == BookingStatus.Canceled)
-            {
-                return new ServiceResult
-                {
-                    Success = false,
-                    ErrorType = Enums.ErrorType.AlreadyCanceled
-                };
-            }
-            booking.Status = BookingStatus.Canceled;
-            await _ctx.SaveChangesAsync();
-            return new ServiceResult
-            {
-                Success = true
-            };
-        }
 
-        public async Task<ServiceResult> ConfirmBookingAsync(int id)
-        {
-            var booking = await _ctx.Bookings.FindAsync(id);
-            if (booking == null)
-            {
-                return new ServiceResult 
-                { 
-                    Success = false, 
-                    ErrorType = ErrorType.BookingNotFound 
-                };
-            }
-            if (booking.Status == BookingStatus.Confirmed)
-            {
-                return new ServiceResult 
-                { 
-                    Success = false, 
-                    ErrorType = ErrorType.AlreadyConfirmed 
-                };
-            }
-
-            booking.Status = BookingStatus.Confirmed;
-            await _ctx.SaveChangesAsync();
-            return new ServiceResult 
-            { 
-                Success = true 
-            };
-        }
-
-        public async Task<ServiceResult> CompleteBookingAsync(int id)
-        {
             var booking = await _ctx.Bookings.FindAsync(id);
             if (booking == null)
             {
@@ -308,23 +253,84 @@ namespace Restaurant.API.Services
                     ErrorType = ErrorType.BookingNotFound
                 };
             }
-            if (booking.Status == BookingStatus.Complete)
-            {
-                return new ServiceResult
-                {
-                    Success = false,
-                    ErrorType = ErrorType.AlreadyComplete
-                };
-            }
 
-            booking.Status = BookingStatus.Complete;
-            await _ctx.SaveChangesAsync();
-            return new ServiceResult
+            // "true" in this parse just makes ignores case, so "canceled", "Canceled" and "CANCELED" will all work
+            //Its name is "ignoreCase"
+            if (Enum.TryParse(request,true, out BookingStatus newStatus))
             {
-                Success = true
-            };
+                switch (newStatus)
+                {
+                    case BookingStatus.Canceled:
+                        if (booking.Status == BookingStatus.Canceled)
+                        {
+                            return new ServiceResult
+                            {
+                                Success = false,
+                                ErrorType = ErrorType.AlreadyCanceled
+                            };
+                        }
+                        booking.Status = BookingStatus.Canceled;
+                        await _ctx.SaveChangesAsync();
+                        return new ServiceResult { Success = true };
+
+                    case BookingStatus.Confirmed:
+                        if (booking.Status == BookingStatus.Confirmed)
+                        {
+                            return new ServiceResult
+                            {
+                                Success = false,
+                                ErrorType = ErrorType.AlreadyConfirmed
+                            };
+                        }
+                        booking.Status = BookingStatus.Confirmed;
+                        await _ctx.SaveChangesAsync();
+                        return new ServiceResult { Success = true };
+
+                    case BookingStatus.Complete:
+                        if (booking.Status == BookingStatus.Complete)
+                        {
+                            return new ServiceResult
+                            {
+                                Success = false,
+                                ErrorType = ErrorType.AlreadyComplete
+                            };
+                        }
+
+                        booking.Status = BookingStatus.Complete;
+                        await _ctx.SaveChangesAsync();
+                        return new ServiceResult{Success = true};
+
+                    case BookingStatus.Pending:
+                        if(booking.Status == BookingStatus.Pending)
+                        {
+                            return new ServiceResult
+                            {
+                                Success = false,
+                                ErrorType = ErrorType.AlreadyPending
+                            };
+                        }
+                        booking.Status = BookingStatus.Pending;
+                        await _ctx.SaveChangesAsync();
+                        return new ServiceResult { Success = true };
+
+                    default:
+                        return new ServiceResult
+                        {
+                            Success = false,
+                            ErrorType = ErrorType.InvalidInput
+                        };
+                }
+            }
+            else 
+            {
+                return new ServiceResult 
+                { 
+                    Success = false, ErrorType = ErrorType.InvalidInput 
+                }; 
+            }          
         }
 
+        
         public async Task<ServiceResult> ChangeBookingDateAsync(int id, BookingDateChangeDto request)
         {
             var booking = await _ctx.Bookings
@@ -408,5 +414,7 @@ namespace Restaurant.API.Services
 
             return new ServiceResult { Success = true };
         }
+
+
     }
 }
