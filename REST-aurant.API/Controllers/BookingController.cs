@@ -36,6 +36,19 @@ namespace Restaurant.API.Controllers
             return Ok(booking);
         }
 
+        [HttpGet("GetDailyBookings")]
+        [EndpointSummary("ADMIN Get daily bookings")]
+        public async Task<ActionResult> GetDailyBookings(DateOnly date)
+        {
+            var bookings = await _bookingService.GetDailyBookingAsync(date);
+            if (!bookings.Any())
+            {
+                return NotFound("No bookings found for this date.");
+
+            }
+            return Ok(bookings);
+        }
+
         [HttpGet("GetWeeklyBookings")]
         public async Task<ActionResult> GetWeeklyBookings(int year, int week)
         {
@@ -100,7 +113,8 @@ namespace Restaurant.API.Controllers
                 {
                     ErrorType.ContactDetailsTaken => BadRequest("This email or phone number already belongs to another guest."),
                     ErrorType.FullyBooked => BadRequest("This time is fully booked, please choose another time."),
-                    _ => BadRequest() };
+                    _ => BadRequest()
+                };
             }
 
             return Ok("Thank you, your booking has been received!");
@@ -178,7 +192,7 @@ namespace Restaurant.API.Controllers
                     var unknownError => throw new InvalidOperationException($"Unhandled error type: {unknownError}")
                 };
             return Ok("Booking successfully changed.");
-            
+
         }
 
         [HttpPut("{id}/details", Name = "UpdateBookingDetails")]
