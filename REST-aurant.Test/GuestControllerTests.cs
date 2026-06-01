@@ -99,4 +99,34 @@ public class GuestControllerTests
         //Assert
         Assert.IsInstanceOfType(result, typeof(OkObjectResult));
     }
+
+    [TestMethod]
+    public async Task AddGuest_WhenAllergiesAndNoteAreEmpty_ReturnOk()
+    {
+        //Arrange
+        var mockService = new Mock<IGuestService>();
+
+        var request = new CreateAddGuestRequest
+        {
+            FirstName = "Mini",
+            LastName = "Momo",
+            Email = "minimomo@mail.com",
+            Password = "password1234",
+            Allergies = null,
+            Note = null
+        };
+        mockService.Setup(s => s.AddGuestAsync(request))
+            .ReturnsAsync(new ServiceResult<Guest>
+            {
+                Success = true,
+                Data = new Guest()
+            });
+        var controller = new GuestController(null!, mockService.Object);
+
+        //Act
+        var result = await controller.AddGuest(request);
+
+        //Assert
+        Assert.IsInstanceOfType(result, typeof(OkObjectResult));
+    }
 }
