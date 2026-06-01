@@ -86,5 +86,10 @@ namespace Restaurant.API.Services
 
             return tablesToAssign;
         }
+
+        public async Task<List<Table>> GetAllTablesAsync()
+        {
+            return await _ctx.Tables.OrderBy(t => t.TableNumber).ToListAsync();
+        }
     }
 }
