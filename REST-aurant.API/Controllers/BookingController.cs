@@ -100,11 +100,16 @@ namespace Restaurant.API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            TimeOnly startTime;
             if (string.IsNullOrWhiteSpace(request.Email) && string.IsNullOrWhiteSpace(request.PhoneNumber))
                 return BadRequest("You must provide either an email or phone number.");
 
-            if (!TimeOnly.TryParse(request.StartTime, out _))
+            if (!TimeOnly.TryParse(request.StartTime, out startTime))
                 return BadRequest("Time must be entered in format HH:mm. For example 18:30");
+            
+            if (startTime.Minute != 0
+                && startTime.Minute != 30)
+                return BadRequest("Start time must be on the hour or half hour. For example 18:00 or 18:30");
 
             var result = await _bookingService.PlaceBookingAsync(request);
             if (!result.Success)
