@@ -9,11 +9,11 @@ using Restaurant.API.Data;
 
 #nullable disable
 
-namespace REST_aurant.API.Migrations
+namespace Restaurant.API.Migrations
 {
     [DbContext(typeof(RestaurantDbContext))]
-    [Migration("20260519105843_updatedNamespaces")]
-    partial class updatedNamespaces
+    [Migration("20260601140141_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -102,7 +102,7 @@ namespace REST_aurant.API.Migrations
                             EndTime = new DateTime(2026, 5, 8, 20, 0, 0, 0, DateTimeKind.Unspecified),
                             GuestId = 1,
                             StartTime = new DateTime(2026, 5, 8, 18, 0, 0, 0, DateTimeKind.Unspecified),
-                            Status = 0
+                            Status = 1
                         },
                         new
                         {
@@ -113,7 +113,7 @@ namespace REST_aurant.API.Migrations
                             EndTime = new DateTime(2026, 5, 10, 21, 0, 0, 0, DateTimeKind.Unspecified),
                             GuestId = 2,
                             StartTime = new DateTime(2026, 5, 10, 19, 0, 0, 0, DateTimeKind.Unspecified),
-                            Status = 1
+                            Status = 2
                         },
                         new
                         {
@@ -124,17 +124,14 @@ namespace REST_aurant.API.Migrations
                             EndTime = new DateTime(2026, 5, 15, 20, 0, 0, 0, DateTimeKind.Unspecified),
                             GuestId = 3,
                             StartTime = new DateTime(2026, 5, 15, 17, 0, 0, 0, DateTimeKind.Unspecified),
-                            Status = 0
+                            Status = 1
                         });
                 });
 
             modelBuilder.Entity("Restaurant.Models.Models.Table", b =>
                 {
                     b.Property<int>("TableNumber")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TableNumber"));
 
                     b.Property<int>("Seats")
                         .HasColumnType("int");

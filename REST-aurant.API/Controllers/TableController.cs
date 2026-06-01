@@ -35,12 +35,27 @@ namespace Restaurant.API.Controllers
             {
                 return requestResult.ErrorType switch
                 {
-                    ErrorType.BadRequest => BadRequest("This tablenumber is already taken."),
+                    ErrorType.TableAlreadyExists => BadRequest("This tablenumber is already taken."),
                     _ => BadRequest()
                 };
             }
             return Ok($"Table {request.TableNumber} was added.");
         }
 
+        [HttpDelete("{tableNumber}")]
+        public async Task<ActionResult> DeleteTable(int tableNumber)
+        {
+            var requestResult = await _tableService.DeleteTableAsync(tableNumber);
+            if (!requestResult.Success)
+            {
+                return requestResult.ErrorType switch
+                {
+                    ErrorType.TableNotFound => NotFound($"Table {tableNumber} does not exist."),
+                    ErrorType.TableHasActiceBookings => BadRequest($"Table {tableNumber} has active bookings."),
+                    _ => BadRequest()
+                };
+            }
+            return Ok($"Table {tableNumber} deleted successfully.");
+        }
     }
 }
