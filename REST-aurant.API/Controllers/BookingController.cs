@@ -106,7 +106,11 @@ namespace Restaurant.API.Controllers
 
             if (!TimeOnly.TryParse(request.StartTime, out startTime))
                 return BadRequest("Time must be entered in format HH:mm. For example 18:30");
-            
+
+            //Ensure that the start time can't be before 17:00 or after 22:00
+            if (startTime < TimeOnly.Parse("17:00") || startTime > TimeOnly.Parse("22:00"))
+                return BadRequest("Start time must be between 17:00 and 22:00.");
+
             if (startTime.Minute != 0
                 && startTime.Minute != 30)
                 return BadRequest("Start time must be on the hour or half hour. For example 18:00 or 18:30");
