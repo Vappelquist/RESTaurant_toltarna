@@ -101,7 +101,7 @@ namespace Restaurant.API.Services
                 return new ServiceResult
                 {
                     Success = false,
-                    ErrorType = ErrorType.BadRequest
+                    ErrorType = ErrorType.TableAlreadyExists
                 };
             }
 
@@ -110,6 +110,40 @@ namespace Restaurant.API.Services
                 TableNumber = tableNumber,
                 Seats = seats
             });
+            await _ctx.SaveChangesAsync();
+            return new ServiceResult
+            {
+                Success = true
+            };
+        }
+
+        public async Task<ServiceResult> DeleteTableAsync(int tableNumber)
+        {
+            var table = await _ctx.Tables.FindAsync(tableNumber);
+            if (table == null)
+            {
+                return new ServiceResult
+                {
+                    Success = false,
+                    ErrorType = ErrorType.TableNotFound
+                };
+
+            }
+            var hasActiveBookings = await _ctx.Bookings
+            .AnyAsync(b => b.Tables.Any(t => t.TableNumber == tableNumber)
+            && b.Status != BookingStatus.Canceled
+            && b.Status != BookingStatus.Complete);
+
+            if (hasActiveBookings)
+            {
+                return new ServiceResult
+                {
+                    Success = false,
+                    ErrorType = ErrorType.TableHasActiceBookings
+                };
+            }
+
+            _ctx.Tables.Remove(table);
             await _ctx.SaveChangesAsync();
             return new ServiceResult
             {
