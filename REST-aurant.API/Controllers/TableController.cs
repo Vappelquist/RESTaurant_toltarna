@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Restaurant.API.DTOs;
 using Restaurant.API.Services;
+using Restaurant.API.Services.Enums;
 
 namespace Restaurant.API.Controllers
 {
@@ -23,6 +25,21 @@ namespace Restaurant.API.Controllers
                 return NotFound("No tables found.");
             }
             return Ok(tables);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> AddTable(AddTableRequest request)
+        {
+            var requestResult = await _tableService.AddTableAsync(request.TableNumber, request.Seats);
+            if (!requestResult.Success)
+            {
+                return requestResult.ErrorType switch
+                {
+                    ErrorType.BadRequest => BadRequest("This tablenumber is already taken."),
+                    _ => BadRequest()
+                };
+            }
+            return Ok($"Table {request.TableNumber} was added.");
         }
 
     }
