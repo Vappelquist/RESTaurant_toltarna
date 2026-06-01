@@ -70,5 +70,33 @@ namespace Restaurant.API.Controllers
             return Ok(result.Data);
         }
 
+        [HttpGet("{email}")]
+        [EndpointSummary("Get guest by email")]
+        public async Task<ActionResult> GetGuestByEmail(string email)
+        {
+            var guest = await _guestService.GetGuestByEmailAsync(email);
+
+            if(guest == null)
+            {
+                return NotFound("No guest found with this email.");
+            }
+            return Ok($"Id: {guest.Id}");
+        }
+
+        [HttpDelete("{id}")]
+        [EndpointSummary("Delete guest by id")]
+        public async Task<ActionResult> DeleteGuest(int id)
+        {
+            var result = await _guestService.DeleteGuestByIdAsync(id);
+            if (!result.Success)
+            {
+                return result.ErrorType switch
+                {
+                    ErrorType.GuestNotFound => NotFound("No guest found with this id."),
+                    _ => BadRequest()
+                };
+            }
+            return Ok("Guest deleted.");
+        }
     }
 }

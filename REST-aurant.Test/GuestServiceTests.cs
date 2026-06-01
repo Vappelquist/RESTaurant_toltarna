@@ -69,6 +69,7 @@ public class GuestServiceTests
         //Assert
         Assert.IsTrue(result.Success);
         Assert.IsNotNull(result.Data);
+
     }
 
     [TestMethod]

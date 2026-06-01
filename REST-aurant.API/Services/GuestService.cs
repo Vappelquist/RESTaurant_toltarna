@@ -81,5 +81,30 @@ namespace Restaurant.API.Services
                 Data = guest
             };
         }
+        public async Task<Guest?> GetGuestByEmailAsync(string email)
+        {
+            return await _context.Guests.FirstOrDefaultAsync(g => g.Email == email);
+        }
+        public async Task<ServiceResult> DeleteGuestByIdAsync(int id)
+        {
+            //Find guest by email
+            var guestToDelete = await _context.Guests.FirstOrDefaultAsync(g => g.Id == id);
+
+            //Return error if not found
+            if (guestToDelete == null)
+            {
+                return new ServiceResult
+                {
+                    Success = false,
+                    ErrorType = ErrorType.GuestNotFound
+                };
+            }
+            _context.Guests.Remove(guestToDelete);
+            await _context.SaveChangesAsync();
+            return new ServiceResult
+            {
+                Success = true
+            };
+        }
     }
 }

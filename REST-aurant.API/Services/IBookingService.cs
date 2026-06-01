@@ -17,6 +17,7 @@ namespace Restaurant.API.Services
         Task<List<TableStatusDto>> ViewBookingsByTimeAsync(DateOnly date, string time);
         Task<ServiceResult> ChangeBookingDateAsync(int id, BookingDateChangeDto request);
         Task<ServiceResult> UpdateBookingDetailsAsync(int id, UpdateBookingDetailsRequest request);
+
         Task<ServiceResult> EditBookingStatusAsync(int id, string request);
     }
 }
