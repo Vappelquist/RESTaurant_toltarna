@@ -14,9 +14,20 @@ namespace Restaurant.API.Services
         {
             _context = context;
         }
-        public async Task<List<Guest>> GetAllGuestsAsync()
+        public async Task<List<GetGuestResponse>> GetAllGuestsAsync()
         {
-            return await _context.Guests.ToListAsync();
+            return await _context.Guests
+                .AsNoTracking()
+                .Select(g => new GetGuestResponse
+                {
+                    Id = g.Id,
+                    FirstName = g.FirstName,
+                    LastName = g.LastName,
+                    Email = g.Email,
+                    PhoneNumber = g.PhoneNumber,
+                    BookingStatuses = g.Bookings!.Select(b => b.Status).ToList()
+                })
+                .ToListAsync();
         }
         public async Task<ServiceResult<Guest>> AddGuestAsync(CreateAddGuestRequest addGuestRequest)
         {

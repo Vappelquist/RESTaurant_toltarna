@@ -202,5 +202,21 @@ namespace Restaurant.API.Controllers
 
             return Ok("Booking details successfully updated.");
         }
+
+        [HttpDelete("{id}")]
+        [EndpointSummary("Delete booking by id")]
+        public async Task<ActionResult> DeleteGuest(int id)
+        {
+            var result = await _bookingService.DeleteBookingByIdAsync(id);
+            if (!result.Success)
+            {
+                return result.ErrorType switch
+                {
+                    ErrorType.GuestNotFound => NotFound("No booking found with this id."),
+                    _ => BadRequest()
+                };
+            }
+            return Ok("Booking deleted.");
+        }
     }
 }

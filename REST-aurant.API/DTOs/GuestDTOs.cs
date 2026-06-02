@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Restaurant.Models.Models.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace Restaurant.API.DTOs
 {
@@ -41,6 +42,18 @@ namespace Restaurant.API.DTOs
 
             public string? Allergies { get; init; }
             public string? Note { get; init; }
+        }
+
+        public record GetGuestResponse
+        {
+            public int Id { get; init; }
+            public string? FirstName { get; init; }
+            public string? LastName { get; init; }
+            public string? Email { get; init; }
+            public string? PhoneNumber { get; init; }
+            public string? Allergies { get; init; }
+            public string? Note { get; init; }
+            public List<BookingStatus> BookingStatuses { get; init; } = new();
         }
     }
 }
