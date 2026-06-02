@@ -1,8 +1,11 @@
 
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Restaurant.API.Data;
 using Restaurant.API.Services;
+using Restaurant.API.Validators;
 using System.Text.Json.Serialization;
+using FluentValidation.AspNetCore;
 
 namespace Restaurant.API
 {
@@ -18,6 +21,9 @@ namespace Restaurant.API
             builder.Services.AddScoped<ITableService, TableService>();
             builder.Services.AddScoped<IBookingService, BookingService>();
             builder.Services.AddScoped<IGuestService, GuestService>();
+
+            builder.Services.AddValidatorsFromAssemblyContaining<PlaceBookingValidator>();
+            builder.Services.AddFluentValidationAutoValidation();
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
