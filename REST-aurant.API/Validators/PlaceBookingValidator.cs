@@ -17,6 +17,10 @@ namespace Restaurant.API.Validators
                 .Must(x => !string.IsNullOrWhiteSpace(x.Email) || !string.IsNullOrWhiteSpace(x.PhoneNumber))
                 .WithMessage("You must provide either an email or phone number.");
 
+            RuleFor(x => x.BookingDate)
+                .Must(date => date >= DateOnly.FromDateTime(DateTime.Now))
+                .WithMessage("Booking date must be today or in the future.");
+
             RuleFor(x => x.StartTime)
                 .NotEmpty().WithMessage("Start time is required.")
                 .Must(t => TimeOnly.TryParse(t, out _))
