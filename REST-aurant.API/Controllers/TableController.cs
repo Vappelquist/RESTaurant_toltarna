@@ -51,11 +51,26 @@ namespace Restaurant.API.Controllers
                 return requestResult.ErrorType switch
                 {
                     ErrorType.TableNotFound => NotFound($"Table {tableNumber} does not exist."),
-                    ErrorType.TableHasActiceBookings => BadRequest($"Table {tableNumber} has active bookings."),
+                    ErrorType.TableHasActiveBookings => BadRequest($"Table {tableNumber} has active bookings."),
                     _ => BadRequest()
                 };
             }
             return Ok($"Table {tableNumber} deleted successfully.");
+        }
+
+        [HttpPut("{tableNumber}")]
+        public async Task<ActionResult> EditTable(int tableNumber, EditTableRequest request)
+        {
+            var requestResult = await _tableService.EditTableAsync(tableNumber, request.Seats);
+            if (!requestResult.Success)
+            {
+                return requestResult.ErrorType switch
+                {
+                    ErrorType.TableNotFound => NotFound($"Table {tableNumber} does not exist."),
+                    _ => BadRequest()
+                };
+            }
+            return Ok($"Table {tableNumber} was updated.");
         }
     }
 }
