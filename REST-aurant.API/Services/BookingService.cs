@@ -441,6 +441,27 @@ namespace Restaurant.API.Services
             return new ServiceResult { Success = true };
         }
 
+        public async Task<ServiceResult> DeleteBookingByIdAsync(int id)
+        {
+            //Find guest by email
+            var bookingToDelete = await _ctx.Bookings.FirstOrDefaultAsync(b => b.Id == id);
+
+            //Return error if not found
+            if (bookingToDelete == null)
+            {
+                return new ServiceResult
+                {
+                    Success = false,
+                    ErrorType = ErrorType.GuestNotFound
+                };
+            }
+            _ctx.Bookings.Remove(bookingToDelete);
+            await _ctx.SaveChangesAsync();
+            return new ServiceResult
+            {
+                Success = true
+            };
+        }
 
     }
 }

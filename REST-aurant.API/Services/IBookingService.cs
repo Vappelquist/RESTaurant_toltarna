@@ -20,5 +20,6 @@ namespace Restaurant.API.Services
 
         Task<ServiceResult> EditBookingStatusAsync(int id, string request);
         Task<List<GetAllBookingResponse>> GetDailyBookingAsync(DateOnly date);
+        Task<ServiceResult> DeleteBookingByIdAsync(int id);
     }
 }
