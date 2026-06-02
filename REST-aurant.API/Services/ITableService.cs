@@ -9,6 +9,7 @@ namespace Restaurant.API.Services
         Task<List<Table>> GetAllTablesAsync();
         Task<ServiceResult> AddTableAsync(int tableNumber, int seats);
         Task<ServiceResult> DeleteTableAsync(int tableNumber);
+        Task<ServiceResult> EditTableAsync(int tableNumber, int seats);
 
     }
 }

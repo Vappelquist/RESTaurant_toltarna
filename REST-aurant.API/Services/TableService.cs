@@ -150,5 +150,25 @@ namespace Restaurant.API.Services
                 Success = true
             };
         }
+
+        public async Task<ServiceResult> EditTableAsync(int tableNumber, int seats)
+        {
+            var table = await _ctx.Tables.FindAsync(tableNumber);
+            if (table == null)
+            {
+                return new ServiceResult
+                {
+                    Success = false,
+                    ErrorType = ErrorType.TableNotFound
+                };
+            }
+
+            table.Seats = seats;
+            await _ctx.SaveChangesAsync();
+            return new ServiceResult
+            {
+                Success = true
+            };
+        }
     }
 }
