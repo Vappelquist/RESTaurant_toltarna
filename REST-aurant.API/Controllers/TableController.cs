@@ -57,5 +57,11 @@ namespace Restaurant.API.Controllers
             }
             return Ok($"Table {tableNumber} deleted successfully.");
         }
+
+        [HttpPut("{tableNumber}")]
+        public async Task<ActionResult> EditTable(int tableNumber, int seats)
+        {
+
+        }
     }
 }
