@@ -139,7 +139,7 @@ namespace Restaurant.API.Services
                 return new ServiceResult
                 {
                     Success = false,
-                    ErrorType = ErrorType.TableHasActiceBookings
+                    ErrorType = ErrorType.TableHasActiveBookings
                 };
             }
 

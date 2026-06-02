@@ -17,6 +17,6 @@
         ContactDetailsTaken,
         TableNotFound,
         TableAlreadyExists,
-        TableHasActiceBookings
+        TableHasActiveBookings
     }
 }

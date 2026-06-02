@@ -51,7 +51,7 @@ namespace Restaurant.API.Controllers
                 return requestResult.ErrorType switch
                 {
                     ErrorType.TableNotFound => NotFound($"Table {tableNumber} does not exist."),
-                    ErrorType.TableHasActiceBookings => BadRequest($"Table {tableNumber} has active bookings."),
+                    ErrorType.TableHasActiveBookings => BadRequest($"Table {tableNumber} has active bookings."),
                     _ => BadRequest()
                 };
             }
