@@ -59,9 +59,18 @@ namespace Restaurant.API.Controllers
         }
 
         [HttpPut("{tableNumber}")]
-        public async Task<ActionResult> EditTable(int tableNumber, int seats)
+        public async Task<ActionResult> EditTable(int tableNumber, EditTableRequest request)
         {
-
+            var requestResult = await _tableService.EditTableAsync(tableNumber, request.Seats);
+            if (!requestResult.Success)
+            {
+                return requestResult.ErrorType switch
+                {
+                    ErrorType.TableNotFound => NotFound($"Table {tableNumber} does not exist."),
+                    _ => BadRequest()
+                };
+            }
+            return Ok($"Table {tableNumber} was updated.");
         }
     }
 }
