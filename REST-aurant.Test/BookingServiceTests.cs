@@ -462,5 +462,50 @@ public class BookingServiceTests
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ErrorType.BookingNotFound, result.ErrorType);
     }
+
+    [TestMethod]
+    public async Task UpdateBookingDetailsAsync_DoesNotOverwriteWithEmptyValues()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDb();
+
+        var booking = new Booking
+        {
+            Id = 1,
+            Guest = new Guest
+            {
+                FirstName = "KeepFirst",
+                LastName = "KeepLast",
+                Email = "doe@mail.com"
+            },
+            BookingNotes = "Keep notes",
+            StartTime = DateTime.Now,
+            EndTime = DateTime.Now.AddHours(2)
+        };
+
+        ctx.Bookings.Add(booking);
+        await ctx.SaveChangesAsync();
+
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        var request = new UpdateBookingDetailsRequest
+        {
+            FirstName = "   ",   // whitespace
+            LastName = null,
+            BookingNotes = null
+        };
+
+        // Act
+        var result = await service.UpdateBookingDetailsAsync(1, request);
+
+        // Assert
+        Assert.IsTrue(result.Success);
+
+        var updated = await ctx.Bookings.Include(b => b.Guest).FirstOrDefaultAsync(b => b.Id == 1);
+
+        Assert.AreEqual("KeepFirst", updated!.Guest!.FirstName);
+        Assert.AreEqual("KeepLast", updated.Guest!.LastName);
+        Assert.AreEqual("Keep notes", updated.BookingNotes);
+    }
     // edit booking--------------------------------------------------------------------------
 }
