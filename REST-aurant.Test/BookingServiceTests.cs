@@ -414,5 +414,33 @@ public class BookingServiceTests
         Assert.AreEqual(BookingStatus.Confirmed, updated!.Status);
     }
 
+    [TestMethod]
+    public async Task EditBookingStatusAsync_IsCaseInsensitive()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDb();
+
+        ctx.Bookings.Add(new Booking
+        {
+            Id = 1,
+            Status = BookingStatus.Pending,
+            StartTime = DateTime.Now,
+            EndTime = DateTime.Now.AddHours(2)
+        });
+
+        await ctx.SaveChangesAsync();
+
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        // Act
+        var result = await service.EditBookingStatusAsync(1, "cOnFiRmEd");
+
+        // Assert
+        Assert.IsTrue(result.Success);
+
+        var updated = await ctx.Bookings.FindAsync(1);
+        Assert.AreEqual(BookingStatus.Confirmed, updated!.Status);
+    }
+
     // edit booking--------------------------------------------------------------------------
 }
