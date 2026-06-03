@@ -316,4 +316,241 @@ public class BookingServiceTests
     }
 
     // GetWeeklyBookingsAsync-tests --------------------------------------------------------^
+
+    // edit booking--------------------------------------------------------------------------
+
+    [TestMethod]
+    public async Task EditBookingStatusAsync_WhenBookingDoesNotExist_ReturnsBookingNotFound()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDb();
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        // Act
+        var result = await service.EditBookingStatusAsync(999, "Confirmed");
+
+        // Assert
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ErrorType.BookingNotFound, result.ErrorType);
+    }
+
+    [TestMethod]
+    public async Task EditBookingStatusAsync_WhenInvalidStatus_ReturnsInvalidInput()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDb();
+
+        ctx.Bookings.Add(new Booking
+        {
+            Id = 1,
+            Status = BookingStatus.Pending,
+            StartTime = DateTime.Now,
+            EndTime = DateTime.Now.AddHours(2)
+        });
+
+        await ctx.SaveChangesAsync();
+
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        // Act
+        var result = await service.EditBookingStatusAsync(1, "NotAStatus");
+
+        // Assert
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ErrorType.InvalidInput, result.ErrorType);
+    }
+
+    [TestMethod]
+    public async Task EditBookingStatusAsync_WhenAlreadyConfirmed_ReturnsAlreadyConfirmed()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDb();
+
+        ctx.Bookings.Add(new Booking
+        {
+            Id = 1,
+            Status = BookingStatus.Confirmed,
+            StartTime = DateTime.Now,
+            EndTime = DateTime.Now.AddHours(2)
+        });
+
+        await ctx.SaveChangesAsync();
+
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        // Act
+        var result = await service.EditBookingStatusAsync(1, "Confirmed");
+
+        // Assert
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ErrorType.AlreadyConfirmed, result.ErrorType);
+    }
+
+    [TestMethod]
+    public async Task EditBookingStatusAsync_WhenValidStatus_UpdatesStatus()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDb();
+
+        ctx.Bookings.Add(new Booking
+        {
+            Id = 1,
+            Status = BookingStatus.Pending,
+            StartTime = DateTime.Now,
+            EndTime = DateTime.Now.AddHours(2)
+        });
+
+        await ctx.SaveChangesAsync();
+
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        // Act
+        var result = await service.EditBookingStatusAsync(1, "Confirmed");
+
+        // Assert
+        Assert.IsTrue(result.Success);
+
+        var updated = await ctx.Bookings.FindAsync(1);
+        Assert.AreEqual(BookingStatus.Confirmed, updated!.Status);
+    }
+
+    [TestMethod]
+    public async Task EditBookingStatusAsync_IsCaseInsensitive()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDb();
+
+        ctx.Bookings.Add(new Booking
+        {
+            Id = 1,
+            Status = BookingStatus.Pending,
+            StartTime = DateTime.Now,
+            EndTime = DateTime.Now.AddHours(2)
+        });
+
+        await ctx.SaveChangesAsync();
+
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        // Act
+        var result = await service.EditBookingStatusAsync(1, "cOnFiRmEd");
+
+        // Assert
+        Assert.IsTrue(result.Success);
+
+        var updated = await ctx.Bookings.FindAsync(1);
+        Assert.AreEqual(BookingStatus.Confirmed, updated!.Status);
+    }
+
+
+    [TestMethod]
+    public async Task UpdateBookingDetailsAsync_WhenBookingDoesNotExist_ReturnsNotFound()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDb();
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        var request = new UpdateBookingDetailsRequest
+        {
+            FirstName = "Test"
+        };
+
+        // Act
+        var result = await service.UpdateBookingDetailsAsync(999, request);
+
+        // Assert
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ErrorType.BookingNotFound, result.ErrorType);
+    }
+
+    [TestMethod]
+    public async Task UpdateBookingDetailsAsync_DoesNotOverwriteWithEmptyValues()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDb();
+
+        var booking = new Booking
+        {
+            Id = 1,
+            Guest = new Guest
+            {
+                FirstName = "KeepFirst",
+                LastName = "KeepLast",
+                Email = "doe@mail.com"
+            },
+            BookingNotes = "Keep notes",
+            StartTime = DateTime.Now,
+            EndTime = DateTime.Now.AddHours(2)
+        };
+
+        ctx.Bookings.Add(booking);
+        await ctx.SaveChangesAsync();
+
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        var request = new UpdateBookingDetailsRequest
+        {
+            FirstName = "   ",   // whitespace
+            LastName = null,
+            BookingNotes = null
+        };
+
+        // Act
+        var result = await service.UpdateBookingDetailsAsync(1, request);
+
+        // Assert
+        Assert.IsTrue(result.Success);
+
+        var updated = await ctx.Bookings.Include(b => b.Guest).FirstOrDefaultAsync(b => b.Id == 1);
+
+        Assert.AreEqual("KeepFirst", updated!.Guest!.FirstName);
+        Assert.AreEqual("KeepLast", updated.Guest!.LastName);
+        Assert.AreEqual("Keep notes", updated.BookingNotes);
+    }
+
+    [TestMethod]
+    public async Task UpdateBookingDetailsAsync_UpdatesGuestAndNotes()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDb();
+
+        var booking = new Booking
+        {
+            Id = 1,
+            Guest = new Guest
+            {
+                FirstName = "OldFirst",
+                LastName = "OldLast",
+                Email = "old@mail.com"
+            },
+            BookingNotes = "Old note",
+            StartTime = DateTime.Now,
+            EndTime = DateTime.Now.AddHours(2)
+        };
+
+        ctx.Bookings.Add(booking);
+        await ctx.SaveChangesAsync();
+
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        var request = new UpdateBookingDetailsRequest
+        {
+            FirstName = "NewFirst",
+            LastName = "NewLast",
+            BookingNotes = "New note"
+        };
+
+        // Act
+        var result = await service.UpdateBookingDetailsAsync(1, request);
+
+        // Assert
+        Assert.IsTrue(result.Success);
+
+        var updated = await ctx.Bookings.Include(b => b.Guest).FirstOrDefaultAsync(b => b.Id == 1);
+
+        Assert.AreEqual("NewFirst", updated!.Guest!.FirstName);
+        Assert.AreEqual("NewLast", updated.Guest!.LastName);
+        Assert.AreEqual("New note", updated.BookingNotes);
+    }
+    // edit booking--------------------------------------------------------------------------
 }
