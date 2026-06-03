@@ -316,4 +316,23 @@ public class BookingServiceTests
     }
 
     // GetWeeklyBookingsAsync-tests --------------------------------------------------------^
+
+    // edit booking--------------------------------------------------------------------------
+
+    [TestMethod]
+    public async Task EditBookingStatusAsync_WhenBookingDoesNotExist_ReturnsBookingNotFound()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDb();
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        // Act
+        var result = await service.EditBookingStatusAsync(999, "Confirmed");
+
+        // Assert
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ErrorType.BookingNotFound, result.ErrorType);
+    }
+
+    // edit booking--------------------------------------------------------------------------
 }
