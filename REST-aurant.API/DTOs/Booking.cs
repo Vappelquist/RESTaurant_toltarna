@@ -29,12 +29,9 @@ namespace Restaurant.API.DTOs
             public List<int> TableNumbers { get; set; } = new List<int>();
         }
 
-        public record PlaceBookingRequest
+        public record PlaceBookingRequest : UpdateBookingDetailsRequest
         {
-            [Required]
-            public string? FirstName { get; set; }
-            [Required]
-            public string? LastName { get; set; }
+            
             [EmailAddress]
             public string? Email { get; set; }
             [Phone]
@@ -43,12 +40,13 @@ namespace Restaurant.API.DTOs
             public int AmountOfGuests { get; set; }
             public DateOnly BookingDate { get; set; }
             public string? StartTime { get; set; }
-            public string? BookingNotes { get; set; }
         }
 
         public record UpdateBookingDetailsRequest
         {
+            [Required]
             public string? FirstName { get; init; }
+            [Required]
             public string? LastName { get; init; }
             public string? BookingNotes { get; init; }
         }
