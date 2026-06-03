@@ -20,4 +20,9 @@ namespace Restaurant.API.DTOs
         [Range(1, 10, ErrorMessage = "Number of seats must be between 1 and 10.")]
         public int Seats { get; set; }
     }
+    public record TableDto
+    {
+        public int TableNumber { get; set; }
+        public int Seats { get; set; }
+    }
 }
