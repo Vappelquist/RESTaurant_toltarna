@@ -442,5 +442,25 @@ public class BookingServiceTests
         Assert.AreEqual(BookingStatus.Confirmed, updated!.Status);
     }
 
+
+    [TestMethod]
+    public async Task UpdateBookingDetailsAsync_WhenBookingDoesNotExist_ReturnsNotFound()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDb();
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        var request = new UpdateBookingDetailsRequest
+        {
+            FirstName = "Test"
+        };
+
+        // Act
+        var result = await service.UpdateBookingDetailsAsync(999, request);
+
+        // Assert
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ErrorType.BookingNotFound, result.ErrorType);
+    }
     // edit booking--------------------------------------------------------------------------
 }
