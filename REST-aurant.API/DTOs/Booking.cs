@@ -50,5 +50,6 @@ namespace Restaurant.API.DTOs
             public string? LastName { get; init; }
             public string? BookingNotes { get; init; }
         }
+
     }
 }

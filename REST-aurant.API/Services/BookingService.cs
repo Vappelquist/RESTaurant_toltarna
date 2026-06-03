@@ -84,7 +84,8 @@ namespace Restaurant.API.Services
             await _ctx.SaveChangesAsync();
             return new ServiceResult
             {
-                Success = true
+                Success = true,
+                BookingId = booking.Id
             };
         }
 

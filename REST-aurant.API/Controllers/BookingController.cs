@@ -107,7 +107,11 @@ namespace Restaurant.API.Controllers
                 };
             }
 
-            return Ok("Thank you, your booking has been received!");
+            return Ok(new
+            {
+                Message = "Thank you, your booking has been received!",
+                BookingId = result.BookingId
+            });
         }
 
         [HttpGet("{id}/date", Name = "GetBookingDate")]
