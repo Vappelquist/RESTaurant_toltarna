@@ -360,5 +360,31 @@ public class BookingServiceTests
         Assert.AreEqual(ErrorType.InvalidInput, result.ErrorType);
     }
 
+    [TestMethod]
+    public async Task EditBookingStatusAsync_WhenAlreadyConfirmed_ReturnsAlreadyConfirmed()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDb();
+
+        ctx.Bookings.Add(new Booking
+        {
+            Id = 1,
+            Status = BookingStatus.Confirmed,
+            StartTime = DateTime.Now,
+            EndTime = DateTime.Now.AddHours(2)
+        });
+
+        await ctx.SaveChangesAsync();
+
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        // Act
+        var result = await service.EditBookingStatusAsync(1, "Confirmed");
+
+        // Assert
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ErrorType.AlreadyConfirmed, result.ErrorType);
+    }
+
     // edit booking--------------------------------------------------------------------------
 }
