@@ -507,5 +507,50 @@ public class BookingServiceTests
         Assert.AreEqual("KeepLast", updated.Guest!.LastName);
         Assert.AreEqual("Keep notes", updated.BookingNotes);
     }
+
+    [TestMethod]
+    public async Task UpdateBookingDetailsAsync_UpdatesGuestAndNotes()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDb();
+
+        var booking = new Booking
+        {
+            Id = 1,
+            Guest = new Guest
+            {
+                FirstName = "OldFirst",
+                LastName = "OldLast",
+                Email = "old@mail.com"
+            },
+            BookingNotes = "Old note",
+            StartTime = DateTime.Now,
+            EndTime = DateTime.Now.AddHours(2)
+        };
+
+        ctx.Bookings.Add(booking);
+        await ctx.SaveChangesAsync();
+
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        var request = new UpdateBookingDetailsRequest
+        {
+            FirstName = "NewFirst",
+            LastName = "NewLast",
+            BookingNotes = "New note"
+        };
+
+        // Act
+        var result = await service.UpdateBookingDetailsAsync(1, request);
+
+        // Assert
+        Assert.IsTrue(result.Success);
+
+        var updated = await ctx.Bookings.Include(b => b.Guest).FirstOrDefaultAsync(b => b.Id == 1);
+
+        Assert.AreEqual("NewFirst", updated!.Guest!.FirstName);
+        Assert.AreEqual("NewLast", updated.Guest!.LastName);
+        Assert.AreEqual("New note", updated.BookingNotes);
+    }
     // edit booking--------------------------------------------------------------------------
 }
