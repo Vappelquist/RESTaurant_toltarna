@@ -1,4 +1,5 @@
-﻿using Restaurant.Models.Models;
+﻿using Restaurant.API.DTOs;
+using Restaurant.Models.Models;
 
 namespace Restaurant.API.Services
 {
@@ -6,7 +7,7 @@ namespace Restaurant.API.Services
     {
         Task<List<Table>> GetAvailableTablesAsync(DateTime startDateTime, DateTime endTime, int? ignoreBookingId = null);
         Task<List<Table>> AllocateTablesAsync(DateTime startDateTime, DateTime endTime, int amountOfGuests, int? ignoreBookingId = null);
-        Task<List<Table>> GetAllTablesAsync();
+        Task<List<TableDto>> GetAllTablesAsync();
         Task<ServiceResult> AddTableAsync(int tableNumber, int seats);
         Task<ServiceResult> DeleteTableAsync(int tableNumber);
         Task<ServiceResult> EditTableAsync(int tableNumber, int seats);

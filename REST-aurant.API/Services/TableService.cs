@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Restaurant.API.Data;
+using Restaurant.API.DTOs;
 using Restaurant.API.Services.Enums;
 using Restaurant.Models.Models;
 using Restaurant.Models.Models.Enums;
@@ -88,9 +89,16 @@ namespace Restaurant.API.Services
             return tablesToAssign;
         }
 
-        public async Task<List<Table>> GetAllTablesAsync()
+        public async Task<List<TableDto>> GetAllTablesAsync()
         {
-            return await _ctx.Tables.OrderBy(t => t.TableNumber).ToListAsync();
+            return await _ctx.Tables
+                .OrderBy(t => t.TableNumber)
+                .Select(t => new TableDto
+                {
+                    TableNumber = t.TableNumber,
+                    Seats = t.Seats
+                })
+                .ToListAsync();
         }
 
         public async Task<ServiceResult> AddTableAsync(int tableNumber, int seats)
