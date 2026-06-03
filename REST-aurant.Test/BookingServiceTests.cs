@@ -334,5 +334,31 @@ public class BookingServiceTests
         Assert.AreEqual(ErrorType.BookingNotFound, result.ErrorType);
     }
 
+    [TestMethod]
+    public async Task EditBookingStatusAsync_WhenInvalidStatus_ReturnsInvalidInput()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDb();
+
+        ctx.Bookings.Add(new Booking
+        {
+            Id = 1,
+            Status = BookingStatus.Pending,
+            StartTime = DateTime.Now,
+            EndTime = DateTime.Now.AddHours(2)
+        });
+
+        await ctx.SaveChangesAsync();
+
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        // Act
+        var result = await service.EditBookingStatusAsync(1, "NotAStatus");
+
+        // Assert
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ErrorType.InvalidInput, result.ErrorType);
+    }
+
     // edit booking--------------------------------------------------------------------------
 }
