@@ -671,6 +671,7 @@ public class BookingServiceTests
     [TestMethod]
     public async Task GetBookingsByEmailAsync_ReturnsMatchingBookings()
     {
+        // Arrange
         var ctx = CreateInMemoryDb();
 
         ctx.Bookings.AddRange(
@@ -701,11 +702,51 @@ public class BookingServiceTests
 
         var service = new BookingService(ctx, new Mock<ITableService>().Object);
 
+        // Act
         var result = await service.GetBookingsByEmailAsync("test@test.se");
 
+        // Assert
         Assert.HasCount(1, result);
     }
 
     // Get bookings by email--------------------------------------------------------------------------
+
+    // Delete Booking--------------------------------------------------------------------------
+
+    [TestMethod]
+    public async Task DeleteBookingByIdAsync_WhenBookingExists_DeletesBooking()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDb();
+
+        var booking = new Booking
+        {
+            StartTime = DateTime.Now,
+            EndTime = DateTime.Now.AddHours(2),
+            Guest = new Guest
+            {
+                FirstName = "Test",
+                LastName = "Testsson",
+                Email = "test@test.se"
+            }
+        };
+
+        ctx.Bookings.Add(booking);
+        await ctx.SaveChangesAsync();
+
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        // Act
+        var result = await service.DeleteBookingByIdAsync(booking.Id);
+
+        // Assert
+        Assert.IsTrue(result.Success);
+
+        var deletedBooking = await ctx.Bookings.FindAsync(booking.Id);
+
+        Assert.IsNull(deletedBooking);
+    }
+
+    // Delete Booking--------------------------------------------------------------------------
 
 }
