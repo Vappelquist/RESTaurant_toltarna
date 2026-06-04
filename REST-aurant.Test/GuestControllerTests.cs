@@ -216,4 +216,25 @@ public class GuestControllerTests
         //Assert
         Assert.IsInstanceOfType(result, typeof(OkObjectResult));
     }
+
+    [TestMethod]
+    public async Task UpdateGuest_WhenUpdateGuestFails_ShouldReturnBadRequest()
+    {
+        //Arrange
+        var mockService = new Mock<IGuestService>();
+        mockService.Setup(s => s.UpdateGuestAsync(1, It.IsAny<UpdateGuestRequest>()))
+            .ReturnsAsync(new ServiceResult<Guest>
+            {
+                Success = false,
+                ErrorType = ErrorType.InvalidInput
+            });
+
+        var controller = new GuestController(null!, mockService.Object);
+
+        //Act
+        var result = await controller.UpdateGuest(1, new UpdateGuestRequest());
+
+        //Assert
+        Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+    }
 }
