@@ -608,6 +608,7 @@ public class BookingServiceTests
     [TestMethod]
     public async Task GetMonthlyBookingsAsync_AcceptsMonthName()
     {
+        // Arrange
         var ctx = CreateInMemoryDb();
 
         ctx.Bookings.Add(new Booking
@@ -626,8 +627,10 @@ public class BookingServiceTests
 
         var service = new BookingService(ctx, new Mock<ITableService>().Object);
 
+        // Act
         var result = await service.GetMonthlyBookingsAsync(2026, "May");
 
+        // Assert
         Assert.HasCount(1, result);
     }
 
@@ -638,6 +641,7 @@ public class BookingServiceTests
     [TestMethod]
     public async Task GetBookingDateAsync_ReturnsCorrectDateAndTime()
     {
+        // Arrange
         var ctx = CreateInMemoryDb();
 
         var booking = new Booking
@@ -652,13 +656,56 @@ public class BookingServiceTests
 
         var service = new BookingService(ctx, new Mock<ITableService>().Object);
 
+        // Act
         var result = await service.GetBookingDateAsync(booking.Id);
 
+        // Assert
         Assert.IsNotNull(result);
         Assert.AreEqual("18:00 - 20:00", result.Timespan);
     }
 
     // Get booking date--------------------------------------------------------------------------
 
+    // Get bookings by email--------------------------------------------------------------------------
+
+    [TestMethod]
+    public async Task GetBookingsByEmailAsync_ReturnsMatchingBookings()
+    {
+        var ctx = CreateInMemoryDb();
+
+        ctx.Bookings.AddRange(
+            new Booking
+            {
+                Guest = new Guest
+                {
+                    FirstName = "Test",
+                    LastName = "Testsson",
+                    Email = "test@test.se"
+                },
+                StartTime = DateTime.Now,
+                EndTime = DateTime.Now.AddHours(2)
+            },
+            new Booking
+            {
+                Guest = new Guest
+                {
+                    FirstName = "Häst",
+                    LastName = "Hästsson",
+                    Email = "hest@test.se"
+                },
+                StartTime = DateTime.Now,
+                EndTime = DateTime.Now.AddHours(2)
+            });
+
+        await ctx.SaveChangesAsync();
+
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        var result = await service.GetBookingsByEmailAsync("test@test.se");
+
+        Assert.HasCount(1, result);
+    }
+
+    // Get bookings by email--------------------------------------------------------------------------
 
 }
