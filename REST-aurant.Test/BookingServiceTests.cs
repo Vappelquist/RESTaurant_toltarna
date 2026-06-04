@@ -577,6 +577,7 @@ public class BookingServiceTests
     [TestMethod]
     public async Task GetMonthlyBookingsAsync_ReturnsOnlyBookingsForMonth()
     {
+        // Arrange
         var ctx = CreateInMemoryDb();
 
         ctx.Bookings.AddRange(
@@ -597,11 +598,67 @@ public class BookingServiceTests
 
         var service = new BookingService(ctx, new Mock<ITableService>().Object);
 
+        // Act
         var result = await service.GetMonthlyBookingsAsync(2026, "5");
+
+        // Assert
+        Assert.HasCount(1, result);
+    }
+
+    [TestMethod]
+    public async Task GetMonthlyBookingsAsync_AcceptsMonthName()
+    {
+        var ctx = CreateInMemoryDb();
+
+        ctx.Bookings.Add(new Booking
+        {
+            Guest = new Guest
+            {
+                FirstName = "Test",
+                LastName = "Guest",
+                Email = "test@test.se"
+            },
+            StartTime = new DateTime(2026, 5, 15),
+            EndTime = new DateTime(2026, 5, 15).AddHours(2)
+        });
+
+        await ctx.SaveChangesAsync();
+
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        var result = await service.GetMonthlyBookingsAsync(2026, "May");
 
         Assert.HasCount(1, result);
     }
 
     // Get monthly bookings--------------------------------------------------------------------------
+
+    // Get booking date--------------------------------------------------------------------------
+
+    [TestMethod]
+    public async Task GetBookingDateAsync_ReturnsCorrectDateAndTime()
+    {
+        var ctx = CreateInMemoryDb();
+
+        var booking = new Booking
+        {
+            DateBooked = new DateTime(2026, 5, 1),
+            StartTime = new DateTime(2026, 5, 10, 18, 0, 0),
+            EndTime = new DateTime(2026, 5, 10, 20, 0, 0)
+        };
+
+        ctx.Bookings.Add(booking);
+        await ctx.SaveChangesAsync();
+
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        var result = await service.GetBookingDateAsync(booking.Id);
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual("18:00 - 20:00", result.Timespan);
+    }
+
+    // Get booking date--------------------------------------------------------------------------
+
 
 }
