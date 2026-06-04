@@ -502,7 +502,16 @@ public class BookingServiceTests
         Assert.AreEqual(booking.Id, result.BookingId);
         Assert.AreEqual("Test Testsson", result.GuestName);
     }
+    [TestMethod]
+    public async Task GetBookingByIdAsync_WhenBookingDoesNotExist_ReturnsNull()
+    {
+        var ctx = CreateInMemoryDb();
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
 
+        var result = await service.GetBookingByIdAsync(999);
+
+        Assert.IsNull(result);
+    }
     // Get booking by id--------------------------------------------------------------------------
 
 }
