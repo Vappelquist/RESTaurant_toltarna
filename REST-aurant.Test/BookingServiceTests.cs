@@ -747,6 +747,21 @@ public class BookingServiceTests
         Assert.IsNull(deletedBooking);
     }
 
+    [TestMethod]
+    public async Task DeleteBookingByIdAsync_WhenBookingDoesNotExist_ReturnsError()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDb();
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        // Act
+        var result = await service.DeleteBookingByIdAsync(999);
+
+        // Assert
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ErrorType.GuestNotFound, result.ErrorType);
+    }
+
     // Delete Booking--------------------------------------------------------------------------
 
 }
