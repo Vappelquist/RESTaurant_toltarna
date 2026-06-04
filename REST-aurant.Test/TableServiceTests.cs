@@ -14,8 +14,9 @@ public class TableServiceTests
             .Options;
         return new RestaurantDbContext(options);
     }
+    //-- EditTableAsync Tests --
     [TestMethod]
-    public async Task EditTableAsync_TryToEditExistingTable_ReturnsSuccess() 
+    public async Task EditTableAsync_TryToEditExistingTable_ReturnsSuccess()
     {
 
         // Arrange
@@ -135,5 +136,75 @@ public class TableServiceTests
         var result = await services.EditTableAsync(99, 8);
         // Assert
         Assert.IsTrue(result.Success);
-    } 
+    }
+
+
+    // --GetAllTablesAsync Tests--
+    [TestMethod]
+    public async Task GetAllTablesAsync_WithMultipleTables_ReturnsAllTables()
+    {
+        // Arrange
+        using var ctx = CreateInMemoryDb();
+        var service = new TableService(ctx);
+        ctx.Tables.AddRange(
+            new Models.Models.Table { TableNumber = 1, Seats = 4 },
+            new Models.Models.Table { TableNumber = 2, Seats = 6 },
+            new Models.Models.Table { TableNumber = 3, Seats = 2 }
+            );
+        await ctx.SaveChangesAsync();
+
+        //act
+        var result = await service.GetAllTablesAsync();
+
+        //Assert
+        Assert.AreEqual(3, result.Count);
+        Assert.AreEqual(1, result[0].TableNumber);
+        Assert.AreEqual(2, result[1].TableNumber);
+        Assert.AreEqual(3, result[2].TableNumber);
+    }
+
+    [TestMethod]
+    public async Task GetAllTablesAsync_WithNoTables_ReturnsEmptyList()
+    {
+        // Arrange
+        using var ctx = CreateInMemoryDb();
+        var service = new TableService(ctx);
+
+        //act
+        var result = await service.GetAllTablesAsync();
+        
+        //Assert
+        Assert.AreEqual(0, result.Count);
+    }
+
+    [TestMethod]
+    public async Task GetAllTablesAsync_WithSingleTable_ReturnsListWithOneTable()
+    {
+        // Arrange
+        using var ctx = CreateInMemoryDb();
+        var service = new TableService(ctx);
+        ctx.Tables.Add(new Models.Models.Table { TableNumber = 1, Seats = 4 });
+        await ctx.SaveChangesAsync();
+        
+        //act
+        var result = await service.GetAllTablesAsync();
+        
+        //Assert
+        Assert.AreEqual(1, result.Count);
+    }
+    [TestMethod]
+    public async Task GetAllTablesAsync_WithMultipleTables_ReturnsDtoWithCorrectValues()
+    {
+        // Arrange
+        using var ctx = CreateInMemoryDb();
+        var service = new TableService(ctx);
+        ctx.Tables.AddRange(new Models.Models.Table { TableNumber = 5, Seats = 8 });
+        await ctx.SaveChangesAsync();
+        //act
+        var result = await service.GetAllTablesAsync();
+        //Assert
+        Assert.AreEqual(5, result[0].TableNumber);
+        Assert.AreEqual(8, result[0].Seats);
+        
+    }
 }
