@@ -176,4 +176,21 @@ public class GuestControllerTests
         //Assert
         Assert.IsInstanceOfType(result, typeof(OkObjectResult));
     }
+
+    [TestMethod]
+    public async Task GetGuestByEmail_WhenEmailDoesNotExist_ShouldReturnNotFound()
+    {
+        //Arrange
+        var mockService = new Mock<IGuestService>();
+        mockService.Setup(s => s.GetGuestByEmailAsync("blabla@mail.com"))
+            .ReturnsAsync((Guest?)null);
+
+        var controller = new GuestController(null!, mockService.Object);
+
+        //Act
+        var result = await controller.GetGuestByEmail("blabla@mail.com");
+
+        //Assert
+        Assert.IsInstanceOfType(result, typeof(NotFoundObjectResult));
+    }
 }
