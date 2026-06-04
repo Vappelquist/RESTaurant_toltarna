@@ -514,4 +514,40 @@ public class BookingServiceTests
     }
     // Get booking by id--------------------------------------------------------------------------
 
+    // Get daily booking--------------------------------------------------------------------------
+
+
+    [TestMethod]
+    public async Task GetDailyBookingAsync_ReturnsOnlyBookingsForSpecifiedDay()
+    {
+        var ctx = CreateInMemoryDb();
+
+        var targetDate = new DateOnly(2026, 5, 10);
+
+        ctx.Bookings.AddRange(
+            new Booking
+            {
+                Guest = new Guest { FirstName = "Test", LastName = "Testsson", Email = "test@test.se" },
+                StartTime = new DateTime(2026, 5, 10, 18, 0, 0),
+                EndTime = new DateTime(2026, 5, 10, 20, 0, 0)
+            },
+            new Booking
+            {
+                Guest = new Guest { FirstName = "Häst", LastName = "Hästsson", Email = "hest@test.se" },
+                StartTime = new DateTime(2026, 5, 11, 18, 0, 0),
+                EndTime = new DateTime(2026, 5, 11, 20, 0, 0)
+            });
+
+        await ctx.SaveChangesAsync();
+
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        var result = await service.GetDailyBookingAsync(targetDate);
+
+        Assert.HasCount(1, result);
+    }
+
+
+    // Get daily booking--------------------------------------------------------------------------
+
 }
