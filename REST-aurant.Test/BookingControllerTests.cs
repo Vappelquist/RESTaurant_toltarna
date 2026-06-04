@@ -64,6 +64,35 @@ public class BookingControllerTests
             badRequest.Value);
     }
 
+    [TestMethod]
+    public async Task PlaceBooking_WhenRestaurantIsFull_ReturnsBadRequest()
+    {
+        // Arrange
+        var mockService = new Mock<IBookingService>();
+
+        mockService
+            .Setup(x => x.PlaceBookingAsync(It.IsAny<PlaceBookingRequest>()))
+            .ReturnsAsync(new ServiceResult
+            {
+                Success = false,
+                ErrorType = ErrorType.FullyBooked
+            });
+
+        var controller = new BookingController(mockService.Object);
+
+        // Act
+        var result = await controller.PlaceBooking(new PlaceBookingRequest());
+
+        // Assert
+        Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+
+        var badRequest = (BadRequestObjectResult)result;
+
+        Assert.AreEqual(
+            "This time is fully booked, please choose another time.",
+            badRequest.Value);
+    }
+
     // PlaceBooking-tests ---------------------------------------------------------------^
 
 
