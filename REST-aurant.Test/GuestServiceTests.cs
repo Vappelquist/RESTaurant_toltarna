@@ -215,4 +215,43 @@ public class GuestServiceTests
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ErrorType.GuestNotFound, result.ErrorType);
     }
+    [TestMethod]
+    public async Task GetGuestByEmailAsync_WhenEmailExists_ShouldReturnGuest()
+    {
+        //Arrange
+        var ctx = CreateInMemoryDb();
+        var service = new GuestService(ctx);
+
+        ctx.Guests.Add(new Guest
+        {
+            FirstName = "Anna",
+            LastName = "Svensson",
+            Email = "anna@mail.com"
+        });
+        await ctx.SaveChangesAsync();
+
+        //Act
+        var result = await service.GetGuestByEmailAsync("anna@mail.com");
+
+        //Assert
+        Assert.IsNotNull(result);
+        Assert.AreEqual("anna@mail.com", result.Email);
+    }
+
+    [TestMethod]
+    public async Task GetGuestByEmailAsync_WhenEmailDoesNotExist_ShouldReturnNull()
+    {
+        //Arrange
+        var ctx = CreateInMemoryDb();
+        var service = new GuestService(ctx);
+
+        //ctx.Guests.Add(new Guest { Email = "Annie@mail.com" });
+        //await ctx.SaveChangesAsync();
+
+        //Act
+        var result = await service.GetGuestByEmailAsync("bobobo@mail.com");
+
+        //Assert
+        Assert.IsNull(result);
+    }
 }
