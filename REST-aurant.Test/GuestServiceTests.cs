@@ -136,4 +136,19 @@ public class GuestServiceTests
         //Assert
         Assert.AreEqual(2, result.Count);
     }
+
+    [TestMethod]
+    public async Task GetAllGuestsAsync_WhenNoGuestsExist_ShouldReturnEmptyList()
+    {
+        //Arrange
+        var ctx = CreateInMemoryDb();
+        var service = new GuestService(ctx);
+
+        //Act
+        var result = await service.GetAllGuestsAsync();
+
+        //Assert
+        Assert.IsNotNull(result);
+        Assert.AreEqual(0, result.Count);
+    }
 }
