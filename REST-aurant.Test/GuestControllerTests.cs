@@ -66,39 +66,30 @@ public class GuestControllerTests
         Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
     }
 
-    //[TestMethod]
-    //public async Task GetAllGuests_WhenNoGuests_ShouldReturnNotFound()
-    //{
-    //    //Arrange
-    //    var mockService = new Mock<IGuestService>();
-    //    mockService.Setup(s => s.GetAllGuestsAsync())
-    //        .ReturnsAsync(new List<Guest>());
+    [TestMethod]
+    public async Task GetAllGuests_WhenGuestsExist_ShouldReturnOk()
+    {
+        //Arrange
+        var mockService = new Mock<IGuestService>();
 
-    //    var controller = new GuestController(null!, mockService.Object);
+        var controller = new GuestController(null!, mockService.Object);
+        mockService.Setup(s => s.GetAllGuestsAsync())
+            .ReturnsAsync(new List<GetGuestResponse>
+        {
+            new GetGuestResponse
+            {   Id = 1,
+                FirstName = "Anna",
+                LastName = "Svensson",
+                Email = "anna@mail.com"
+            }
+        });
 
-    //    //Act
-    //    var result = await controller.GetAllGuests();
+        //Act
+        var result = await controller.GetAllGuests();
 
-    //    //Assert
-    //    Assert.IsInstanceOfType(result, typeof(NotFoundObjectResult));
-    //}
-
-    //[TestMethod]
-    //public async Task GetAllGuests_WhenGuestsExist_ShouldReturnOk()
-    //{
-    //    //Arrange
-    //    var mockService = new Mock<IGuestService>();
-    //    mockService.Setup(s => s.GetAllGuestsAsync())
-    //        .ReturnsAsync(new List<Guest> { new Guest() });
-
-    //    var controller = new GuestController(null!, mockService.Object);
-
-    //    //Act
-    //    var result = await controller.GetAllGuests();
-
-    //    //Assert
-    //    Assert.IsInstanceOfType(result, typeof(OkObjectResult));
-    //}
+        //Assert
+        Assert.IsInstanceOfType(result, typeof(OkObjectResult));
+    }
 
     [TestMethod]
     public async Task AddGuest_WhenAllergiesAndNoteAreEmpty_ReturnOk()
@@ -128,5 +119,21 @@ public class GuestControllerTests
 
         //Assert
         Assert.IsInstanceOfType(result, typeof(OkObjectResult));
+    }
+    [TestMethod]
+    public async Task GetAllGuests_WhenNoGuestsExist_ShouldReturnNotFound()
+    {
+        //Arrange
+        var mockService = new Mock<IGuestService>();
+        var controller = new GuestController(null!, mockService.Object);
+
+        mockService.Setup(s => s.GetAllGuestsAsync())
+            .ReturnsAsync(new List<GetGuestResponse>());
+
+        //Act
+        var result = await controller.GetAllGuests();
+
+        //Assert
+        Assert.IsInstanceOfType(result, typeof(NotFoundObjectResult));
     }
 }
