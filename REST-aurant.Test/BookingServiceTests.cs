@@ -476,6 +476,7 @@ public class BookingServiceTests
     [TestMethod]
     public async Task GetBookingByIdAsync_WhenBookingExists_ReturnsBooking()
     {
+        // Arrange
         var ctx = CreateInMemoryDb();
 
         var booking = new Booking
@@ -496,8 +497,10 @@ public class BookingServiceTests
 
         var service = new BookingService(ctx, new Mock<ITableService>().Object);
 
+        // Act
         var result = await service.GetBookingByIdAsync(booking.Id);
 
+        // Assert
         Assert.IsNotNull(result);
         Assert.AreEqual(booking.Id, result.BookingId);
         Assert.AreEqual("Test Testsson", result.GuestName);
@@ -505,11 +508,14 @@ public class BookingServiceTests
     [TestMethod]
     public async Task GetBookingByIdAsync_WhenBookingDoesNotExist_ReturnsNull()
     {
+        // Arrange
         var ctx = CreateInMemoryDb();
         var service = new BookingService(ctx, new Mock<ITableService>().Object);
 
+        // Act
         var result = await service.GetBookingByIdAsync(999);
 
+        // Assert
         Assert.IsNull(result);
     }
     // Get booking by id--------------------------------------------------------------------------
@@ -520,6 +526,7 @@ public class BookingServiceTests
     [TestMethod]
     public async Task GetDailyBookingAsync_ReturnsOnlyBookingsForSpecifiedDay()
     {
+        // Arrange
         var ctx = CreateInMemoryDb();
 
         var targetDate = new DateOnly(2026, 5, 10);
@@ -542,11 +549,26 @@ public class BookingServiceTests
 
         var service = new BookingService(ctx, new Mock<ITableService>().Object);
 
+        // Act
         var result = await service.GetDailyBookingAsync(targetDate);
 
+        // Assert
         Assert.HasCount(1, result);
     }
 
+    [TestMethod]
+    public async Task GetDailyBookingAsync_WhenNoBookingsExist_ReturnsEmptyList()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDb();
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        // Act
+        var result = await service.GetDailyBookingAsync(new DateOnly(2026, 5, 10));
+
+        // Assert
+        Assert.IsEmpty(result);
+    }
 
     // Get daily booking--------------------------------------------------------------------------
 
