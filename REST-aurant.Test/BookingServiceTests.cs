@@ -437,9 +437,9 @@ public class BookingServiceTests
             BookingNotes = "Window seat",
             Guest = new Guest
             {
-                FirstName = "Ahmed",
-                LastName = "Jönsson",
-                Email = "ahmed@test.se"
+                FirstName = "Test",
+                LastName = "Testsson",
+                Email = "test@test.se"
             },
             Tables = new List<Table>
         {
@@ -464,11 +464,45 @@ public class BookingServiceTests
 
         var returnedBooking = result.First();
 
-        Assert.AreEqual("Ahmed Jönsson", returnedBooking.GuestName);
+        Assert.AreEqual("Test Testsson", returnedBooking.GuestName);
         Assert.AreEqual(4, returnedBooking.AmountOfGuests);
         Assert.AreEqual(BookingStatus.Confirmed, returnedBooking.Status);
         Assert.AreEqual("Window seat", returnedBooking.BookingNotes);
     }
 
     // Get all bookings--------------------------------------------------------------------------
+
+    // Get booking by id--------------------------------------------------------------------------
+    [TestMethod]
+    public async Task GetBookingByIdAsync_WhenBookingExists_ReturnsBooking()
+    {
+        var ctx = CreateInMemoryDb();
+
+        var booking = new Booking
+        {
+            Guest = new Guest
+            {
+                FirstName = "Test",
+                LastName = "Testsson",
+                Email = "test@test.se"
+            },
+            AmountOfGuests = 4,
+            StartTime = DateTime.Now,
+            EndTime = DateTime.Now.AddHours(2)
+        };
+
+        ctx.Bookings.Add(booking);
+        await ctx.SaveChangesAsync();
+
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        var result = await service.GetBookingByIdAsync(booking.Id);
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(booking.Id, result.BookingId);
+        Assert.AreEqual("Test Testsson", result.GuestName);
+    }
+
+    // Get booking by id--------------------------------------------------------------------------
+
 }
