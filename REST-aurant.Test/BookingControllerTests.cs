@@ -10,8 +10,29 @@ namespace Restaurant.Test;
 public class BookingControllerTests
 {
     // PlaceBooking-tests ---------------------------------------------------------------V
-    
 
+    [TestMethod]
+    public async Task PlaceBooking_WhenBookingSucceeds_ReturnsOk()
+    {
+        // Arrange
+        var mockService = new Mock<IBookingService>();
+
+        mockService
+            .Setup(x => x.PlaceBookingAsync(It.IsAny<PlaceBookingRequest>()))
+            .ReturnsAsync(new ServiceResult
+            {
+                Success = true,
+                BookingId = 123
+            });
+
+        var controller = new BookingController(mockService.Object);
+
+        // Act
+        var result = await controller.PlaceBooking(new PlaceBookingRequest());
+
+        // Assert
+        Assert.IsInstanceOfType(result, typeof(OkObjectResult));
+    }
 
     // PlaceBooking-tests ---------------------------------------------------------------^
 
