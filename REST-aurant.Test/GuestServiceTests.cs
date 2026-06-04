@@ -136,4 +136,83 @@ public class GuestServiceTests
         //Assert
         Assert.AreEqual(2, result.Count);
     }
+
+    [TestMethod]
+    public async Task GetAllGuestsAsync_WhenNoGuestsExist_ShouldReturnEmptyList()
+    {
+        //Arrange
+        var ctx = CreateInMemoryDb();
+        var service = new GuestService(ctx);
+
+        //Act
+        var result = await service.GetAllGuestsAsync();
+
+        //Assert
+        Assert.IsNotNull(result);
+        Assert.AreEqual(0, result.Count);
+    }
+
+    [TestMethod]
+    public async Task DeleteGuestByIdAsync_WhenGuestExists_ShouldReturnSuccess()
+    {
+        //Arrange
+        var ctx = CreateInMemoryDb();
+        var service = new GuestService(ctx);
+
+        var guest = new Guest
+        {
+            FirstName = "Anna",
+            LastName = "Svensson",
+            Email = "anna@mail.com"
+        };
+        ctx.Guests.Add(guest);
+        await ctx.SaveChangesAsync();
+
+        //Act
+        var result = await service.DeleteGuestByIdAsync(guest.Id);
+
+        //Assert
+        Assert.IsTrue(result.Success);
+        var deletedGuest = await ctx.Guests.FindAsync(guest.Id);
+        Assert.IsNull(deletedGuest);
+    }
+
+    [TestMethod]
+    public async Task DeleteGuestByIdAsync_WhenGuestIsDeleted_ShouldNotExistInDatabase()
+    {
+        //Arrange
+        var ctx = CreateInMemoryDb();
+        var service = new GuestService(ctx);
+
+        var guest = new Guest
+        {
+            FirstName = "Anna",
+            LastName = "Svensson",
+            Email = "anna@mail.com"
+        };
+        ctx.Guests.Add(guest);
+        await ctx.SaveChangesAsync();
+
+        //Act
+        await service.DeleteGuestByIdAsync(guest.Id);
+
+        //Assert
+        var count = await ctx.Guests.CountAsync();
+        Assert.AreEqual(0, count);
+    }
+
+    [TestMethod]
+    public async Task DeleteGuestByIdAsync_WhenGuestDoesNotExist_ShouldReturnGuestNotFound()
+    {
+        //Arrange
+        var ctx = CreateInMemoryDb();
+        var service = new GuestService(ctx);
+
+        //Act
+        var result = await service.DeleteGuestByIdAsync(999);
+
+        //Assert
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ErrorType.GuestNotFound, result.ErrorType);
+    }
 }
