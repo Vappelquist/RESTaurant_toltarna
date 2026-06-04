@@ -20,6 +20,8 @@ public class BookingServiceTests
             .Options;
         return new RestaurantDbContext(options);
     }
+
+    // PlaceBooking-tests --------------------------------------------------------V
     [TestMethod]
     public async Task PlaceBooking_IfEndTimeIsTwoHoursAfterStartTime_ReturnTrue()
     {
@@ -102,159 +104,8 @@ public class BookingServiceTests
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ErrorType.FullyBooked, result.ErrorType);
     }
+    // PlaceBooking-tests --------------------------------------------------------V
 
-    // Edit booking tests: ------------------------------------------------------------------
-    /*
-    [TestMethod]
-    public async Task CancelBooking_WhenBookingDoesNotExist_ReturnNotFound()
-    {
-        // Arrange
-        var ctx = CreateInMemoryDb();
-        var service = new BookingService(ctx, new Mock<ITableService>().Object);
-
-        // Act
-        var result = await service.CancelBookingAsync(999);
-
-        // Assert
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ErrorType.BookingNotFound, result.ErrorType);
-    }
-
-    [TestMethod]
-    public async Task ConfirmBooking_WhenBookingDoesNotExist_ReturnNotFound()
-    {
-        // Arrange
-        var ctx = CreateInMemoryDb();
-        var service = new BookingService(ctx, new Mock<ITableService>().Object);
-
-        // Act
-        var result = await service.ConfirmBookingAsync(999);
-
-        // Assert
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ErrorType.BookingNotFound, result.ErrorType);
-    }
-    [TestMethod]
-    public async Task CompleteBooking_WhenBookingDoesNotExist_ReturnNotFound()
-    {
-        //arrange
-        var ctx = CreateInMemoryDb();
-        var service = new BookingService(ctx, new Mock<ITableService>().Object);
-
-        //act
-        var result = await service.CompleteBookingAsync(999);
-
-        //assert
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ErrorType.BookingNotFound, result.ErrorType);
-    }
-
-    [TestMethod]
-    public async Task CancelBooking_WhenAlreadyCanceled_ReturnsAlreadyCanceled()
-    {
-        //arrange
-        var ctx = CreateInMemoryDb();
-        ctx.Bookings.Add(new Booking { Id = 1, Status = BookingStatus.Canceled });
-        await ctx.SaveChangesAsync();
-
-        //act
-        var service = new BookingService(ctx, new Mock<ITableService>().Object);
-        var result = await service.CancelBookingAsync(1);
-
-        //assert
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ErrorType.AlreadyCanceled, result.ErrorType);
-    }
-
-    [TestMethod]
-    public async Task ConfirmBooking_WhenAlreadyConfirmed_ReturnsAlreadyConfirmed()
-    {
-        //arrange
-        var ctx = CreateInMemoryDb();
-        ctx.Bookings.Add(new Booking { Id = 1, Status = BookingStatus.Confirmed });
-        await ctx.SaveChangesAsync();
-
-        //act
-        var service = new BookingService(ctx, new Mock<ITableService>().Object);
-        var result = await service.ConfirmBookingAsync(1);
-
-        //assert
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ErrorType.AlreadyConfirmed, result.ErrorType);
-    }
-
-    [TestMethod]
-    public async Task CompleteBooking_WhenAlreadyComplete_ReturnsAlreadyComplete()
-    {
-        //arrange
-        var ctx = CreateInMemoryDb();
-        ctx.Bookings.Add(new Booking { Id = 1, Status = BookingStatus.Complete });
-        await ctx.SaveChangesAsync();
-
-        //act
-        var service = new BookingService(ctx, new Mock<ITableService>().Object);
-        var result = await service.CompleteBookingAsync(1);
-
-        //assert
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ErrorType.AlreadyComplete, result.ErrorType);
-    }
-
-    [TestMethod]
-    public async Task CancelBooking_WhenBookingIsConfirmed_StatusSetToCanceled()
-    {
-        //arrange
-        var ctx = CreateInMemoryDb();
-        ctx.Bookings.Add(new Booking { Id = 1, Status = BookingStatus.Confirmed });
-        await ctx.SaveChangesAsync();
-
-        //act
-        var service = new BookingService(ctx, new Mock<ITableService>().Object);
-        var result = await service.CancelBookingAsync(1);
-
-        //assert
-        Assert.IsTrue(result.Success);
-        var booking = await ctx.Bookings.FindAsync(1);
-        Assert.AreEqual(BookingStatus.Canceled, booking!.Status);
-    }
-
-    [TestMethod]
-    public async Task ConfirmBooking_WhenBookingIsCanceled_StatusSetToConfirmed()
-    {
-        //arrange
-        var ctx = CreateInMemoryDb();
-        ctx.Bookings.Add(new Booking { Id = 1, Status = BookingStatus.Canceled });
-        await ctx.SaveChangesAsync();
-
-        //act
-        var service = new BookingService(ctx, new Mock<ITableService>().Object);
-        var result = await service.ConfirmBookingAsync(1);
-
-        //assert
-        Assert.IsTrue(result.Success);
-        var booking = await ctx.Bookings.FindAsync(1);
-        Assert.AreEqual(BookingStatus.Confirmed, booking!.Status);
-    }
-
-    [TestMethod]
-    public async Task CompleteBooking_WhenBookingIsConfirmed_StatusSetToComplete()
-    {
-        //arrange
-        var ctx = CreateInMemoryDb();
-        ctx.Bookings.Add(new Booking { Id = 1, Status = BookingStatus.Confirmed });
-        await ctx.SaveChangesAsync();
-
-        //act
-        var service = new BookingService(ctx, new Mock<ITableService>().Object);
-        var result = await service.CompleteBookingAsync(1);
-
-        //assert
-        Assert.IsTrue(result.Success);
-        var booking = await ctx.Bookings.FindAsync(1);
-        Assert.AreEqual(BookingStatus.Complete, booking!.Status);
-    }
-    */
-    // Edit booking tests: ------------------------------------------------------------------
 
     // GetWeeklyBookingsAsync-tests --------------------------------------------------------V
 
@@ -553,4 +404,22 @@ public class BookingServiceTests
         Assert.AreEqual("New note", updated.BookingNotes);
     }
     // edit booking--------------------------------------------------------------------------
+    // Get all bookings--------------------------------------------------------------------------
+
+    [TestMethod]
+    public async Task GetAllBookingsAsync_WhenNoBookingsExist_ReturnsEmptyList()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDb();
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        // Act
+        var result = await service.GetAllBookingsAsync();
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.IsEmpty(result);
+    }
+
+    // Get all bookings--------------------------------------------------------------------------
 }
