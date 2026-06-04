@@ -421,5 +421,54 @@ public class BookingServiceTests
         Assert.IsEmpty(result);
     }
 
+    [TestMethod]
+    public async Task GetAllBookingsAsync_WhenBookingExists_ReturnsCorrectData()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDb();
+
+        var booking = new Booking
+        {
+            AmountOfGuests = 4,
+            Status = BookingStatus.Confirmed,
+            DateBooked = new DateTime(2026, 5, 1),
+            StartTime = new DateTime(2026, 5, 10, 18, 0, 0),
+            EndTime = new DateTime(2026, 5, 10, 20, 0, 0),
+            BookingNotes = "Window seat",
+            Guest = new Guest
+            {
+                FirstName = "Ahmed",
+                LastName = "Jönsson",
+                Email = "ahmed@test.se"
+            },
+            Tables = new List<Table>
+        {
+            new Table
+            {
+                TableNumber = 7,
+                Seats = 4
+            }
+        }
+        };
+
+        ctx.Bookings.Add(booking);
+        await ctx.SaveChangesAsync();
+
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        // Act
+        var result = await service.GetAllBookingsAsync();
+
+        // Assert
+        Assert.HasCount(1, result);
+
+        var returnedBooking = result.First();
+
+        Assert.AreEqual("Ahmed Jönsson", returnedBooking.GuestName);
+        Assert.AreEqual(4, returnedBooking.AmountOfGuests);
+        Assert.AreEqual(BookingStatus.Confirmed, returnedBooking.Status);
+        Assert.AreEqual("Window seat", returnedBooking.BookingNotes);
+    }
+
     // Get all bookings--------------------------------------------------------------------------
 }
