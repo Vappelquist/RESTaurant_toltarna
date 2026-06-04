@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Restaurant.API.Controllers;
 using Restaurant.API.Services;
+using Restaurant.API.Services.Enums;
 using static Restaurant.API.DTOs.Booking;
 
 namespace Restaurant.Test;
@@ -10,8 +11,87 @@ namespace Restaurant.Test;
 public class BookingControllerTests
 {
     // PlaceBooking-tests ---------------------------------------------------------------V
-    
 
+    [TestMethod]
+    public async Task PlaceBooking_WhenBookingSucceeds_ReturnsOk()
+    {
+        // Arrange
+        var mockService = new Mock<IBookingService>();
+
+        mockService
+            .Setup(x => x.PlaceBookingAsync(It.IsAny<PlaceBookingRequest>()))
+            .ReturnsAsync(new ServiceResult
+            {
+                Success = true,
+                BookingId = 123
+            });
+
+        var controller = new BookingController(mockService.Object);
+
+        // Act
+        var result = await controller.PlaceBooking(new PlaceBookingRequest());
+
+        // Assert
+        Assert.IsInstanceOfType(result, typeof(OkObjectResult));
+    }
+
+    [TestMethod]
+    public async Task PlaceBooking_WhenContactDetailsTaken_ReturnsBadRequest()
+    {
+        // Arrange
+        var mockService = new Mock<IBookingService>();
+
+        mockService
+            .Setup(x => x.PlaceBookingAsync(It.IsAny<PlaceBookingRequest>()))
+            .ReturnsAsync(new ServiceResult
+            {
+                Success = false,
+                ErrorType = ErrorType.ContactDetailsTaken
+            });
+
+        var controller = new BookingController(mockService.Object);
+
+        // Act
+        var result = await controller.PlaceBooking(new PlaceBookingRequest());
+
+        // Assert
+        Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+
+        var badRequest = (BadRequestObjectResult)result;
+
+        Assert.AreEqual(
+            "This email or phone number already belongs to another guest.",
+            badRequest.Value);
+    }
+
+    [TestMethod]
+    public async Task PlaceBooking_WhenRestaurantIsFull_ReturnsBadRequest()
+    {
+        // Arrange
+        var mockService = new Mock<IBookingService>();
+
+        mockService
+            .Setup(x => x.PlaceBookingAsync(It.IsAny<PlaceBookingRequest>()))
+            .ReturnsAsync(new ServiceResult
+            {
+                Success = false,
+                ErrorType = ErrorType.FullyBooked
+            });
+
+        var controller = new BookingController(mockService.Object);
+
+        // Act
+        var result = await controller.PlaceBooking(new PlaceBookingRequest());
+
+        // Assert
+        Assert.IsInstanceOfType(result, typeof(BadRequestObjectResult));
+
+        var badRequest = (BadRequestObjectResult)result;
+
+        Assert.AreEqual(
+            "This time is fully booked, please choose another time.",
+            badRequest.Value);
+    }
 
     // PlaceBooking-tests ---------------------------------------------------------------^
 
