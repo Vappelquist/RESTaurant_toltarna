@@ -96,6 +96,7 @@ namespace Restaurant.API.Services
         {
             return await _context.Guests.FirstOrDefaultAsync(g => g.Email == email);
         }
+
         public async Task<ServiceResult> DeleteGuestByIdAsync(int id)
         {
             //Find guest by email
