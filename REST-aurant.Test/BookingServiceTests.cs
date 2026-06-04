@@ -20,6 +20,8 @@ public class BookingServiceTests
             .Options;
         return new RestaurantDbContext(options);
     }
+
+    // PlaceBooking-tests --------------------------------------------------------V
     [TestMethod]
     public async Task PlaceBooking_IfEndTimeIsTwoHoursAfterStartTime_ReturnTrue()
     {
@@ -102,159 +104,8 @@ public class BookingServiceTests
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ErrorType.FullyBooked, result.ErrorType);
     }
+    // PlaceBooking-tests --------------------------------------------------------V
 
-    // Edit booking tests: ------------------------------------------------------------------
-    /*
-    [TestMethod]
-    public async Task CancelBooking_WhenBookingDoesNotExist_ReturnNotFound()
-    {
-        // Arrange
-        var ctx = CreateInMemoryDb();
-        var service = new BookingService(ctx, new Mock<ITableService>().Object);
-
-        // Act
-        var result = await service.CancelBookingAsync(999);
-
-        // Assert
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ErrorType.BookingNotFound, result.ErrorType);
-    }
-
-    [TestMethod]
-    public async Task ConfirmBooking_WhenBookingDoesNotExist_ReturnNotFound()
-    {
-        // Arrange
-        var ctx = CreateInMemoryDb();
-        var service = new BookingService(ctx, new Mock<ITableService>().Object);
-
-        // Act
-        var result = await service.ConfirmBookingAsync(999);
-
-        // Assert
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ErrorType.BookingNotFound, result.ErrorType);
-    }
-    [TestMethod]
-    public async Task CompleteBooking_WhenBookingDoesNotExist_ReturnNotFound()
-    {
-        //arrange
-        var ctx = CreateInMemoryDb();
-        var service = new BookingService(ctx, new Mock<ITableService>().Object);
-
-        //act
-        var result = await service.CompleteBookingAsync(999);
-
-        //assert
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ErrorType.BookingNotFound, result.ErrorType);
-    }
-
-    [TestMethod]
-    public async Task CancelBooking_WhenAlreadyCanceled_ReturnsAlreadyCanceled()
-    {
-        //arrange
-        var ctx = CreateInMemoryDb();
-        ctx.Bookings.Add(new Booking { Id = 1, Status = BookingStatus.Canceled });
-        await ctx.SaveChangesAsync();
-
-        //act
-        var service = new BookingService(ctx, new Mock<ITableService>().Object);
-        var result = await service.CancelBookingAsync(1);
-
-        //assert
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ErrorType.AlreadyCanceled, result.ErrorType);
-    }
-
-    [TestMethod]
-    public async Task ConfirmBooking_WhenAlreadyConfirmed_ReturnsAlreadyConfirmed()
-    {
-        //arrange
-        var ctx = CreateInMemoryDb();
-        ctx.Bookings.Add(new Booking { Id = 1, Status = BookingStatus.Confirmed });
-        await ctx.SaveChangesAsync();
-
-        //act
-        var service = new BookingService(ctx, new Mock<ITableService>().Object);
-        var result = await service.ConfirmBookingAsync(1);
-
-        //assert
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ErrorType.AlreadyConfirmed, result.ErrorType);
-    }
-
-    [TestMethod]
-    public async Task CompleteBooking_WhenAlreadyComplete_ReturnsAlreadyComplete()
-    {
-        //arrange
-        var ctx = CreateInMemoryDb();
-        ctx.Bookings.Add(new Booking { Id = 1, Status = BookingStatus.Complete });
-        await ctx.SaveChangesAsync();
-
-        //act
-        var service = new BookingService(ctx, new Mock<ITableService>().Object);
-        var result = await service.CompleteBookingAsync(1);
-
-        //assert
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ErrorType.AlreadyComplete, result.ErrorType);
-    }
-
-    [TestMethod]
-    public async Task CancelBooking_WhenBookingIsConfirmed_StatusSetToCanceled()
-    {
-        //arrange
-        var ctx = CreateInMemoryDb();
-        ctx.Bookings.Add(new Booking { Id = 1, Status = BookingStatus.Confirmed });
-        await ctx.SaveChangesAsync();
-
-        //act
-        var service = new BookingService(ctx, new Mock<ITableService>().Object);
-        var result = await service.CancelBookingAsync(1);
-
-        //assert
-        Assert.IsTrue(result.Success);
-        var booking = await ctx.Bookings.FindAsync(1);
-        Assert.AreEqual(BookingStatus.Canceled, booking!.Status);
-    }
-
-    [TestMethod]
-    public async Task ConfirmBooking_WhenBookingIsCanceled_StatusSetToConfirmed()
-    {
-        //arrange
-        var ctx = CreateInMemoryDb();
-        ctx.Bookings.Add(new Booking { Id = 1, Status = BookingStatus.Canceled });
-        await ctx.SaveChangesAsync();
-
-        //act
-        var service = new BookingService(ctx, new Mock<ITableService>().Object);
-        var result = await service.ConfirmBookingAsync(1);
-
-        //assert
-        Assert.IsTrue(result.Success);
-        var booking = await ctx.Bookings.FindAsync(1);
-        Assert.AreEqual(BookingStatus.Confirmed, booking!.Status);
-    }
-
-    [TestMethod]
-    public async Task CompleteBooking_WhenBookingIsConfirmed_StatusSetToComplete()
-    {
-        //arrange
-        var ctx = CreateInMemoryDb();
-        ctx.Bookings.Add(new Booking { Id = 1, Status = BookingStatus.Confirmed });
-        await ctx.SaveChangesAsync();
-
-        //act
-        var service = new BookingService(ctx, new Mock<ITableService>().Object);
-        var result = await service.CompleteBookingAsync(1);
-
-        //assert
-        Assert.IsTrue(result.Success);
-        var booking = await ctx.Bookings.FindAsync(1);
-        Assert.AreEqual(BookingStatus.Complete, booking!.Status);
-    }
-    */
-    // Edit booking tests: ------------------------------------------------------------------
 
     // GetWeeklyBookingsAsync-tests --------------------------------------------------------V
 
@@ -553,4 +404,364 @@ public class BookingServiceTests
         Assert.AreEqual("New note", updated.BookingNotes);
     }
     // edit booking--------------------------------------------------------------------------
+    // Get all bookings--------------------------------------------------------------------------
+
+    [TestMethod]
+    public async Task GetAllBookingsAsync_WhenNoBookingsExist_ReturnsEmptyList()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDb();
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        // Act
+        var result = await service.GetAllBookingsAsync();
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.IsEmpty(result);
+    }
+
+    [TestMethod]
+    public async Task GetAllBookingsAsync_WhenBookingExists_ReturnsCorrectData()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDb();
+
+        var booking = new Booking
+        {
+            AmountOfGuests = 4,
+            Status = BookingStatus.Confirmed,
+            DateBooked = new DateTime(2026, 5, 1),
+            StartTime = new DateTime(2026, 5, 10, 18, 0, 0),
+            EndTime = new DateTime(2026, 5, 10, 20, 0, 0),
+            BookingNotes = "Window seat",
+            Guest = new Guest
+            {
+                FirstName = "Test",
+                LastName = "Testsson",
+                Email = "test@test.se"
+            },
+            Tables = new List<Table>
+        {
+            new Table
+            {
+                TableNumber = 7,
+                Seats = 4
+            }
+        }
+        };
+
+        ctx.Bookings.Add(booking);
+        await ctx.SaveChangesAsync();
+
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        // Act
+        var result = await service.GetAllBookingsAsync();
+
+        // Assert
+        Assert.HasCount(1, result);
+
+        var returnedBooking = result.First();
+
+        Assert.AreEqual("Test Testsson", returnedBooking.GuestName);
+        Assert.AreEqual(4, returnedBooking.AmountOfGuests);
+        Assert.AreEqual(BookingStatus.Confirmed, returnedBooking.Status);
+        Assert.AreEqual("Window seat", returnedBooking.BookingNotes);
+    }
+
+    // Get all bookings--------------------------------------------------------------------------
+
+    // Get booking by id--------------------------------------------------------------------------
+    [TestMethod]
+    public async Task GetBookingByIdAsync_WhenBookingExists_ReturnsBooking()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDb();
+
+        var booking = new Booking
+        {
+            Guest = new Guest
+            {
+                FirstName = "Test",
+                LastName = "Testsson",
+                Email = "test@test.se"
+            },
+            AmountOfGuests = 4,
+            StartTime = DateTime.Now,
+            EndTime = DateTime.Now.AddHours(2)
+        };
+
+        ctx.Bookings.Add(booking);
+        await ctx.SaveChangesAsync();
+
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        // Act
+        var result = await service.GetBookingByIdAsync(booking.Id);
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.AreEqual(booking.Id, result.BookingId);
+        Assert.AreEqual("Test Testsson", result.GuestName);
+    }
+    [TestMethod]
+    public async Task GetBookingByIdAsync_WhenBookingDoesNotExist_ReturnsNull()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDb();
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        // Act
+        var result = await service.GetBookingByIdAsync(999);
+
+        // Assert
+        Assert.IsNull(result);
+    }
+    // Get booking by id--------------------------------------------------------------------------
+
+    // Get daily bookings--------------------------------------------------------------------------
+
+
+    [TestMethod]
+    public async Task GetDailyBookingAsync_ReturnsOnlyBookingsForSpecifiedDay()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDb();
+
+        var targetDate = new DateOnly(2026, 5, 10);
+
+        ctx.Bookings.AddRange(
+            new Booking
+            {
+                Guest = new Guest { FirstName = "Test", LastName = "Testsson", Email = "test@test.se" },
+                StartTime = new DateTime(2026, 5, 10, 18, 0, 0),
+                EndTime = new DateTime(2026, 5, 10, 20, 0, 0)
+            },
+            new Booking
+            {
+                Guest = new Guest { FirstName = "Häst", LastName = "Hästsson", Email = "hest@test.se" },
+                StartTime = new DateTime(2026, 5, 11, 18, 0, 0),
+                EndTime = new DateTime(2026, 5, 11, 20, 0, 0)
+            });
+
+        await ctx.SaveChangesAsync();
+
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        // Act
+        var result = await service.GetDailyBookingAsync(targetDate);
+
+        // Assert
+        Assert.HasCount(1, result);
+    }
+
+    [TestMethod]
+    public async Task GetDailyBookingAsync_WhenNoBookingsExist_ReturnsEmptyList()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDb();
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        // Act
+        var result = await service.GetDailyBookingAsync(new DateOnly(2026, 5, 10));
+
+        // Assert
+        Assert.IsEmpty(result);
+    }
+
+    // Get daily bookings--------------------------------------------------------------------------
+
+    // Get monthly bookings--------------------------------------------------------------------------
+
+    [TestMethod]
+    public async Task GetMonthlyBookingsAsync_ReturnsOnlyBookingsForMonth()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDb();
+
+        ctx.Bookings.AddRange(
+            new Booking
+            {
+                Guest = new Guest { FirstName = "Test", LastName = "Testsson", Email = "test@test.se" },
+                StartTime = new DateTime(2026, 5, 10),
+                EndTime = new DateTime(2026, 5, 10).AddHours(2)
+            },
+            new Booking
+            {
+                Guest = new Guest { FirstName = "Häst", LastName = "Hästsson", Email = "häst@test.se" },
+                StartTime = new DateTime(2026, 6, 10),
+                EndTime = new DateTime(2026, 6, 10).AddHours(2)
+            });
+
+        await ctx.SaveChangesAsync();
+
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        // Act
+        var result = await service.GetMonthlyBookingsAsync(2026, "5");
+
+        // Assert
+        Assert.HasCount(1, result);
+    }
+
+    [TestMethod]
+    public async Task GetMonthlyBookingsAsync_AcceptsMonthName()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDb();
+
+        ctx.Bookings.Add(new Booking
+        {
+            Guest = new Guest
+            {
+                FirstName = "Test",
+                LastName = "Guest",
+                Email = "test@test.se"
+            },
+            StartTime = new DateTime(2026, 5, 15),
+            EndTime = new DateTime(2026, 5, 15).AddHours(2)
+        });
+
+        await ctx.SaveChangesAsync();
+
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        // Act
+        var result = await service.GetMonthlyBookingsAsync(2026, "May");
+
+        // Assert
+        Assert.HasCount(1, result);
+    }
+
+    // Get monthly bookings--------------------------------------------------------------------------
+
+    // Get booking date--------------------------------------------------------------------------
+
+    [TestMethod]
+    public async Task GetBookingDateAsync_ReturnsCorrectDateAndTime()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDb();
+
+        var booking = new Booking
+        {
+            DateBooked = new DateTime(2026, 5, 1),
+            StartTime = new DateTime(2026, 5, 10, 18, 0, 0),
+            EndTime = new DateTime(2026, 5, 10, 20, 0, 0)
+        };
+
+        ctx.Bookings.Add(booking);
+        await ctx.SaveChangesAsync();
+
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        // Act
+        var result = await service.GetBookingDateAsync(booking.Id);
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.AreEqual("18:00 - 20:00", result.Timespan);
+    }
+
+    // Get booking date--------------------------------------------------------------------------
+
+    // Get bookings by email--------------------------------------------------------------------------
+
+    [TestMethod]
+    public async Task GetBookingsByEmailAsync_ReturnsMatchingBookings()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDb();
+
+        ctx.Bookings.AddRange(
+            new Booking
+            {
+                Guest = new Guest
+                {
+                    FirstName = "Test",
+                    LastName = "Testsson",
+                    Email = "test@test.se"
+                },
+                StartTime = DateTime.Now,
+                EndTime = DateTime.Now.AddHours(2)
+            },
+            new Booking
+            {
+                Guest = new Guest
+                {
+                    FirstName = "Häst",
+                    LastName = "Hästsson",
+                    Email = "hest@test.se"
+                },
+                StartTime = DateTime.Now,
+                EndTime = DateTime.Now.AddHours(2)
+            });
+
+        await ctx.SaveChangesAsync();
+
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        // Act
+        var result = await service.GetBookingsByEmailAsync("test@test.se");
+
+        // Assert
+        Assert.HasCount(1, result);
+    }
+
+    // Get bookings by email--------------------------------------------------------------------------
+
+    // Delete Booking--------------------------------------------------------------------------
+
+    [TestMethod]
+    public async Task DeleteBookingByIdAsync_WhenBookingExists_DeletesBooking()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDb();
+
+        var booking = new Booking
+        {
+            StartTime = DateTime.Now,
+            EndTime = DateTime.Now.AddHours(2),
+            Guest = new Guest
+            {
+                FirstName = "Test",
+                LastName = "Testsson",
+                Email = "test@test.se"
+            }
+        };
+
+        ctx.Bookings.Add(booking);
+        await ctx.SaveChangesAsync();
+
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        // Act
+        var result = await service.DeleteBookingByIdAsync(booking.Id);
+
+        // Assert
+        Assert.IsTrue(result.Success);
+
+        var deletedBooking = await ctx.Bookings.FindAsync(booking.Id);
+
+        Assert.IsNull(deletedBooking);
+    }
+
+    [TestMethod]
+    public async Task DeleteBookingByIdAsync_WhenBookingDoesNotExist_ReturnsError()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDb();
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        // Act
+        var result = await service.DeleteBookingByIdAsync(999);
+
+        // Assert
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ErrorType.GuestNotFound, result.ErrorType);
+    }
+
+    // Delete Booking--------------------------------------------------------------------------
+
 }
