@@ -129,4 +129,77 @@ public class GuestControllerTests
         //Assert
         Assert.IsInstanceOfType(result, typeof(OkObjectResult));
     }
+    [TestMethod]
+    public async Task GetAllGuests_WhenNoGuestsExist_ShouldReturnNotFound()
+    {
+        //Arrange
+        var mockService = new Mock<IGuestService>();
+        var controller = new GuestController(null!, mockService.Object);
+
+        mockService.Setup(s => s.GetAllGuestsAsync())
+            .ReturnsAsync(new List<GetGuestResponse>());
+
+        //Act
+        var result = await controller.GetAllGuests();
+
+        //Assert
+        Assert.IsInstanceOfType(result, typeof(NotFoundObjectResult));
+    }
+
+    [TestMethod]
+    public async Task DeleteGuest_WhenGuestDoesNotExist_ShouldReturnNotFound()
+    {
+        //Arrange
+        var mockService = new Mock<IGuestService>();
+        mockService.Setup(s => s.DeleteGuestByIdAsync(50))
+            .ReturnsAsync(new ServiceResult
+            {
+                Success = false,
+                ErrorType = ErrorType.GuestNotFound
+            });
+        var controller = new GuestController(null!, mockService.Object);
+
+        //Act
+        var result = await controller.DeleteGuest(50);
+
+        //Assert
+        Assert.IsInstanceOfType(result, typeof(NotFoundObjectResult));
+    }
+
+    [TestMethod]
+    public async Task DeleteGuest_WhenGuestExists_ShouldReturnOk()
+    {
+        //Arrange
+        var mockService = new Mock<IGuestService>();
+        mockService.Setup(s => s.DeleteGuestByIdAsync(1))
+            .ReturnsAsync(new ServiceResult
+            {
+                Success = true
+            });
+
+        var controller = new GuestController(null!, mockService.Object);
+
+        //Act
+        var result = await controller.DeleteGuest(1);
+
+        //Assert
+        Assert.IsInstanceOfType(result, typeof(OkObjectResult));
+    }
+
+    [TestMethod]
+    public async Task GetGuestByEmail_WhenEmailDoesNotExist_ShouldReturnNotFound()
+    {
+        //Arrange
+        var mockService = new Mock<IGuestService>();
+        mockService.Setup(s => s.GetGuestByEmailAsync("blabla@mail.com"))
+            .ReturnsAsync((Guest?)null);
+
+        var controller = new GuestController(null!, mockService.Object);
+
+        //Act
+        var result = await controller.GetGuestByEmail("blabla@mail.com");
+
+        //Assert
+        Assert.IsInstanceOfType(result, typeof(NotFoundObjectResult));
+    }
 }
