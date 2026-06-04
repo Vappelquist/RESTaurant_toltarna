@@ -520,7 +520,7 @@ public class BookingServiceTests
     }
     // Get booking by id--------------------------------------------------------------------------
 
-    // Get daily booking--------------------------------------------------------------------------
+    // Get daily bookings--------------------------------------------------------------------------
 
 
     [TestMethod]
@@ -570,6 +570,38 @@ public class BookingServiceTests
         Assert.IsEmpty(result);
     }
 
-    // Get daily booking--------------------------------------------------------------------------
+    // Get daily bookings--------------------------------------------------------------------------
+
+    // Get monthly bookings--------------------------------------------------------------------------
+
+    [TestMethod]
+    public async Task GetMonthlyBookingsAsync_ReturnsOnlyBookingsForMonth()
+    {
+        var ctx = CreateInMemoryDb();
+
+        ctx.Bookings.AddRange(
+            new Booking
+            {
+                Guest = new Guest { FirstName = "Test", LastName = "Testsson", Email = "test@test.se" },
+                StartTime = new DateTime(2026, 5, 10),
+                EndTime = new DateTime(2026, 5, 10).AddHours(2)
+            },
+            new Booking
+            {
+                Guest = new Guest { FirstName = "Häst", LastName = "Hästsson", Email = "häst@test.se" },
+                StartTime = new DateTime(2026, 6, 10),
+                EndTime = new DateTime(2026, 6, 10).AddHours(2)
+            });
+
+        await ctx.SaveChangesAsync();
+
+        var service = new BookingService(ctx, new Mock<ITableService>().Object);
+
+        var result = await service.GetMonthlyBookingsAsync(2026, "5");
+
+        Assert.HasCount(1, result);
+    }
+
+    // Get monthly bookings--------------------------------------------------------------------------
 
 }
