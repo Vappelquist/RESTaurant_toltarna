@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Restaurant.API.Controllers;
+using Restaurant.API.DTOs;
 using Restaurant.API.Services;
 using Restaurant.API.Services.Enums;
 using static Restaurant.API.DTOs.Booking;
@@ -204,4 +205,44 @@ public class BookingControllerTests
 
     // GetWeeklyBookings-tests ---------------------------------------------------------------^
 
+
+    //GetAllBookings-Test -----------------
+    [TestMethod]
+    public async Task GetAllBookings_WithExistingBookings_ReturnOk()
+    {
+        //Arrange
+        var mockBookingService = new Mock<IBookingService>();
+        mockBookingService
+            .Setup(s => s.GetAllBookingsAsync())
+            .ReturnsAsync(new List<GetAllBookingResponse>
+            {
+                new GetAllBookingResponse()
+            });
+        var controller = new BookingController(mockBookingService.Object);
+
+        //Act
+        var result = await controller.GetAllBookings();
+
+        //Assert
+        Assert.IsInstanceOfType(result, typeof(OkObjectResult));
+    }
+
+    [TestMethod]
+    public async Task GetAllBooking_WithNoBookings_ReturnsNotFound()
+    {
+        //Arrange
+        var mockBuildingService = new Mock<IBookingService>();
+        mockBuildingService
+            .Setup(s => s.GetAllBookingsAsync())
+            .ReturnsAsync(new List<GetAllBookingResponse>());
+        var controller = new BookingController(mockBuildingService.Object);
+
+        //Act
+        var result = await controller.GetAllBookings();
+
+        //Assert
+        Assert.IsInstanceOfType(result, typeof(NotFoundObjectResult));
+
+    }
+    
 }
