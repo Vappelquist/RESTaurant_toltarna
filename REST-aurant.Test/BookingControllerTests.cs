@@ -244,5 +244,37 @@ public class BookingControllerTests
         Assert.IsInstanceOfType(result, typeof(NotFoundObjectResult));
 
     }
-    
+    //GetBookingsById ----------------
+    [TestMethod]
+    public async Task GetBookingById_SearchWithExistingId_ReturnsOk()
+    {
+        //Arrange
+        var mockBuildingService = new Mock<IBookingService>();
+        mockBuildingService
+        .Setup(s => s.GetBookingByIdAsync(It.IsAny<int>()))
+        .ReturnsAsync(new GetAllBookingResponse());
+        var controller = new BookingController(mockBuildingService.Object);
+        //Act
+        var result = await controller.GetBookingById(1);
+
+        //Arrange
+        Assert.IsInstanceOfType(result, typeof(OkObjectResult));
+
+    }
+    [TestMethod]
+    public async Task GetBookingById_SearchWithNonExistingId_ReturnsOk()
+    {
+        //Arrange
+        var mockBuildingService = new Mock<IBookingService>();
+        mockBuildingService
+            .Setup(s => s.GetBookingByIdAsync(It.IsAny<int>()))
+        .ReturnsAsync((GetAllBookingResponse?)null);
+        var controller = new BookingController(mockBuildingService.Object);
+        //Act
+        var result = await controller.GetBookingById(99);
+
+        //Arrange
+        Assert.IsInstanceOfType(result, typeof(NotFoundResult));
+
+    }
 }
