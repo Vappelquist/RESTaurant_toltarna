@@ -80,7 +80,7 @@ namespace Restaurant.API.Controllers
             {
                 return NotFound("No guest found with this email.");
             }
-            return Ok($"Id: {guest.Id}");
+            return Ok(guest);
         }
 
         [HttpDelete("{id}")]
