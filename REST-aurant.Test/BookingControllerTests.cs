@@ -257,7 +257,7 @@ public class BookingControllerTests
         //Act
         var result = await controller.GetBookingById(1);
 
-        //Arrange
+        //Assert
         Assert.IsInstanceOfType(result, typeof(OkObjectResult));
 
     }
@@ -275,6 +275,40 @@ public class BookingControllerTests
 
         //Arrange
         Assert.IsInstanceOfType(result, typeof(NotFoundResult));
+    }
 
+    //GetDailyBookings tests ------------------------
+    [TestMethod]
+    public async Task GetDailyBookings_SearchWithExistingDate_ReturnsOk()
+    {
+        //Arrange
+        var mockBuildingService = new Mock<IBookingService>();
+        mockBuildingService
+        .Setup(s => s.GetDailyBookingAsync(It.IsAny<DateOnly>()))
+            .ReturnsAsync(new List<GetAllBookingResponse>
+                {
+                    new GetAllBookingResponse()
+                });
+        var controller = new BookingController(mockBuildingService.Object);
+
+        //Act
+        var result = await controller.GetDailyBookings(new DateOnly(2026, 07, 11));
+        //Assert
+        Assert.IsInstanceOfType(result, typeof(OkObjectResult));
+    }
+    [TestMethod]
+    public async Task GetDailyBookings_WithNoBookingsOnDate_ReturnsNotFound()
+    {
+        //Arrange
+        var mockBuildingService = new Mock<IBookingService>();
+        mockBuildingService
+    .Setup(s => s.GetDailyBookingAsync(It.IsAny<DateOnly>()))
+    .ReturnsAsync(new List<GetAllBookingResponse>());
+        var controller = new BookingController(mockBuildingService.Object);
+
+        //Act
+        var result = await controller.GetDailyBookings(new DateOnly(2027, 07, 11));
+        //Assert
+        Assert.IsInstanceOfType(result, typeof(NotFoundObjectResult));
     }
 }
