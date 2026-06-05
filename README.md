@@ -228,5 +228,6 @@ Enter guest id, ex. "50".
   "password": null
 }
   ```
-
+## Teststrategi and result
+[Teststrategi och resultat (PDF)](Teststrategi%20och%20resultat.pdf)
 
