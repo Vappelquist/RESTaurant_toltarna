@@ -14,14 +14,15 @@ A booking is always connected to both a guest and a table
 
 API structure:
 
-User
+Booking
 ----------------------------------
 
 GET /api/Booking: 
 
 Get all bookings in the database.
 
-´´´Json
+*Response*
+```Json
 {
     "bookingId": 1,
     "guestName": "Anna Andersson",
@@ -37,6 +38,60 @@ Get all bookings in the database.
       1
     ]
   }
-  ´´´
+  ```
 
 ----------------------------------
+
+POST /api/Booking
+
+Place a new booking.
+
+*Request*
+```Json
+{
+  "firstName": "Hugo",
+  "lastName": "Jansson",
+  "bookingNotes": "string",
+  "email": "hugo_jansson@example.com",
+  "phoneNumber": "0701234560",
+  "amountOfGuests": 2,
+  "bookingDate": "2026-08-05",
+  "startTime": "19:00"
+}
+```
+
+*Response*
+```Json
+{
+  "message": "Thank you, your booking has been received!",
+  "bookingId": 50
+}
+```
+
+----------------------------------
+
+Get /api/Booking/[id}
+
+Get booking by id.
+
+*Request*
+50
+
+*Response*
+```Json
+{
+  "bookingId": 50,
+  "guestName": "Hugo Jansson",
+  "amountOfGuests": 2,
+  "status": "Pending",
+  "dateBooked": "2026-06-05",
+  "startDate": "2026-08-05",
+  "startTime": "19:00:00",
+  "endDate": "2026-08-05",
+  "endTime": "21:00:00",
+  "bookingNotes": "string",
+  "tableNumbers": [
+    2
+  ]
+}
+```
