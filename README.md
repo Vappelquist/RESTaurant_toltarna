@@ -1,3 +1,5 @@
+A REST API for a restaurant reservation system called REST-aurant. The system is designed for use by both customers making table reservations and restaurant staff responsible for managing bookings.
+
 Database structure:
 
 User 
