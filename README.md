@@ -9,7 +9,7 @@ Bookings
   connection between Booking and Guest 
 
 Tables 
-– Stores TableNumber and Seats
+- Stores TableNumber and Seats
 
 BookingTables 
 - stores which tables a guest has booked with BookingsId and TablesTableId
