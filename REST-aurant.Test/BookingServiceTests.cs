@@ -147,7 +147,7 @@ public class BookingServiceTests
         var result = await service.GetWeeklyBookingsAsync(2026, 10);
 
         // Assert
-        Assert.AreEqual(1, result.Count); // We expect only 1 booking in the result
+        Assert.HasCount(1, result); // We expect only 1 booking in the result
         Assert.AreEqual(bookingInWeek.Id, result.First().BookingId); // And it should be the one from week 10.
     }
 
@@ -163,7 +163,7 @@ public class BookingServiceTests
 
         // Assert
         Assert.IsNotNull(result);
-        Assert.AreEqual(0, result.Count); // The list should be empty
+        Assert.HasCount(0, result); // The list should be empty
     }
 
     // GetWeeklyBookingsAsync-tests --------------------------------------------------------^

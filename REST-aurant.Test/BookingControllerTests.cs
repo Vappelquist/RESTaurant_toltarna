@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Restaurant.API.Controllers;
-using Restaurant.API.DTOs;
 using Restaurant.API.Services;
 using Restaurant.API.Services.Enums;
 using static Restaurant.API.DTOs.Booking;
