@@ -3,7 +3,6 @@ using Restaurant.API.Data;
 using Restaurant.API.Services.Enums;
 using Restaurant.Models.Models;
 using static Restaurant.API.DTOs.GuestDTOs;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Restaurant.API.Services
 {

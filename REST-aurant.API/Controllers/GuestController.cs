@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Restaurant.API.Data;
 using Restaurant.API.Services;
 using Restaurant.API.Services.Enums;
-using Restaurant.Models.Models;
 using static Restaurant.API.DTOs.GuestDTOs;
 
 namespace Restaurant.API.Controllers

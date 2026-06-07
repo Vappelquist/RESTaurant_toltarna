@@ -82,7 +82,7 @@ namespace Restaurant.API.Services
             }
             if (seatsNeeded > 0)
             {
-                // If we do not have enough seats in the resturant, we'll return an enmpty list. 
+                // If we do not have enough seats in the resturant, we'll return an empty list. 
                 return new List<Table>();
             }
 

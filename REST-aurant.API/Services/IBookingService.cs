@@ -1,12 +1,10 @@
 ﻿using Restaurant.API.DTOs;
-using Restaurant.Models.Models.Enums;
 using static Restaurant.API.DTOs.Booking;
 
 namespace Restaurant.API.Services
 {
     public interface IBookingService
     {
-        //Task<(Guest? guest, string? errorMessage)> GetOrCreateGuestAsync(PlaceBookingRequest request);
         Task<ServiceResult> PlaceBookingAsync(PlaceBookingRequest request);
         Task<List<GetAllBookingResponse>> GetAllBookingsAsync();
         Task<GetAllBookingResponse?> GetBookingByIdAsync(int id);

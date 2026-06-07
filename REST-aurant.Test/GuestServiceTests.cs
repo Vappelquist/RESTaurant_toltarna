@@ -1,12 +1,8 @@
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Moq;
-using Restaurant.API.Controllers;
 using Restaurant.API.Data;
 using Restaurant.API.Services;
 using Restaurant.Models.Models;
 using Restaurant.API.Services.Enums;
-using System.ComponentModel.DataAnnotations;
 using static Restaurant.API.DTOs.GuestDTOs;
 
 namespace Restaurant.Test;
@@ -149,7 +145,7 @@ public class GuestServiceTests
 
         //Assert
         Assert.IsNotNull(result);
-        Assert.AreEqual(0, result.Count);
+        Assert.HasCount(0, result);
     }
 
     [TestMethod]
@@ -244,9 +240,6 @@ public class GuestServiceTests
         //Arrange
         var ctx = CreateInMemoryDb();
         var service = new GuestService(ctx);
-
-        //ctx.Guests.Add(new Guest { Email = "Annie@mail.com" });
-        //await ctx.SaveChangesAsync();
 
         //Act
         var result = await service.GetGuestByEmailAsync("bobobo@mail.com");

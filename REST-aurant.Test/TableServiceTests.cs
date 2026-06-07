@@ -159,7 +159,7 @@ public class TableServiceTests
         var result = await service.GetAllTablesAsync();
 
         //Assert
-        Assert.AreEqual(3, result.Count);
+        Assert.HasCount(3, result);
         Assert.AreEqual(1, result[0].TableNumber);
         Assert.AreEqual(2, result[1].TableNumber);
         Assert.AreEqual(3, result[2].TableNumber);
@@ -176,7 +176,7 @@ public class TableServiceTests
         var result = await service.GetAllTablesAsync();
         
         //Assert
-        Assert.AreEqual(0, result.Count);
+        Assert.HasCount(0, result);
     }
 
     [TestMethod]
@@ -192,7 +192,7 @@ public class TableServiceTests
         var result = await service.GetAllTablesAsync();
         
         //Assert
-        Assert.AreEqual(1, result.Count);
+        Assert.HasCount(1, result);
     }
     [TestMethod]
     public async Task GetAllTablesAsync_WithMultipleTables_ReturnsDtoWithCorrectValues()
