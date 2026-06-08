@@ -46,6 +46,7 @@ namespace Restaurant.API.DTOs
         public record GetGuestResponse : GuestBaseDTO
         {
             public int Id { get; init; }
+            public List<int> BookingIds { get; init; } = new();
             public List<BookingStatus> BookingStatuses { get; init; } = new();
         }
     }
