@@ -91,9 +91,22 @@ namespace Restaurant.API.Services
                 Data = guest
             };
         }
-        public async Task<Guest?> GetGuestByEmailAsync(string email)
+        public async Task<GetGuestResponse?> GetGuestByEmailAsync(string email)
         {
-            return await _context.Guests.FirstOrDefaultAsync(g => g.Email == email);
+            return await _context.Guests
+                .AsNoTracking()
+        .Where(g => g.Email == email)
+        .Select(g => new GetGuestResponse
+        {
+            Id = g.Id,
+            FirstName = g.FirstName,
+            LastName = g.LastName,
+            Email = g.Email,
+            PhoneNumber = g.PhoneNumber,
+            BookingIds = g.Bookings!.Select(b => b.Id).ToList(),
+            BookingStatuses = g.Bookings!.Select(b => b.Status).ToList()
+        })
+        .FirstOrDefaultAsync();
         }
 
         public async Task<ServiceResult> DeleteGuestByIdAsync(int id)
